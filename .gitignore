@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# reference media (prevent bundle inclusion)
+*.mp4
+*.mov
+*.webm
+*.avi

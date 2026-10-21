@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg-primary: #1f5e44;
+    --bg-paper: #ecece2;
+    --fg-primary: #f0f1e6;
+    --fg-muted: #a8cebc;
+    --fg-dim: rgba(240, 241, 230, 0.65);
+    --line-subtle: rgba(168, 206, 188, 0.22);
+    --line-active: #d0e5d3;
+    --btn-surface: #25231b;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--fg-primary);
+    font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Subtle architectural paper noise texture overlay */
+.paper-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+/* Vertical guide lines */
+.grid-lines {
+  background-size: calc(100% / 8) 100%;
+  background-image: linear-gradient(
+    to right,
+    rgba(168, 206, 188, 0.07) 1px,
+    transparent 1px
+  );
+}
+
+@media (min-width: 1024px) {
+  .grid-lines {
+    background-size: calc(100% / 10) 100%;
+  }
+}
+
+/* Custom keyframes for schematic animation & intro sequence */
+@keyframes curtainDrop {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(105%);
+  }
+}
+
+@keyframes schematicRotateSlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes schematicRotateReverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes dashFlow {
+  to {
+    stroke-dashoffset: -200;
+  }
+}
+
+.animate-rotate-slow {
+  animation: schematicRotateSlow 40s linear infinite;
+  transform-origin: center;
+}
+
+.animate-rotate-reverse {
+  animation: schematicRotateReverse 32s linear infinite;
+  transform-origin: center;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 4s ease-in-out infinite;
+}
+
+.animate-dash-flow {
+  animation: dashFlow 20s linear infinite;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
