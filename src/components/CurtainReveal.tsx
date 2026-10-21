@@ -30,7 +30,7 @@ export const CurtainReveal: React.FC<CurtainRevealProps> = ({ onComplete }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 pointer-events-none flex w-full h-full overflow-hidden"
+      className="fixed inset-0 z-50 pointer-events-none flex w-full h-full overflow-hidden font-body"
       aria-hidden="true"
     >
       {columns.map((index) => {
@@ -47,8 +47,8 @@ export const CurtainReveal: React.FC<CurtainRevealProps> = ({ onComplete }) => {
               willChange: "transform",
             }}
           >
-            {/* Subtle vertical measurement notch on each column */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-mono tracking-widest text-[#7a7a72] opacity-40 select-none">
+            {/* Subtle vertical measurement notch on each column (Manrope 500) */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-medium tracking-widest text-[#7a7a72] opacity-40 select-none">
               {(index + 1).toString().padStart(2, "0")}
             </div>
           </div>
