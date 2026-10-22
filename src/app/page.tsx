@@ -10,10 +10,13 @@ import { Section03Showcase } from "@/components/Section03Showcase";
 import { Section04HomeTour } from "@/components/Section04HomeTour";
 import { FinalCta } from "@/components/FinalCta";
 
+const WORDMARK_PROBE_Y = 24;
+
 export default function Home() {
   const [stage, setStage] = useState<number>(0);
   const [contactOpen, setContactOpen] = useState(false);
   const [navTheme, setNavTheme] = useState<"dark" | "light">("dark");
+  const [wordmarkSplit, setWordmarkSplit] = useState<number | null>(null);
   const [overlayProgress, setOverlayProgress] = useState<number>(0);
 
   const transitionTrackRef = useRef<HTMLDivElement>(null);
@@ -36,10 +39,9 @@ export default function Home() {
     };
   }, []);
 
-  // Scroll listener to calculate overlay sliding progress and dynamic navigation contrast
+  // Scroll listener to calculate the ivory overlay progress and wordmark contrast.
   useEffect(() => {
     const handleScroll = () => {
-      // 1. Calculate overlay progress across the pinned stage's travel within the 200vh track
       let scrollProgress = 0;
       if (transitionTrackRef.current && pinnedStageRef.current) {
         const rect = transitionTrackRef.current.getBoundingClientRect();
@@ -51,25 +53,49 @@ export default function Home() {
           setOverlayProgress(scrollProgress);
         }
 
-        // 2. Derive the ivory panel's position from the track geometry rather than its
-        // transformed rect, which lags a frame behind scrollProgress during large jumps.
         const stageRect = pinnedStageRef.current.getBoundingClientRect();
         const panelTop = stageRect.top + (1 - scrollProgress) * stageRect.height;
-        const panelBottom = panelTop + stageRect.height;
-        let isLight = panelTop <= 80 && panelBottom >= 60;
+        const stageCoversWordmark =
+          stageRect.top <= WORDMARK_PROBE_Y && stageRect.bottom >= WORDMARK_PROBE_Y;
 
-        // 3. The buyer section is ivory, except for the dark interior viewport.
-        const buyer = document.getElementById("buyer-experience");
-        if (buyer) {
-          const b = buyer.getBoundingClientRect();
-          if (b.top <= 80 && b.bottom >= 60) {
-            const visual = document.getElementById("buyer-visual");
-            const v = visual?.getBoundingClientRect();
-            isLight = !(v && v.top <= 80 && v.bottom >= 60);
+        let onLightBackground = false;
+        let nextWordmarkSplit: number | null = null;
+
+        if (stageCoversWordmark) {
+          const wordmark = document.getElementById("wordmark");
+          if (wordmark) {
+            const wordmarkRect = wordmark.getBoundingClientRect();
+            const split = Math.min(
+              Math.max(panelTop - wordmarkRect.top, 0),
+              wordmarkRect.height,
+            );
+
+            if (split >= wordmarkRect.height) {
+              onLightBackground = false;
+            } else if (split <= 0) {
+              onLightBackground = true;
+            } else {
+              nextWordmarkSplit = split;
+              onLightBackground = false;
+            }
           }
+        } else {
+          const sectionAtProbe = (id: string) => {
+            const section = document.getElementById(id);
+            if (!section) return false;
+            const bounds = section.getBoundingClientRect();
+            return bounds.top <= WORDMARK_PROBE_Y && bounds.bottom >= WORDMARK_PROBE_Y;
+          };
+
+          if (sectionAtProbe("interactive-showcase")) onLightBackground = false;
+          else if (sectionAtProbe("buyer-experience")) onLightBackground = true;
+          else if (sectionAtProbe("contact")) onLightBackground = false;
         }
-        setNavTheme(isLight ? "light" : "dark");
+
+        setWordmarkSplit(nextWordmarkSplit);
+        setNavTheme(onLightBackground ? "light" : "dark");
       } else {
+        setWordmarkSplit(null);
         setNavTheme("dark");
       }
     };
@@ -79,16 +105,14 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleExploreClick = () => {
-    if (transitionTrackRef.current && pinnedStageRef.current) {
-      const totalDistance =
-        transitionTrackRef.current.offsetHeight - pinnedStageRef.current.offsetHeight;
-      const targetY = transitionTrackRef.current.offsetTop + totalDistance;
-      window.scrollTo({
-        top: targetY,
-        behavior: "smooth",
-      });
+  const handleContactClick = () => {
+    const contactSection = document.getElementById("contact");
+    if (contactSection) {
+      const top = contactSection.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top, behavior: "smooth" });
+      return;
     }
+    setContactOpen(true);
   };
 
   return (
@@ -96,19 +120,13 @@ export default function Home() {
       {/* 1. Opening Curtain Wave Reveal (Exact recreation of Crosswalk intro) */}
       <CurtainReveal onComplete={() => setStage((prev) => Math.max(prev, 1))} />
 
-      {/* 2. Fixed Persistent Navigation (Seamless across Hero & Section 02 with dynamic theme) */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-1000 ease-out pointer-events-none ${
-          stage >= 2 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
-        }`}
-      >
-        <Navigation
-          theme={navTheme}
-          glassProgress={overlayProgress}
-          onContactClick={() => setContactOpen(true)}
-          onExploreClick={handleExploreClick}
-        />
-      </div>
+      {/* 2. Top page marks: the wordmark and Contact action sit directly on the artwork. */}
+      <Navigation
+        theme={navTheme}
+        visible={stage >= 2}
+        wordmarkSplit={wordmarkSplit}
+        onContactClick={handleContactClick}
+      />
 
       {/* =========================================================================
           TRANSITION STAGE: HERO & UPWARD SLIDING IVORY OVERLAY
@@ -157,10 +175,7 @@ export default function Home() {
                 stage >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
             >
-              <HeroTypography
-                onExploreClick={handleExploreClick}
-                onContactClick={() => setContactOpen(true)}
-              />
+              <HeroTypography />
             </div>
           </section>
 

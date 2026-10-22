@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Worldsmith — Digital Worlds for Real Estate",
+  title: "WorldSmith",
   description:
     "We transform architectural plans, renders and project assets into interactive places buyers can explore before they visit.",
   keywords: [
