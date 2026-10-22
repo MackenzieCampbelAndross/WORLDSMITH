@@ -39,24 +39,25 @@ export default function Home() {
   useEffect(() => {
     const handleScroll = () => {
       // 1. Calculate overlay progress across the pinned stage's travel within the 200vh track
+      let scrollProgress = 0;
       if (transitionTrackRef.current && pinnedStageRef.current) {
         const rect = transitionTrackRef.current.getBoundingClientRect();
         const totalDistance =
           transitionTrackRef.current.offsetHeight - pinnedStageRef.current.offsetHeight;
         if (totalDistance > 0) {
           const scrolled = -rect.top;
-          const progress = Math.min(Math.max(scrolled / totalDistance, 0), 1);
-          setOverlayProgress(progress);
+          scrollProgress = Math.min(Math.max(scrolled / totalDistance, 0), 1);
+          setOverlayProgress(scrollProgress);
         }
-      }
 
-      // 2. Check which section intersects the top navbar zone (approx y=80px)
-      const manifestoEl = document.getElementById("manifesto-panel");
-
-      if (manifestoEl) {
-        const r = manifestoEl.getBoundingClientRect();
-        const isOverLight = r.top <= 80 && r.bottom >= 60;
-        setNavTheme(isOverLight ? "light" : "dark");
+        // 2. Derive the ivory panel's position from the track geometry rather than its
+        // transformed rect, which lags a frame behind scrollProgress during large jumps.
+        const stageRect = pinnedStageRef.current.getBoundingClientRect();
+        const panelTop = stageRect.top + (1 - scrollProgress) * stageRect.height;
+        const panelBottom = panelTop + stageRect.height;
+        setNavTheme(panelTop <= 80 && panelBottom >= 60 ? "light" : "dark");
+      } else {
+        setNavTheme("dark");
       }
     };
 
