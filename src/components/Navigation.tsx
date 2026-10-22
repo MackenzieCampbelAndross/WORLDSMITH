@@ -19,16 +19,14 @@ export const Navigation: React.FC<NavigationProps> = ({
 
   const isLight = theme === "light";
   const glassSurface = isLight
-    ? "border-[#1f6651]/10 bg-[#f7f5ea]/70 shadow-[0_18px_50px_-28px_rgba(23,63,50,0.45)]"
-    : "border-[#f0f1e6]/10 bg-[#081c14]/50 shadow-[0_18px_60px_-24px_rgba(0,0,0,0.65)]";
+    ? `border-[#1f6651]/10 ${glass ? "bg-[#f4f2e8]/45" : "bg-[#f4f2e8]/35"}`
+    : `border-[#f0f1e6]/10 ${glass ? "bg-[#081c14]/30" : "bg-[#081c14]/22"}`;
 
   return (
-    <header className="pointer-events-auto relative z-40 w-full px-5 pt-4 font-body sm:px-8 md:pt-5 lg:px-11">
-      <div
-        className={`mx-auto flex w-full items-center justify-between rounded-full border px-3 py-2 transition-all duration-500 ease-out sm:px-4 ${
-          glass ? `backdrop-blur-2xl backdrop-saturate-150 ${glassSurface}` : "border-transparent bg-transparent shadow-none"
-        }`}
-      >
+    <header
+      className={`pointer-events-auto relative z-40 flex h-[68px] w-full items-center border-b px-6 font-body backdrop-blur-[16px] backdrop-saturate-[1.2] transition-colors duration-500 sm:px-10 md:h-[76px] lg:px-14 ${glassSurface}`}
+    >
+      <div className="flex w-full items-center justify-between">
       {/* Brand Identity: Clean Wordmark Only (Space Grotesk 700) */}
       <a
         href="#"
