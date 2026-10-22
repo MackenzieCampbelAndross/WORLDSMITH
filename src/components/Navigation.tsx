@@ -6,27 +6,31 @@ interface NavigationProps {
   onContactClick?: () => void;
   onExploreClick?: () => void;
   theme?: "dark" | "light";
-  glass?: boolean;
+  glassProgress?: number;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
   onContactClick,
   onExploreClick,
   theme = "dark",
-  glass = false,
+  glassProgress = 0,
 }) => {
   const [activeItem, setActiveItem] = useState<string | null>(null);
 
   const isLight = theme === "light";
+  const glassAmount = Math.min(1, Math.max(0, glassProgress));
   const glassSurface = isLight
-    ? `border-[#1f6651]/10 ${glass ? "bg-[#f4f2e8]/45" : "bg-[#f4f2e8]/35"}`
-    : `border-[#f0f1e6]/10 ${glass ? "bg-[#081c14]/30" : "bg-[#081c14]/22"}`;
+    ? "border-[#1f6651]/10 bg-[#f4f2e8]/45"
+    : "border-[#f0f1e6]/10 bg-[#081c14]/30";
 
   return (
-    <header
-      className={`pointer-events-auto relative z-40 flex h-[68px] w-full items-center border-b px-6 font-body backdrop-blur-[16px] backdrop-saturate-[1.2] transition-colors duration-500 sm:px-10 md:h-[76px] lg:px-14 ${glassSurface}`}
-    >
-      <div className="flex w-full items-center justify-between">
+    <header className="pointer-events-auto relative z-40 flex h-[68px] w-full items-center px-6 font-body sm:px-10 md:h-[76px] lg:px-14">
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-0 border-b backdrop-blur-[16px] backdrop-saturate-[1.2] transition-colors duration-500 ${glassSurface}`}
+        style={{ opacity: glassAmount }}
+      />
+      <div className="relative z-10 flex w-full items-center justify-between">
       {/* Brand Identity: Clean Wordmark Only (Space Grotesk 700) */}
       <a
         href="#"

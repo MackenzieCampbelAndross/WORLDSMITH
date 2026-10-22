@@ -13,7 +13,6 @@ export default function Home() {
   const [stage, setStage] = useState<number>(0);
   const [contactOpen, setContactOpen] = useState(false);
   const [navTheme, setNavTheme] = useState<"dark" | "light">("dark");
-  const [navGlass, setNavGlass] = useState(false);
   const [overlayProgress, setOverlayProgress] = useState<number>(0);
 
   const transitionTrackRef = useRef<HTMLDivElement>(null);
@@ -49,7 +48,6 @@ export default function Home() {
           const scrolled = -rect.top;
           scrollProgress = Math.min(Math.max(scrolled / totalDistance, 0), 1);
           setOverlayProgress(scrollProgress);
-          setNavGlass(scrollProgress >= 0.99);
         }
 
         // 2. Derive the ivory panel's position from the track geometry rather than its
@@ -72,7 +70,6 @@ export default function Home() {
         setNavTheme(isLight ? "light" : "dark");
       } else {
         setNavTheme("dark");
-        setNavGlass(false);
       }
     };
 
@@ -106,7 +103,7 @@ export default function Home() {
       >
         <Navigation
           theme={navTheme}
-          glass={navGlass}
+          glassProgress={overlayProgress}
           onContactClick={() => setContactOpen(true)}
           onExploreClick={handleExploreClick}
         />
