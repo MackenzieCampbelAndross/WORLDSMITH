@@ -6,19 +6,29 @@ interface NavigationProps {
   onContactClick?: () => void;
   onExploreClick?: () => void;
   theme?: "dark" | "light";
+  glass?: boolean;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
   onContactClick,
   onExploreClick,
   theme = "dark",
+  glass = false,
 }) => {
   const [activeItem, setActiveItem] = useState<string | null>(null);
 
   const isLight = theme === "light";
+  const glassSurface = isLight
+    ? "border-[#1f6651]/10 bg-[#f7f5ea]/70 shadow-[0_18px_50px_-28px_rgba(23,63,50,0.45)]"
+    : "border-[#f0f1e6]/10 bg-[#081c14]/50 shadow-[0_18px_60px_-24px_rgba(0,0,0,0.65)]";
 
   return (
-    <header className="relative z-40 w-full pt-6 md:pt-8 px-6 sm:px-10 lg:px-14 flex items-center justify-between pointer-events-auto font-body transition-colors duration-500">
+    <header className="pointer-events-auto relative z-40 w-full px-5 pt-4 font-body sm:px-8 md:pt-5 lg:px-11">
+      <div
+        className={`mx-auto flex w-full items-center justify-between rounded-full border px-3 py-2 transition-all duration-500 ease-out sm:px-4 ${
+          glass ? `backdrop-blur-2xl backdrop-saturate-150 ${glassSurface}` : "border-transparent bg-transparent shadow-none"
+        }`}
+      >
       {/* Brand Identity: Clean Wordmark Only (Space Grotesk 700) */}
       <a
         href="#"
@@ -112,6 +122,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           </span>
         </button>
       </nav>
+      </div>
     </header>
   );
 };
