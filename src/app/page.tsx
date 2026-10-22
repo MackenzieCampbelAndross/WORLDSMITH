@@ -7,7 +7,7 @@ import { ArchitecturalSchematic } from "@/components/ArchitecturalSchematic";
 import { HeroTypography } from "@/components/HeroTypography";
 import { ContactModal } from "@/components/ContactModal";
 import { Section03Showcase } from "@/components/Section03Showcase";
-import { Section04Transformation } from "@/components/Section04Transformation";
+import { Section04HomeTour } from "@/components/Section04HomeTour";
 
 export default function Home() {
   const [stage, setStage] = useState<number>(0);
@@ -55,7 +55,19 @@ export default function Home() {
         const stageRect = pinnedStageRef.current.getBoundingClientRect();
         const panelTop = stageRect.top + (1 - scrollProgress) * stageRect.height;
         const panelBottom = panelTop + stageRect.height;
-        setNavTheme(panelTop <= 80 && panelBottom >= 60 ? "light" : "dark");
+        let isLight = panelTop <= 80 && panelBottom >= 60;
+
+        // 3. The buyer section is ivory, except for the dark interior viewport.
+        const buyer = document.getElementById("buyer-experience");
+        if (buyer) {
+          const b = buyer.getBoundingClientRect();
+          if (b.top <= 80 && b.bottom >= 60) {
+            const visual = document.getElementById("buyer-visual");
+            const v = visual?.getBoundingClientRect();
+            isLight = !(v && v.top <= 80 && v.bottom >= 60);
+          }
+        }
+        setNavTheme(isLight ? "light" : "dark");
       } else {
         setNavTheme("dark");
       }
@@ -186,10 +198,10 @@ export default function Home() {
       <Section03Showcase />
 
       {/* =========================================================================
-          SECTION 04: FROM PLAN TO PLACE
-          Golden-hour transformation stage — plan → structure → experience.
+          SECTION 04: THE HOMEBUYER EXPERIENCE
+          Ivory editorial stage with a live room-by-room interior tour.
          ========================================================================= */}
-      <Section04Transformation />
+      <Section04HomeTour />
 
       {/* Persistent Developer Project Inquiry Dialog */}
       <ContactModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
