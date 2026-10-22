@@ -13,9 +13,9 @@ interface PropertyViewerProps {
   onReady: () => void;
 }
 
-const EYE_HEIGHT = 1.62;
+const EYE_HEIGHT = 1.6;
 const PLAYER_RADIUS = 0.32;
-const MOVE_SPEED = 3.4;
+const MOVE_SPEED = 2.2;
 
 interface Engine {
   renderer: THREE.WebGLRenderer;
@@ -30,6 +30,7 @@ interface Engine {
   joy: { active: boolean; dx: number; dy: number };
   lookTouch: { id: number | null; x: number; y: number };
   collidesAt?: (x: number, z: number) => boolean;
+  step?: (dt: number) => void;
 }
 
 export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewerProps) {
@@ -72,38 +73,40 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.62;
+    renderer.toneMappingExposure = 0.66;
     mount.appendChild(renderer.domElement);
     Object.assign(renderer.domElement.style, { display: "block", width: "100%", height: "100%" });
     renderer.domElement.tabIndex = 0;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xbcc8cc, 90, 260);
+    scene.fog = new THREE.Fog(0xc9d4d8, 130, 420);
 
     // Image-based lighting for believable PBR response
     const pmrem = new THREE.PMREMGenerator(renderer);
     const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = envTex;
-    scene.environmentIntensity = 0.55;
+    scene.environmentIntensity = 0.6;
 
-    const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.1, 3500);
+    const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.1, 4000);
     camera.position.copy(DEFAULT_VIEWS.overview.pos);
 
-    const hemi = new THREE.HemisphereLight(0xdfe9e2, 0x3a443c, 0.55);
+    const hemi = new THREE.HemisphereLight(0xdfe9e2, 0x3a443c, 0.5);
     scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xffe8c2, 3.4);
-    sun.position.copy(SUN_DIRECTION).multiplyScalar(70);
+    const sun = new THREE.DirectionalLight(0xffeecf, 3.6);
+    sun.position.copy(SUN_DIRECTION).multiplyScalar(80);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.left = -28;
-    sun.shadow.camera.right = 28;
-    sun.shadow.camera.top = 30;
-    sun.shadow.camera.bottom = -30;
-    sun.shadow.camera.far = 160;
-    sun.shadow.bias = -0.0003;
-    sun.shadow.radius = 3;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    sun.shadow.mapSize.set(coarse ? 2048 : 4096, coarse ? 2048 : 4096);
+    sun.shadow.camera.left = -34;
+    sun.shadow.camera.right = 34;
+    sun.shadow.camera.top = 36;
+    sun.shadow.camera.bottom = -36;
+    sun.shadow.camera.far = 220;
+    sun.shadow.bias = -0.00035;
+    sun.shadow.normalBias = 0.02;
+    sun.shadow.radius = 2.5;
     scene.add(sun);
     scene.add(sun.target);
 
@@ -118,7 +121,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     orbit.dampingFactor = 0.08;
     orbit.maxPolarAngle = Math.PI / 2 - 0.03;
     orbit.minDistance = 3;
-    orbit.maxDistance = 70;
+    orbit.maxDistance = 90;
     orbit.update();
 
     const engine: Engine = {
@@ -236,7 +239,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
 
-    const clock = new THREE.Clock();
+    const clock = new THREE.Timer();
     const playerBox = new THREE.Box3();
     const tppCam = new THREE.Vector3();
     let raf = 0;
@@ -251,10 +254,14 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
       engine.collidesAt = collides;
       (window as unknown as { __wsEngine?: Engine }).__wsEngine = engine;
     }
+    const camInside = (px: number, py: number, pz: number) => {
+      for (const c of world.colliders) {
+        if (px > c.min.x && px < c.max.x && pz > c.min.z && pz < c.max.z && py > c.min.y && py < c.max.y) return true;
+      }
+      return false;
+    };
 
-    const tick = () => {
-      raf = requestAnimationFrame(tick);
-      const dt = Math.min(clock.getDelta(), 0.05);
+    const step = (dt: number) => {
       world.update(dt);
 
       if (engine.tween) {
@@ -281,9 +288,9 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
         const len = Math.hypot(mx, mz);
         let moving = 0;
         if (len > 0.01) {
-          const step = MOVE_SPEED * dt * Math.min(1, len);
-          const nx = p.x + (fwd.x * mz + right.x * mx) * (step / Math.max(len, 1)) * 2;
-          const nz = p.z + (fwd.z * mz + right.z * mx) * (step / Math.max(len, 1)) * 2;
+          const stepLen = MOVE_SPEED * dt;
+          const nx = p.x + (fwd.x * mz + right.x * mx) * (stepLen / Math.max(len, 1));
+          const nz = p.z + (fwd.z * mz + right.z * mx) * (stepLen / Math.max(len, 1));
           if (!collides(nx, p.z)) p.x = nx;
           if (!collides(p.x, nz)) p.z = nz;
           moving = Math.min(1, len);
@@ -291,27 +298,44 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
         world.avatar.setWalk(moving);
 
         if (engine.mode === "fpp") {
-          camera.position.set(p.x, EYE_HEIGHT, p.z);
+          const baseY = world.floorAt(p.x, p.z);
+          camera.position.set(p.x, baseY + EYE_HEIGHT, p.z);
           camera.quaternion.setFromEuler(new THREE.Euler(p.pitch, p.yaw, 0, "YXZ"));
           world.avatar.group.visible = false;
         } else {
+          const baseY = world.floorAt(p.x, p.z);
           world.avatar.group.visible = true;
-          world.avatar.group.position.set(p.x, 0, p.z);
+          world.avatar.group.position.set(p.x, baseY, p.z);
           world.avatar.group.rotation.y = p.yaw + Math.PI;
-          // follow camera behind the avatar, angled by pitch
-          const dist = 3.4;
-          const height = 2.35 - p.pitch * 1.2;
-          tppCam.set(p.x - fwd.x * dist, Math.max(0.6, height), p.z - fwd.z * dist);
+          // follow camera behind the avatar; pull in when a wall blocks the view
+          const wantDist = 4.0;
+          const camY = baseY + 2.45 - p.pitch * 1.2;
+          let dist = wantDist;
+          for (let i = 1; i <= 9; i++) {
+            const t = (i / 9) * wantDist;
+            if (camInside(p.x - fwd.x * t, camY, p.z - fwd.z * t)) {
+              dist = Math.max(0.9, t - 0.4);
+              break;
+            }
+          }
+          tppCam.set(p.x - fwd.x * dist, Math.max(baseY + 0.75, camY), p.z - fwd.z * dist);
           camera.position.lerp(tppCam, reducedMotion ? 1 : Math.min(1, dt * 8));
-          camera.lookAt(p.x + fwd.x * 1.2, 1.15 - p.pitch * 1.4, p.z + fwd.z * 1.2);
+          camera.lookAt(p.x + fwd.x * 1.2, baseY + 1.2 - p.pitch * 1.4, p.z + fwd.z * 1.2);
         }
       } else {
         world.avatar.group.visible = false;
         orbit.update();
       }
+    };
 
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      clock.update();
+      const dt = Math.min(clock.getDelta(), 0.05);
+      step(dt);
       renderer.render(scene, camera);
     };
+    if (process.env.NODE_ENV !== "production") engine.step = step;
     tick();
     onReady();
 
