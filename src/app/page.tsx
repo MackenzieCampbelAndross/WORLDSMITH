@@ -8,6 +8,7 @@ import { HeroTypography } from "@/components/HeroTypography";
 import { ContactModal } from "@/components/ContactModal";
 import { Section03Showcase } from "@/components/Section03Showcase";
 import { Section04HomeTour } from "@/components/Section04HomeTour";
+import { FinalCta } from "@/components/FinalCta";
 
 export default function Home() {
   const [stage, setStage] = useState<number>(0);
@@ -203,6 +204,9 @@ export default function Home() {
           Ivory editorial stage with a live room-by-room interior tour.
          ========================================================================= */}
       <Section04HomeTour />
+
+      {/* FINAL CTA: A quiet, human close to the WorldSmith story. */}
+      <FinalCta />
 
       {/* Persistent Developer Project Inquiry Dialog */}
       <ContactModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
