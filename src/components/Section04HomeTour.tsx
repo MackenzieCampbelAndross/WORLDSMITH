@@ -184,97 +184,19 @@ export const Section04HomeTour: React.FC = () => {
 
             {/* Room dock */}
             <div className="mt-5 border-t border-[#1f6651]/15 pt-4">
-              <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-                <div className="flex min-w-0 items-end justify-between gap-4">
-                  <div aria-live="polite">
-                    <div className="flex items-baseline gap-2.5">
-                      <span className="font-accent text-[15px] italic text-[#1f6651]/55">{tabIndexLabel}</span>
-                      <h3 className="font-display text-[21px] font-medium tracking-[-0.02em] text-[#173f32] sm:text-[24px]">
-                        {active.label}
-                      </h3>
-                    </div>
-                    <p className="mt-1 font-body text-[11px] leading-relaxed text-[#1c4c3b]/60 sm:text-[12px]">
-                      {active.description}
-                    </p>
+              <div className="flex items-center justify-between gap-4">
+                <div aria-live="polite" className="min-w-0">
+                  <div className="flex items-baseline gap-2.5">
+                    <span className="font-accent text-[15px] italic text-[#1f6651]/55">{tabIndexLabel}</span>
+                    <h3 className="font-display text-[21px] font-medium tracking-[-0.02em] text-[#173f32] sm:text-[24px]">
+                      {active.label}
+                    </h3>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2 lg:hidden">
-                    <button
-                      type="button"
-                      onClick={() => cycle(-1)}
-                      aria-label="Previous room"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#1f6651]/25 text-[#1f6651]/75 transition-colors hover:border-[#1f6651]/60 hover:text-[#1f6651]"
-                    >
-                      <IconArrow dir="prev" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => cycle(1)}
-                      aria-label="Next room"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#1f6651]/25 text-[#1f6651]/75 transition-colors hover:border-[#1f6651]/60 hover:text-[#1f6651]"
-                    >
-                      <IconArrow dir="next" />
-                    </button>
-                  </div>
+                  <p className="mt-1 font-body text-[11px] leading-relaxed text-[#1c4c3b]/60 sm:text-[12px]">
+                    {active.description}
+                  </p>
                 </div>
-
-                <div className="flex flex-1 flex-col gap-2.5 lg:items-end">
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1 sm:gap-x-7 lg:justify-end">
-                    {TOUR_TABS.map((tab) => {
-                      const selected = tab.group === activeGroup;
-                      return (
-                        <button
-                          key={tab.group}
-                          type="button"
-                          onClick={() => selectGroup(tab.group)}
-                          aria-pressed={selected}
-                          className={`group relative flex items-baseline gap-1.5 pb-2 font-display text-[12px] font-medium tracking-[0.015em] transition-colors sm:text-[13px] ${
-                            selected ? "text-[#173f32]" : "text-[#1c4c3b]/50 hover:text-[#173f32]"
-                          }`}
-                        >
-                          <span className={`hidden font-accent text-[11px] italic 2xl:inline ${selected ? "text-[#1f6651]/70" : "text-[#1f6651]/35"}`}>
-                            {tab.index}
-                          </span>
-                          {tab.label}
-                          <span
-                            className={`absolute inset-x-0 bottom-0 h-px bg-[#1f6651] transition-opacity ${
-                              selected ? "opacity-100" : "opacity-0 group-hover:opacity-30"
-                            }`}
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div
-                    aria-hidden={activeGroup !== "bedrooms"}
-                    inert={activeGroup !== "bedrooms"}
-                    className={`flex flex-wrap items-center gap-x-4 gap-y-1 overflow-hidden transition-all duration-300 lg:justify-end ${
-                      activeGroup === "bedrooms" ? "max-h-8 opacity-100" : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    {bedroomViews.map((id, index) => {
-                      const bedroom = TOUR_VIEWS[id];
-                      const selected = view === id;
-                      return (
-                        <span key={id} className="flex items-center gap-4">
-                          {index > 0 && <span className="h-2.5 w-px bg-[#1f6651]/20" aria-hidden="true" />}
-                          <button
-                            type="button"
-                            onClick={() => selectView(id)}
-                            aria-pressed={selected}
-                            className={`font-body text-[10px] uppercase tracking-[0.14em] transition-colors ${
-                              selected ? "text-[#173f32]" : "text-[#1c4c3b]/45 hover:text-[#173f32]"
-                            }`}
-                          >
-                            {bedroom.label}
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                <div className="flex shrink-0 items-center gap-2">
                   <button
                     type="button"
                     onClick={() => cycle(-1)}
@@ -291,6 +213,63 @@ export const Section04HomeTour: React.FC = () => {
                   >
                     <IconArrow dir="next" />
                   </button>
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-col gap-2.5">
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-1 sm:gap-x-7 lg:flex-nowrap lg:justify-end">
+                  {TOUR_TABS.map((tab) => {
+                    const selected = tab.group === activeGroup;
+                    return (
+                      <button
+                        key={tab.group}
+                        type="button"
+                        onClick={() => selectGroup(tab.group)}
+                        aria-pressed={selected}
+                        className={`group relative flex shrink-0 items-baseline gap-1.5 pb-2 font-display text-[12px] font-medium tracking-[0.015em] transition-colors sm:text-[13px] ${
+                          selected ? "text-[#173f32]" : "text-[#1c4c3b]/50 hover:text-[#173f32]"
+                        }`}
+                      >
+                        <span className={`hidden font-accent text-[11px] italic 2xl:inline ${selected ? "text-[#1f6651]/70" : "text-[#1f6651]/35"}`}>
+                          {tab.index}
+                        </span>
+                        {tab.label}
+                        <span
+                          className={`absolute inset-x-0 bottom-0 h-px bg-[#1f6651] transition-opacity ${
+                            selected ? "opacity-100" : "opacity-0 group-hover:opacity-30"
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div
+                  aria-hidden={activeGroup !== "bedrooms"}
+                  inert={activeGroup !== "bedrooms"}
+                  className={`flex flex-wrap items-center gap-x-4 gap-y-1 overflow-hidden transition-all duration-300 lg:justify-end ${
+                    activeGroup === "bedrooms" ? "max-h-8 opacity-100" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  {bedroomViews.map((id, index) => {
+                    const bedroom = TOUR_VIEWS[id];
+                    const selected = view === id;
+                    return (
+                      <span key={id} className="flex items-center gap-4">
+                        {index > 0 && <span className="h-2.5 w-px bg-[#1f6651]/20" aria-hidden="true" />}
+                        <button
+                          type="button"
+                          onClick={() => selectView(id)}
+                          aria-pressed={selected}
+                          className={`font-body text-[10px] uppercase tracking-[0.14em] transition-colors ${
+                            selected ? "text-[#173f32]" : "text-[#1c4c3b]/45 hover:text-[#173f32]"
+                          }`}
+                        >
+                          {bedroom.label}
+                        </button>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>
