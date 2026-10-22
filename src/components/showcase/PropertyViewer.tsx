@@ -1,28 +1,28 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { buildWorld, DEFAULT_VIEWS, ROOMS } from "./scene";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { buildWorld, DEFAULT_VIEWS, ROOMS, SPAWN, SUN_DIRECTION } from "./scene";
 
-export type ViewMode = "overview" | "dollhouse" | "explore";
+export type ViewMode = "overview" | "dollhouse" | "fpp" | "tpp";
 
 interface PropertyViewerProps {
   reducedMotion: boolean;
   onReady: () => void;
 }
 
-const EYE_HEIGHT = 1.6;
-const PLAYER_RADIUS = 0.35;
-const MOVE_SPEED = 3.2; // m/s
+const EYE_HEIGHT = 1.62;
+const PLAYER_RADIUS = 0.32;
+const MOVE_SPEED = 3.4;
 
 interface Engine {
   renderer: THREE.WebGLRenderer;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   orbit: OrbitControls;
-  yaw: number;
-  pitch: number;
+  player: { x: number; z: number; yaw: number; pitch: number };
   keys: Set<string>;
   mode: ViewMode;
   roofOn: boolean;
@@ -37,9 +37,10 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
   const engineRef = useRef<Engine | null>(null);
   const worldRef = useRef<ReturnType<typeof buildWorld> | null>(null);
   const [mode, setMode] = useState<ViewMode>("overview");
-  const [roofOn, setRoofOn] = useState(false);
+  const [roofOn, setRoofOn] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<string>("");
   const [locked, setLocked] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [webglOk] = useState(() => {
     try {
       const probe = document.createElement("canvas");
@@ -48,7 +49,9 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
       return false;
     }
   });
-  const [isTouch] = useState(() => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0));
+  const [isTouch] = useState(
+    () => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0)
+  );
 
   const rooms = ROOMS;
 
@@ -70,33 +73,39 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.62;
     mount.appendChild(renderer.domElement);
-    renderer.domElement.style.display = "block";
-    renderer.domElement.style.width = "100%";
-    renderer.domElement.style.height = "100%";
+    Object.assign(renderer.domElement.style, { display: "block", width: "100%", height: "100%" });
     renderer.domElement.tabIndex = 0;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x101512);
-    scene.fog = new THREE.Fog(0x101512, 90, 190);
+    scene.fog = new THREE.Fog(0xbcc8cc, 90, 260);
 
-    const camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 400);
+    // Image-based lighting for believable PBR response
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = envTex;
+    scene.environmentIntensity = 0.55;
+
+    const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.1, 3500);
     camera.position.copy(DEFAULT_VIEWS.overview.pos);
 
-    // Sky + sun
-    const hemi = new THREE.HemisphereLight(0xcfe3d8, 0x2c3a30, 0.85);
+    const hemi = new THREE.HemisphereLight(0xdfe9e2, 0x3a443c, 0.55);
     scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xffd9a8, 2.4);
-    sun.position.set(28, 34, -22);
+    const sun = new THREE.DirectionalLight(0xffe8c2, 3.4);
+    sun.position.copy(SUN_DIRECTION).multiplyScalar(70);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.left = -45;
-    sun.shadow.camera.right = 45;
-    sun.shadow.camera.top = 45;
-    sun.shadow.camera.bottom = -45;
-    sun.shadow.camera.far = 120;
-    sun.shadow.bias = -0.0004;
+    sun.shadow.camera.left = -28;
+    sun.shadow.camera.right = 28;
+    sun.shadow.camera.top = 30;
+    sun.shadow.camera.bottom = -30;
+    sun.shadow.camera.far = 160;
+    sun.shadow.bias = -0.0003;
+    sun.shadow.radius = 3;
     scene.add(sun);
+    scene.add(sun.target);
 
     const world = buildWorld();
     worldRef.current = world;
@@ -108,14 +117,16 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     orbit.enableDamping = true;
     orbit.dampingFactor = 0.08;
     orbit.maxPolarAngle = Math.PI / 2 - 0.03;
-    orbit.minDistance = 4;
-    orbit.maxDistance = 90;
+    orbit.minDistance = 3;
+    orbit.maxDistance = 70;
     orbit.update();
 
     const engine: Engine = {
       renderer, scene, camera, orbit,
-      yaw: 0, pitch: 0, keys: new Set(),
-      mode: "overview", roofOn: true,
+      player: { x: SPAWN[0], z: SPAWN[1], yaw: Math.PI, pitch: 0 },
+      keys: new Set(),
+      mode: "overview",
+      roofOn: true,
       tween: null,
       joy: { active: false, dx: 0, dy: 0 },
       lookTouch: { id: null, x: 0, y: 0 },
@@ -123,24 +134,25 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     engineRef.current = engine;
 
     // --------------------------------------------------------------
-    // Input: keyboard (Explore only), pointer lock, touch
+    // Input
     // --------------------------------------------------------------
+    const MOVE_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"];
     const onKeyDown = (e: KeyboardEvent) => {
-      if (engine.mode !== "explore") return;
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
-        e.preventDefault(); // stop page scroll while viewer has keyboard control
-        engine.keys.add(e.key);
+      if (engine.mode !== "fpp" && engine.mode !== "tpp") return;
+      if (MOVE_KEYS.includes(e.code)) {
+        e.preventDefault(); // no page scroll while the viewer drives movement
+        engine.keys.add(e.code);
       }
     };
-    const onKeyUp = (e: KeyboardEvent) => engine.keys.delete(e.key);
+    const onKeyUp = (e: KeyboardEvent) => engine.keys.delete(e.code);
     window.addEventListener("keydown", onKeyDown, { passive: false });
     window.addEventListener("keyup", onKeyUp);
 
     const onPointerLockMove = (e: MouseEvent) => {
-      if (document.pointerLockElement !== renderer.domElement || engine.mode !== "explore") return;
-      engine.yaw -= e.movementX * 0.0022;
-      engine.pitch -= e.movementY * 0.0022;
-      engine.pitch = Math.max(-1.45, Math.min(1.45, engine.pitch)); // clamp to prevent flipping
+      if (document.pointerLockElement !== renderer.domElement) return;
+      if (engine.mode !== "fpp" && engine.mode !== "tpp") return;
+      engine.player.yaw -= e.movementX * 0.0022;
+      engine.player.pitch = Math.max(-1.45, Math.min(1.45, engine.player.pitch - e.movementY * 0.0022));
     };
     const onLockChange = () => setLocked(document.pointerLockElement === renderer.domElement);
     document.addEventListener("mousemove", onPointerLockMove);
@@ -148,15 +160,15 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
 
     const el = renderer.domElement;
     const onCanvasDown = () => {
-      if (engine.mode === "explore" && !isTouch && document.pointerLockElement !== el) {
+      if ((engine.mode === "fpp" || engine.mode === "tpp") && !isTouch && document.pointerLockElement !== el) {
         el.requestPointerLock?.();
       }
     };
     el.addEventListener("mousedown", onCanvasDown);
 
-    // Touch: left half = movement joystick, right half = look drag
+    // Touch: left half joystick, right half look
     const onTouchStart = (e: TouchEvent) => {
-      if (engine.mode !== "explore") return;
+      if (engine.mode !== "fpp" && engine.mode !== "tpp") return;
       for (const t of Array.from(e.changedTouches)) {
         const rect = el.getBoundingClientRect();
         const relX = (t.clientX - rect.left) / rect.width;
@@ -174,7 +186,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
       }
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (engine.mode !== "explore") return;
+      if (engine.mode !== "fpp" && engine.mode !== "tpp") return;
       e.preventDefault();
       const joyId = (engine as unknown as { joyId?: number }).joyId ?? -1;
       for (const t of Array.from(e.changedTouches)) {
@@ -186,9 +198,8 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
           engine.joy.dy = Math.max(-1, Math.min(1, (t.clientY - startY) / 60));
           el.dispatchEvent(new CustomEvent("movejoy", { detail: { x: t.clientX, y: t.clientY } }));
         } else if (t.identifier === engine.lookTouch.id) {
-          engine.yaw -= (t.clientX - engine.lookTouch.x) * 0.0045;
-          engine.pitch -= (t.clientY - engine.lookTouch.y) * 0.0045;
-          engine.pitch = Math.max(-1.45, Math.min(1.45, engine.pitch));
+          engine.player.yaw -= (t.clientX - engine.lookTouch.x) * 0.0045;
+          engine.player.pitch = Math.max(-1.45, Math.min(1.45, engine.player.pitch - (t.clientY - engine.lookTouch.y) * 0.0045));
           engine.lookTouch.x = t.clientX;
           engine.lookTouch.y = t.clientY;
         }
@@ -212,7 +223,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     el.addEventListener("touchcancel", onTouchEnd);
 
     // --------------------------------------------------------------
-    // Resize + render loop
+    // Resize + loop
     // --------------------------------------------------------------
     const resize = () => {
       const w = mount.clientWidth || 1;
@@ -227,7 +238,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
 
     const clock = new THREE.Clock();
     const playerBox = new THREE.Box3();
-    const scratch = new THREE.Vector3();
+    const tppCam = new THREE.Vector3();
     let raf = 0;
 
     const collides = (x: number, z: number) => {
@@ -244,6 +255,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     const tick = () => {
       raf = requestAnimationFrame(tick);
       const dt = Math.min(clock.getDelta(), 0.05);
+      world.update(dt);
 
       if (engine.tween) {
         const tw = engine.tween;
@@ -253,31 +265,48 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
         orbit.target.lerpVectors(tw.fromT, tw.toT, k);
         if (tw.t >= 1) engine.tween = null;
         orbit.update();
-      } else if (engine.mode === "explore") {
-        // First-person movement follows the camera's horizontal direction
-        const fwd = scratch.set(-Math.sin(engine.yaw), 0, -Math.cos(engine.yaw));
+      } else if (engine.mode === "fpp" || engine.mode === "tpp") {
+        const p = engine.player;
+        const fwd = new THREE.Vector3(-Math.sin(p.yaw), 0, -Math.cos(p.yaw));
         const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
         let mx = 0, mz = 0;
-        if (engine.keys.has("ArrowUp")) mz += 1;
-        if (engine.keys.has("ArrowDown")) mz -= 1;
-        if (engine.keys.has("ArrowLeft")) mx -= 1;
-        if (engine.keys.has("ArrowRight")) mx += 1;
+        if (engine.keys.has("ArrowUp") || engine.keys.has("KeyW")) mz += 1;
+        if (engine.keys.has("ArrowDown") || engine.keys.has("KeyS")) mz -= 1;
+        if (engine.keys.has("ArrowLeft") || engine.keys.has("KeyA")) mx -= 1;
+        if (engine.keys.has("ArrowRight") || engine.keys.has("KeyD")) mx += 1;
         if (engine.joy.active) {
           mz -= engine.joy.dy;
           mx += engine.joy.dx;
         }
         const len = Math.hypot(mx, mz);
+        let moving = 0;
         if (len > 0.01) {
-          const speed = MOVE_SPEED * dt * Math.min(1, len);
-          const nx = camera.position.x + (fwd.x * mz + right.x * mx) * (speed / Math.max(len, 1)) * 2;
-          const nz = camera.position.z + (fwd.z * mz + right.z * mx) * (speed / Math.max(len, 1)) * 2;
-          // per-axis resolution keeps doorways and corridors navigable
-          if (!collides(nx, camera.position.z)) camera.position.x = nx;
-          if (!collides(camera.position.x, nz)) camera.position.z = nz;
+          const step = MOVE_SPEED * dt * Math.min(1, len);
+          const nx = p.x + (fwd.x * mz + right.x * mx) * (step / Math.max(len, 1)) * 2;
+          const nz = p.z + (fwd.z * mz + right.z * mx) * (step / Math.max(len, 1)) * 2;
+          if (!collides(nx, p.z)) p.x = nx;
+          if (!collides(p.x, nz)) p.z = nz;
+          moving = Math.min(1, len);
         }
-        camera.position.y = EYE_HEIGHT;
-        camera.quaternion.setFromEuler(new THREE.Euler(engine.pitch, engine.yaw, 0, "YXZ"));
+        world.avatar.setWalk(moving);
+
+        if (engine.mode === "fpp") {
+          camera.position.set(p.x, EYE_HEIGHT, p.z);
+          camera.quaternion.setFromEuler(new THREE.Euler(p.pitch, p.yaw, 0, "YXZ"));
+          world.avatar.group.visible = false;
+        } else {
+          world.avatar.group.visible = true;
+          world.avatar.group.position.set(p.x, 0, p.z);
+          world.avatar.group.rotation.y = p.yaw + Math.PI;
+          // follow camera behind the avatar, angled by pitch
+          const dist = 3.4;
+          const height = 2.35 - p.pitch * 1.2;
+          tppCam.set(p.x - fwd.x * dist, Math.max(0.6, height), p.z - fwd.z * dist);
+          camera.position.lerp(tppCam, reducedMotion ? 1 : Math.min(1, dt * 8));
+          camera.lookAt(p.x + fwd.x * 1.2, 1.15 - p.pitch * 1.4, p.z + fwd.z * 1.2);
+        }
       } else {
+        world.avatar.group.visible = false;
         orbit.update();
       }
 
@@ -300,6 +329,8 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
       el.removeEventListener("touchcancel", onTouchEnd);
       if (document.pointerLockElement === el) document.exitPointerLock();
       orbit.dispose();
+      envTex.dispose();
+      pmrem.dispose();
       world.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
@@ -316,21 +347,28 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     const engine = engineRef.current;
     const world = worldRef.current;
     if (!engine || !world) return;
+    const wasWalking = engine.mode === "fpp" || engine.mode === "tpp";
+    const isWalking = next === "fpp" || next === "tpp";
     engine.mode = next;
     setMode(next);
     setSelectedRoom("");
     const el = engine.renderer.domElement;
 
-    if (next === "explore") {
+    if (isWalking) {
       engine.orbit.enabled = false;
-      // drop the player into the living room, facing the corridor
-      engine.camera.position.set(-4.6, EYE_HEIGHT, -2.2);
-      engine.yaw = Math.PI; // look north toward corridor/rooms
-      engine.pitch = 0;
+      if (!wasWalking) {
+        engine.player.x = SPAWN[0];
+        engine.player.z = SPAWN[1];
+        engine.player.yaw = Math.PI;
+        engine.player.pitch = 0;
+      }
       world.roofGroup.visible = true;
+      engine.roofOn = true;
       setRoofOn(true);
+      setShowHelp(true);
     } else {
       if (document.pointerLockElement === el) document.exitPointerLock();
+      world.avatar.group.visible = false;
       engine.orbit.enabled = true;
       const view = next === "overview" ? DEFAULT_VIEWS.overview : DEFAULT_VIEWS.dollhouse;
       engine.tween = {
@@ -340,25 +378,20 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
         toT: view.target.clone(),
         t: 0,
       };
-      if (next === "dollhouse") {
-        // Dollhouse opens the home by default; roof toggle stays available
-        engine.roofOn = false;
-        setRoofOn(false);
-        world.roofGroup.visible = false;
-      } else {
-        engine.roofOn = true;
-        setRoofOn(true);
-        world.roofGroup.visible = true;
-      }
+      engine.roofOn = next === "overview";
+      setRoofOn(next === "overview");
+      world.roofGroup.visible = next === "overview";
+      setShowHelp(false);
     }
   }, []);
 
   const toggleRoof = useCallback(() => {
     const world = worldRef.current;
     const engine = engineRef.current;
-    if (!world || !engine || engine.mode === "explore") return;
+    if (!world || !engine || engine.mode === "fpp" || engine.mode === "tpp") return;
     setRoofOn((prev) => {
       const next = !prev;
+      engine.roofOn = next;
       world.roofGroup.visible = next;
       return next;
     });
@@ -367,10 +400,11 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
   const resetView = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
-    if (engine.mode === "explore") {
-      engine.camera.position.set(-4.6, EYE_HEIGHT, -2.2);
-      engine.yaw = Math.PI;
-      engine.pitch = 0;
+    if (engine.mode === "fpp" || engine.mode === "tpp") {
+      engine.player.x = SPAWN[0];
+      engine.player.z = SPAWN[1];
+      engine.player.yaw = Math.PI;
+      engine.player.pitch = 0;
     } else {
       const view = engine.mode === "overview" ? DEFAULT_VIEWS.overview : DEFAULT_VIEWS.dollhouse;
       engine.tween = {
@@ -390,27 +424,23 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     setSelectedRoom(id);
     const room = world.rooms.find((r) => r.id === id);
     if (!room) return;
-    if (engine.mode === "explore") {
+    if (engine.mode === "fpp" || engine.mode === "tpp") {
       const [x, z] = room.anchor;
-      // find a nearby standing spot that is collision-free
-      const candidates: Array<[number, number]> = [
-        [x, z], [x + 0.6, z], [x - 0.6, z], [x, z + 0.6], [x, z - 0.6],
-      ];
       const box = new THREE.Box3();
       const clear = (px: number, pz: number) => {
         box.min.set(px - PLAYER_RADIUS, 0.3, pz - PLAYER_RADIUS);
         box.max.set(px + PLAYER_RADIUS, 1.9, pz + PLAYER_RADIUS);
         return !world.colliders.some((c) => box.intersectsBox(c));
       };
+      const candidates: Array<[number, number]> = [
+        [x, z], [x + 0.6, z], [x - 0.6, z], [x, z + 0.6], [x, z - 0.6],
+      ];
       const spot = candidates.find(([cx, cz]) => clear(cx, cz)) ?? [x, z];
-      engine.camera.position.set(spot[0], EYE_HEIGHT, spot[1]);
-      const dx = 0 - spot[0], dz = 0 - spot[1];
-      engine.yaw = Math.atan2(-dx, -dz);
-      engine.pitch = 0;
+      engine.player.x = spot[0];
+      engine.player.z = spot[1];
+      engine.player.yaw = Math.atan2(spot[0], spot[1] + 0.001) + Math.PI;
+      engine.player.pitch = 0;
     } else {
-      if (!engine.roofOn && engine.mode === "dollhouse") {
-        // keep roof off for interior framing
-      }
       engine.tween = {
         from: engine.camera.position.clone(),
         to: new THREE.Vector3(...room.view.pos),
@@ -421,8 +451,15 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     }
   }, []);
 
+  // Auto-hide the instruction overlay
+  useEffect(() => {
+    if (!showHelp) return;
+    const t = setTimeout(() => setShowHelp(false), 8000);
+    return () => clearTimeout(t);
+  }, [showHelp]);
+
   // ------------------------------------------------------------------
-  // Mobile joystick visual (driven by custom events from the canvas)
+  // Mobile joystick visual
   // ------------------------------------------------------------------
   const joyRef = useRef<HTMLDivElement>(null);
   const knobRef = useRef<HTMLDivElement>(null);
@@ -432,8 +469,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     if (!el) return;
     const show = (e: Event) => {
       const d = (e as CustomEvent).detail;
-      const host = el.closest("div[data-stage]") as HTMLElement | null;
-      const rect = (host ?? el).getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
       if (joyRef.current) {
         joyRef.current.style.display = "block";
         joyRef.current.style.left = `${d.x - rect.left - 55}px`;
@@ -442,11 +478,10 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     };
     const move = (e: Event) => {
       const d = (e as CustomEvent).detail;
-      if (knobRef.current) {
-        const host = el.closest("div[data-stage]") as HTMLElement | null;
-        const rect = (host ?? el).getBoundingClientRect();
-        const cx = parseFloat(joyRef.current!.style.left) + 55;
-        const cy = parseFloat(joyRef.current!.style.top) + 55;
+      if (knobRef.current && joyRef.current) {
+        const rect = el.getBoundingClientRect();
+        const cx = parseFloat(joyRef.current.style.left) + 55;
+        const cy = parseFloat(joyRef.current.style.top) + 55;
         const dx = Math.max(-40, Math.min(40, d.x - rect.left - cx));
         const dy = Math.max(-40, Math.min(40, d.y - rect.top - cy));
         knobRef.current.style.transform = `translate(${dx}px, ${dy}px)`;
@@ -471,21 +506,20 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
       <div className="w-full h-full flex flex-col items-center justify-center bg-[#121212] text-[#F0EDE3] font-body px-8 text-center">
         <p className="font-display text-lg tracking-[0.18em] text-[#B5D5C5] mb-3">WORLDSMITH</p>
         <p className="text-sm text-[#F0EDE3]/70 max-w-md leading-relaxed">
-          Your browser does not support WebGL, which is required for the interactive property experience.
+          Your browser does not support WebGL, which is required for the interactive villa experience.
           Please try a modern desktop browser, or contact our studio for a guided presentation.
         </p>
       </div>
     );
   }
 
+  const walking = mode === "fpp" || mode === "tpp";
   const modeBtn = (m: ViewMode, label: string) => (
     <button
       type="button"
       onClick={() => applyMode(m)}
-      className={`px-3 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors duration-200 font-display ${
-        mode === m
-          ? "bg-[#B5D5C5] text-[#121212]"
-          : "bg-[#F0EDE3]/10 text-[#F0EDE3]/75 hover:bg-[#F0EDE3]/20"
+      className={`px-2.5 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors duration-200 font-display ${
+        mode === m ? "bg-[#B5D5C5] text-[#121212]" : "bg-[#121212]/10 text-[#F0EDE3]/75 hover:bg-[#F0EDE3]/20"
       }`}
     >
       {label}
@@ -496,15 +530,16 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     <div data-stage className="relative w-full h-full bg-[#121212]">
       <div ref={mountRef} className="absolute inset-0" />
 
-      {/* Top bar: modes + utilities */}
+      {/* Top bar */}
       <div className="absolute top-3 left-3 right-3 flex flex-wrap items-center gap-2 pointer-events-none">
-        <div className="flex gap-1.5 p-1 rounded-full bg-[#121212]/70 backdrop-blur-sm pointer-events-auto">
+        <div className="flex gap-1 p-1 rounded-full bg-[#121212]/70 backdrop-blur-sm pointer-events-auto">
           {modeBtn("overview", "Overview")}
           {modeBtn("dollhouse", "Dollhouse")}
-          {modeBtn("explore", "Explore")}
+          {modeBtn("fpp", "FPP")}
+          {modeBtn("tpp", "TPP")}
         </div>
         <div className="ml-auto flex items-center gap-2 pointer-events-auto">
-          {mode !== "explore" && (
+          {!walking && (
             <button
               type="button"
               onClick={toggleRoof}
@@ -531,23 +566,31 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
           >
             Reset
           </button>
+          <button
+            type="button"
+            onClick={() => setShowHelp((v) => !v)}
+            aria-label="Controls help"
+            className="w-8 h-8 rounded-full bg-[#121212]/70 backdrop-blur-sm text-[#B5D5C5] text-sm font-display font-semibold hover:text-[#F0EDE3] transition-colors"
+          >
+            ?
+          </button>
         </div>
       </div>
 
-      {/* Explore: pointer-lock hint / instructions */}
-      {mode === "explore" && (
+      {/* Instructions overlay */}
+      {walking && showHelp && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none">
           {!isTouch && !locked && (
-            <p className="px-4 py-2 rounded-full bg-[#121212]/80 backdrop-blur-sm text-[#B5D5C5] text-[11px] font-body font-semibold tracking-[0.12em] uppercase">
+            <p className="px-4 py-2 rounded-full bg-[#121212]/85 backdrop-blur-sm text-[#B5D5C5] text-[11px] font-body font-semibold tracking-[0.12em] uppercase">
               Click inside the experience to look around
             </p>
           )}
-          <p className="px-4 py-2 rounded-full bg-[#121212]/80 backdrop-blur-sm text-[#F0EDE3]/85 text-[10px] sm:text-[11px] font-body tracking-[0.06em]">
-            <span className="font-display font-semibold text-[#B5D5C5]">MOVE</span> — Arrow keys
+          <p className="px-4 py-2 rounded-full bg-[#121212]/85 backdrop-blur-sm text-[#F0EDE3]/85 text-[10px] sm:text-[11px] font-body tracking-[0.06em] text-center">
+            <span className="font-display font-semibold text-[#B5D5C5]">MOVE</span> — WASD / Arrow Keys
             {"   "}
             <span className="font-display font-semibold text-[#B5D5C5]">LOOK</span> — Mouse
             {"   "}
-            <span className="font-display font-semibold text-[#B5D5C5]">EXIT</span> — Esc
+            <span className="font-display font-semibold text-[#B5D5C5]">EXIT MOUSE LOOK</span> — Esc
           </p>
         </div>
       )}
@@ -558,10 +601,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
         style={{ display: "none" }}
         className="absolute w-[110px] h-[110px] rounded-full border-2 border-[#B5D5C5]/50 bg-[#121212]/40 pointer-events-none"
       >
-        <div
-          ref={knobRef}
-          className="absolute left-1/2 top-1/2 -ml-6 -mt-6 w-12 h-12 rounded-full bg-[#B5D5C5]/80"
-        />
+        <div ref={knobRef} className="absolute left-1/2 top-1/2 -ml-6 -mt-6 w-12 h-12 rounded-full bg-[#B5D5C5]/80" />
       </div>
     </div>
   );

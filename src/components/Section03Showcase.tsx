@@ -130,8 +130,8 @@ export const Section03Showcase: React.FC = () => {
             <div className="absolute inset-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/showcase/community-splash.png"
-                alt="Aerial evening view of a contemporary gated residential community with landscaped courtyards"
+                src="/showcase/villa-splash.png"
+                alt="Contemporary single-storey villa with projecting flat rooflines, timber entrance screen and landscaped front lawn at dusk"
                 className="absolute inset-0 w-full h-full object-cover"
                 draggable={false}
               />
@@ -179,10 +179,10 @@ export const Section03Showcase: React.FC = () => {
 
                 <div className="w-full flex items-end justify-between">
                   <span className="font-body text-[10px] sm:text-[11px] tracking-[0.1em] text-[#F0EDE3]/55">
-                    Overview · Dollhouse · First-person Explore
+                    Overview · Dollhouse · First person · Third person
                   </span>
                   <span className="hidden sm:block font-accent italic text-[13px] text-[#B5D5C5]/85">
-                    Casa Verdant — a Worldsmith demonstration community
+                    Casa Verdant — a Worldsmith demonstration villa
                   </span>
                 </div>
               </div>
