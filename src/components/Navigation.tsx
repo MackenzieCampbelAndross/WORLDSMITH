@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { WorldsmithLogo } from "./WorldsmithLogo";
 
 interface NavigationProps {
   onContactClick?: () => void;
@@ -40,13 +39,38 @@ export const Navigation: React.FC<NavigationProps> = ({
       {/* Navigation Links & Action Pill (Manrope) */}
       <nav aria-label="Main Navigation" className="flex items-center gap-4 sm:gap-7 md:gap-10">
         <ul
-          className={`hidden sm:flex items-center gap-6 md:gap-9 text-xs tracking-[0.12em] font-medium transition-colors duration-500 ${
+          className={`hidden sm:flex items-center gap-6 sm:gap-8 text-xs tracking-[0.12em] font-medium transition-colors duration-500 ${
             isLight ? "text-[#1f6651]/75" : "text-[#a8cebc]"
           }`}
         >
           <li>
             <a
-              href="#manifesto"
+              href="#hero"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              onMouseEnter={() => setActiveItem("hero")}
+              onMouseLeave={() => setActiveItem(null)}
+              className={`relative py-1 transition-colors duration-200 focus-visible:outline-none ${
+                isLight
+                  ? "hover:text-[#1f6651] focus-visible:text-[#1f6651]"
+                  : "hover:text-[#f0f1e6] focus-visible:text-[#f0f1e6]"
+              }`}
+            >
+              Architectural World
+              {activeItem === "hero" && (
+                <span
+                  className={`absolute -bottom-1 left-0 w-full h-[1px] transition-colors duration-300 ${
+                    isLight ? "bg-[#1f6651]" : "bg-[#d0e5d3]"
+                  }`}
+                />
+              )}
+            </a>
+          </li>
+          <li>
+            <a
+              href="#manifesto-panel"
               onClick={(e) => {
                 e.preventDefault();
                 if (onExploreClick) onExploreClick();
@@ -59,59 +83,8 @@ export const Navigation: React.FC<NavigationProps> = ({
                   : "hover:text-[#f0f1e6] focus-visible:text-[#f0f1e6]"
               }`}
             >
-              Overview
+              Philosophy
               {activeItem === "manifesto" && (
-                <span
-                  className={`absolute -bottom-1 left-0 w-full h-[1px] transition-colors duration-300 ${
-                    isLight ? "bg-[#1f6651]" : "bg-[#d0e5d3]"
-                  }`}
-                />
-              )}
-            </a>
-          </li>
-          <li>
-            <a
-              href="#work"
-              onClick={(e) => {
-                e.preventDefault();
-                const target = document.getElementById("work-section");
-                if (target) target.scrollIntoView({ behavior: "smooth" });
-              }}
-              onMouseEnter={() => setActiveItem("work")}
-              onMouseLeave={() => setActiveItem(null)}
-              className={`relative py-1 transition-colors duration-200 focus-visible:outline-none ${
-                isLight
-                  ? "hover:text-[#1f6651] focus-visible:text-[#1f6651]"
-                  : "hover:text-[#f0f1e6] focus-visible:text-[#f0f1e6]"
-              }`}
-            >
-              Work
-              {activeItem === "work" && (
-                <span
-                  className={`absolute -bottom-1 left-0 w-full h-[1px] transition-colors duration-300 ${
-                    isLight ? "bg-[#1f6651]" : "bg-[#d0e5d3]"
-                  }`}
-                />
-              )}
-            </a>
-          </li>
-          <li>
-            <a
-              href="#developers"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onContactClick) onContactClick();
-              }}
-              onMouseEnter={() => setActiveItem("developers")}
-              onMouseLeave={() => setActiveItem(null)}
-              className={`relative py-1 transition-colors duration-200 focus-visible:outline-none ${
-                isLight
-                  ? "hover:text-[#1f6651] focus-visible:text-[#1f6651]"
-                  : "hover:text-[#f0f1e6] focus-visible:text-[#f0f1e6]"
-              }`}
-            >
-              For developers
-              {activeItem === "developers" && (
                 <span
                   className={`absolute -bottom-1 left-0 w-full h-[1px] transition-colors duration-300 ${
                     isLight ? "bg-[#1f6651]" : "bg-[#d0e5d3]"
