@@ -6,6 +6,7 @@ import { CurtainReveal } from "@/components/CurtainReveal";
 import { ArchitecturalSchematic } from "@/components/ArchitecturalSchematic";
 import { HeroTypography } from "@/components/HeroTypography";
 import { ContactModal } from "@/components/ContactModal";
+import { Section03Showcase } from "@/components/Section03Showcase";
 
 export default function Home() {
   const [stage, setStage] = useState<number>(0);
@@ -175,6 +176,12 @@ export default function Home() {
           </section>
         </div>
       </div>
+
+      {/* =========================================================================
+          SECTION 03: INTERACTIVE 3BHK SHOWCASE
+          Dark premium presentation stage — splash render → live 3D environment.
+         ========================================================================= */}
+      <Section03Showcase />
 
       {/* Persistent Developer Project Inquiry Dialog */}
       <ContactModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
