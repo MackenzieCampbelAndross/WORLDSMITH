@@ -29,8 +29,7 @@ export const ROOMS: RoomDef[] = [
   { id: "kitchen", label: "Kitchen", anchor: [-3.2, 5.6], view: { pos: [-2.4, 2.4, 4.4], target: [-3.9, 1.2, 7.6] } },
   { id: "utility", label: "Utility", anchor: [-5.4, 6.6], view: { pos: [-4.5, 2.2, 5.6], target: [-5.9, 1.2, 8.0] } },
   { id: "foyer", label: "Foyer", anchor: [0, -7.0], view: { pos: [0, 2.6, -9.6], target: [0, 1.4, -6.4] } },
-  { id: "hall", label: "Hall & Staircase", anchor: [0, -3.4], view: { pos: [-1.2, 2.8, -6.0], target: [0.8, 1.3, -2.2] } },
-  { id: "toilet", label: "Guest Toilet", anchor: [0, -0.2], view: { pos: [-1.2, 2.2, -1.8], target: [0.8, 1.2, 0.4] } },
+  { id: "hall", label: "Hall", anchor: [0, -3.4], view: { pos: [-1.2, 2.8, -6.0], target: [0.8, 1.3, -2.2] } },
   { id: "passage", label: "Passage", anchor: [0, 4.6], view: { pos: [-1.2, 2.4, 1.8], target: [0.4, 1.3, 6.6] } },
   { id: "master", label: "Master Bedroom", anchor: [3.0, -5.0], view: { pos: [2.6, 2.6, -3.6], target: [5.0, 1.2, -6.4] } },
   { id: "masterbath", label: "Master Bathroom", anchor: [4.2, -1.4], view: { pos: [2.4, 2.3, -3.3], target: [4.8, 1.1, -1.0] } },
@@ -46,7 +45,7 @@ export const DEFAULT_VIEWS = {
 
 export const SPAWN: [number, number] = [0, -10.2];
 export const SUN_DIRECTION = new THREE.Vector3().setFromSpherical(
-  new THREE.Spherical(1, THREE.MathUtils.degToRad(90 - 38), THREE.MathUtils.degToRad(140))
+  new THREE.Spherical(1, THREE.MathUtils.degToRad(90 - 11), THREE.MathUtils.degToRad(138))
 );
 
 type Opening = { a: number; b: number; sill?: number; head?: number };
@@ -75,7 +74,9 @@ export function buildWorld(): World {
   const geometries: THREE.BufferGeometry[] = [];
   const textures: THREE.Texture[] = [];
   const sway: Array<{ obj: THREE.Object3D; amp: number; phase: number; speed: number }> = [];
-  const windUniforms = { uTime: { value: 0 } };
+  const flutter: Array<{ obj: THREE.Object3D; baseX: number; baseZ: number; amp: number; phase: number; speed: number }> = [];
+  const WIND_DIR = new THREE.Vector2(0.82, 0.57).normalize();
+  const windUniforms = { uTime: { value: 0 }, uWindDir: { value: WIND_DIR } };
 
   const tex = (size: number, repeat: [number, number], draw: (c: CanvasRenderingContext2D, s: number) => void) => {
     const t = new THREE.CanvasTexture(makeCanvas(size, draw));
@@ -222,16 +223,18 @@ export function buildWorld(): World {
     c.fillStyle = "rgba(255,255,255,0.15)"; c.fillRect(6, 6, s - 12, 3);
     noise(c, s, 190, 0.07);
   });
-  const tLawn = tex(512, [38, 38], (c, s) => {
+  const tLawn = tex(512, [120, 120], (c, s) => {
     c.fillStyle = "#466d4b"; c.fillRect(0, 0, s, s);
     for (let i = 0; i < 12000; i++) {
       c.fillStyle = `rgba(${26 + Math.random() * 44},${56 + Math.random() * 78},${36 + Math.random() * 40},0.4)`;
       const x = Math.random() * s, y = Math.random() * s;
       c.fillRect(x, y, 1.6, 5);
     }
-    for (let i = 0; i < 160; i++) {
+    for (let i = 0; i < 260; i++) {
       c.fillStyle = "rgba(120,110,70,0.08)";
       c.beginPath(); c.arc(Math.random() * s, Math.random() * s, 10 + Math.random() * 40, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "rgba(150,170,95,0.05)";
+      c.beginPath(); c.arc(Math.random() * s, Math.random() * s, 16 + Math.random() * 46, 0, Math.PI * 2); c.fill();
     }
   });
   const tAsphalt = tex(512, [12, 2], (c, s) => {
@@ -472,7 +475,7 @@ export function buildWorld(): World {
   floor(M.floorTileGrey, 2.54, 4.38, -3.15, 6.27);
   floor(M.floorTileGrey, 1.88, 4.38, -5.52, 6.27);
   floor(M.floorTile, 3.44, 6.78, 0, -5.07);
-  floor(M.floorTileGrey, 3.44, 2.64, 0, -0.2);
+  floor(M.floorTile, 3.44, 2.64, 0, -0.2);
   floor(M.floorTile, 3.44, 7.18, 0, 4.87);
   floor(M.floorWood, 4.58, 5.58, 4.17, -5.67);
   floor(M.floorTileGrey, 4.58, 2.44, 4.17, -1.5);
@@ -515,8 +518,6 @@ export function buildWorld(): World {
     { a: 4.8, b: 5.9, head: 3.2 },
   ], IW, T_INT);
   wall(true, -1.6, -6.6, -1.8, [{ a: -4.9, b: -2.4, head: 3.4 }], IW, T_INT);
-  wall(true, -1.6, -1.8, 1.8, [{ a: -0.6, b: 0.6, head: 3.2 }], IW, T_INT);
-  wall(true, 1.2, -1.8, 1.8, [{ a: -0.6, b: 0.6, head: 3.2 }], IW, T_INT);
   wall(true, 4.0, -6.6, -1.8, [{ a: -4.1, b: -2.4, head: 3.4 }], IW, T_INT);
   wall(false, -4.5, 4.0, 8.6, [{ a: 6.5, b: 7.5, head: 3.2 }], IW, T_INT);
   wall(true, -2.8, 1.8, 6.6, [{ a: 2.7, b: 3.8, head: 3.2 }], IW, T_INT);
@@ -848,25 +849,12 @@ export function buildWorld(): World {
   plant(1.35, -7.9, 0.9);
   ceilingLamp(0, -6.4, 0.15);
   downlight(0, -8.0);
-  // staircase
-  for (let i = 0; i < 10; i++) {
-    box(M.plasterGrey, 1.1, 0.18, 0.26, 0.95, 0.34 + i * 0.18, -4.9 + i * 0.27, house, true);
-    box(M.timber, 1.12, 0.04, 0.28, 0.95, 0.44 + i * 0.18, -4.9 + i * 0.27, house);
-  }
-  for (let i = 0; i < 6; i++) cyl(M.metal, 0.016, 0.016, 1.0, 0.42, 1.3 + i * 0.3, -4.8 + i * 0.52, house, 6);
-  const rail = cyl(M.metal, 0.03, 0.03, 3.4, 0.42, 2.0, -3.6, house, 8);
-  rail.rotation.x = -0.52;
+  // Hall console
   box(M.timberDark, 0.36, 0.7, 1.1, -1.58, 0.62, -2.7, house);
   box(M.art2, 0.04, 0.9, 0.7, -1.4, 2.1, -2.7, house);
   ceilingLamp(0.2, -3.0, 0.15);
 
-  // Guest toilet
-  wc(-1.22, 0.75, Math.PI / 2);
-  vanity(1.15, 0.85, 0.9);
-  box(M.metal, 0.03, 1.0, 0.03, 1.55, 1.6, 0.1, house);
-  box(M.bedding, 0.24, 0.5, 0.03, 1.55, 1.4, 0.1, house);
-  ceilingLamp(0, -0.2, 0.08);
-  downlight(0, 0.6);
+  // Central spine is left open from foyer to passage
 
   // Passage
   box(M.timberDark, 0.32, 1.9, 0.9, -1.42, 1.22, 3.3, house, true);
@@ -966,16 +954,24 @@ export function buildWorld(): World {
     box(M.cladding, 0.58, 0.34, 0.58, gx, 2.5, -14, root);
     box(M.lampWarm, 0.16, 0.12, 0.16, gx, 2.72, -14, root);
   }
-  // pedestrian gate (open)
-  box(M.frameDark, 0.06, 1.6, 0.06, -1.3, 1.0, -13.8, root);
-  for (let i = 0; i < 7; i++) box(M.frameDark, 0.035, 1.5, 0.035, -1.3 + i * 0.33, 0.95, -13.6, root);
-  box(M.frameDark, 2.3, 0.05, 0.05, -0.15, 1.68, -13.6, root);
-  // driveway gate (open, leaves folded back)
-  for (const [gx, gw] of [[3.25, 1.45], [6.45, 1.45]] as const) {
-    box(M.frameDark, 0.06, 1.7, 0.06, gx, 1.0, -13.5, root);
-    for (let i = 0; i < 4; i++) box(M.frameDark, 0.03, 1.55, 0.04, gx + (gw / 4) * (i + 0.5), 0.98, -13.5, root);
-    box(M.frameDark, 0.06, 0.06, gw, gx + (gw / 2), 1.72, -13.5 + gw / 2, root);
-  }
+  // gates — leaves opened inward, hinged on the piers
+  const gate = (x: number, len: number, height: number, bars: number) => {
+    const z0 = -13.82;
+    const cz = z0 + len / 2;
+    box(M.frameDark, 0.06, 0.07, len, x, height - 0.04, cz, root);
+    box(M.frameDark, 0.055, 0.05, len, x, height * 0.55, cz, root);
+    box(M.frameDark, 0.055, 0.05, len, x, 0.24, cz, root);
+    box(M.frameDark, 0.07, height, 0.07, x, height / 2, z0, root);
+    box(M.frameDark, 0.07, height, 0.07, x, height / 2, z0 + len, root);
+    for (let i = 1; i < bars; i++) box(M.frameDark, 0.032, height - 0.16, 0.032, x, (height - 0.16) / 2 + 0.06, z0 + (len * i) / bars, root);
+    for (const hy of [height * 0.35, height * 0.8]) {
+      const hinge = cyl(M.metal, 0.045, 0.045, 0.12, x - 0.045, hy, z0 - 0.02, root, 8);
+      hinge.rotation.z = Math.PI / 2;
+    }
+  };
+  gate(-1.07, 1.62, 1.65, 9);
+  gate(3.42, 1.42, 1.8, 7);
+  gate(6.28, 1.42, 1.8, 7);
 
   // hedges + beds
   box(M.hedge, 4.6, 0.62, 0.7, -4.4, 0.31, -13.3, root);
@@ -1070,8 +1066,12 @@ export function buildWorld(): World {
       cg.position.set(ox * s, oy * s, oz * s);
       cg.rotation.set(Math.random() * 0.4, Math.random() * Math.PI * 2, Math.random() * 0.4);
       crown.add(cg);
+      flutter.push({
+        obj: cg, baseX: cg.rotation.x, baseZ: cg.rotation.z,
+        amp: 0.006 + Math.random() * 0.007, phase: Math.random() * Math.PI * 2, speed: 1.0 + Math.random() * 0.7,
+      });
     }
-    addSway(crown, 0.022 + (seed % 0.02), seed % 6.28, 0.55 + (seed % 0.3));
+    addSway(crown, 0.03 + (seed % 0.02), seed % 6.28, 0.55 + (seed % 0.3));
   };
 
   const palm = (x: number, z: number, s: number) => {
@@ -1105,8 +1105,12 @@ export function buildWorld(): World {
       frond.rotation.y = (i * Math.PI * 2) / 9;
       frond.rotation.z = 0.16;
       fronds.add(frond);
+      flutter.push({
+        obj: frond, baseX: 0, baseZ: 0.16,
+        amp: 0.008 + Math.random() * 0.006, phase: Math.random() * Math.PI * 2, speed: 1.2 + Math.random() * 0.5,
+      });
     }
-    addSway(fronds, 0.055, x * 0.3, 0.8);
+    addSway(fronds, 0.05, x * 0.3, 0.8);
   };
 
   const bush = (x: number, z: number, s: number) => {
@@ -1162,29 +1166,39 @@ export function buildWorld(): World {
   // ============================================================
   // GRASS — instanced, wind-reactive
   // ============================================================
-  const bladeGeo = new THREE.PlaneGeometry(0.07, 0.5, 1, 4);
+  const bladeGeo = new THREE.PlaneGeometry(0.065, 0.5, 1, 4);
   bladeGeo.translate(0, 0.25, 0);
   geometries.push(bladeGeo);
   const grassMat = mat({ color: 0xffffff, roughness: 0.92, side: THREE.DoubleSide });
   grassMat.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = windUniforms.uTime;
-    shader.vertexShader = "uniform float uTime;\n" + shader.vertexShader.replace(
+    shader.uniforms.uWindDir = windUniforms.uWindDir;
+    shader.vertexShader = `uniform float uTime;\nuniform vec2 uWindDir;\n` + shader.vertexShader.replace(
       "#include <begin_vertex>",
       `#include <begin_vertex>
       #ifdef USE_INSTANCING
-        vec3 grassOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
+        vec3 grassOrigin = instanceMatrix[3].xyz;
+        vec3 instX = normalize(instanceMatrix[0].xyz + vec3(0.0001));
+        vec3 instZ = normalize(instanceMatrix[2].xyz + vec3(0.0001));
       #else
         vec3 grassOrigin = vec3(0.0);
+        vec3 instX = vec3(1.0, 0.0, 0.0);
+        vec3 instZ = vec3(0.0, 0.0, 1.0);
       #endif
       float bladeH = max(transformed.y, 0.0);
-      float gustA = sin(uTime * 1.7 + grassOrigin.x * 0.62 + grassOrigin.z * 0.43);
-      float gustB = sin(uTime * 3.0 + grassOrigin.x * 1.7 + grassOrigin.z * 1.05);
-      transformed.x += (gustA * 0.72 + gustB * 0.28) * bladeH * bladeH * 0.34;
-      transformed.z += gustB * 0.4 * bladeH * bladeH * 0.2;`
+      float phase = grassOrigin.x * 0.31 + grassOrigin.z * 0.23;
+      float travel = (grassOrigin.x * uWindDir.x + grassOrigin.z * uWindDir.y) * 0.19;
+      float wave = sin(uTime * 1.05 - travel + phase * 0.35);
+      float ripple = sin(uTime * 1.9 - travel * 1.7 + phase * 1.3);
+      float tip = bladeH * bladeH;
+      float amp = 0.115 * (0.75 + 0.25 * sin(phase * 2.1));
+      vec2 off = uWindDir * ((wave * 0.75 + ripple * 0.25) * amp * tip);
+      transformed.x += dot(off, instX.xz);
+      transformed.z += dot(off, instZ.xz);`
     );
   };
 
-  const GRASS_COUNT = 24000;
+  const GRASS_COUNT = 48000;
   const grass = new THREE.InstancedMesh(bladeGeo, grassMat, GRASS_COUNT);
   grass.receiveShadow = true;
   grass.frustumCulled = false;
@@ -1194,33 +1208,63 @@ export function buildWorld(): World {
     return gseed / 4294967296;
   };
   const grassBlocked = (x: number, z: number) => {
+    if (z > -23.6 && z < -13.55) return true;
     if (x > -7.35 && x < 7.35 && z > -11.9 && z < 9.4) return true;
-    if (x > 3.1 && x < 6.6 && z > -14.4 && z < -8.7) return true;
-    if (x > -1.5 && x < 1.5 && z > -14.4 && z < -11.0) return true;
+    if (x > 3.1 && x < 6.7 && z > -14 && z < -8.7) return true;
+    if (x > -1.5 && x < 1.5 && z > -14 && z < -11.0) return true;
     if (x > -6.6 && x < -3.4 && z > -10.1 && z < -8.9) return true;
     if (x > 7.6 && x < 9.8 && z > -13.9 && z < -12.3) return true;
+    if (x > -3.8 && x < 7.8 && z > 22.6 && z < 31.4) return true;
     return false;
   };
   const dummy = new THREE.Object3D();
   const grassColor = new THREE.Color();
   let placed = 0;
-  for (let attempt = 0; attempt < GRASS_COUNT * 4 && placed < GRASS_COUNT; attempt++) {
-    const x = -20 + grad() * 40;
-    const z = -13.7 + grad() * 35.5;
+  for (let attempt = 0; attempt < GRASS_COUNT * 6 && placed < GRASS_COUNT; attempt++) {
+    const x = -48 + grad() * 96;
+    const z = -25 + grad() * 71;
     if (grassBlocked(x, z)) continue;
+    const density = 0.5 + 0.5 * Math.sin(x * 0.23 + 1.3) * Math.cos(z * 0.19 - 0.7);
+    if (grad() > 0.35 + 0.65 * density) continue;
     dummy.position.set(x, 0.02, z);
     dummy.rotation.set(0, grad() * Math.PI * 2, 0);
-    const h = 0.6 + grad() * 0.85;
-    dummy.scale.set(0.75 + grad() * 0.7, h, 1);
+    let h = 0.55 + grad() * 1.05;
+    if (grad() < 0.05) h += 0.5;
+    dummy.scale.set(0.7 + grad() * 0.85, h, 1);
     dummy.updateMatrix();
     grass.setMatrixAt(placed, dummy.matrix);
-    grassColor.setHSL(0.255 + grad() * 0.055, 0.32 + grad() * 0.22, 0.24 + grad() * 0.14);
+    grassColor.setHSL(0.245 + grad() * 0.06, 0.3 + grad() * 0.25, 0.2 + grad() * 0.19);
     grass.setColorAt(placed, grassColor);
     placed++;
   }
   grass.count = placed;
   if (grass.instanceColor) grass.instanceColor.needsUpdate = true;
   root.add(grass);
+
+  // Outer meadow: a coarser field extending the lawn to the horizon
+  const OUTER_COUNT = 30000;
+  const grassOuter = new THREE.InstancedMesh(bladeGeo, grassMat, OUTER_COUNT);
+  grassOuter.receiveShadow = true;
+  grassOuter.frustumCulled = false;
+  let outerPlaced = 0;
+  for (let attempt = 0; attempt < OUTER_COUNT * 5 && outerPlaced < OUTER_COUNT; attempt++) {
+    const x = -115 + grad() * 230;
+    const z = -65 + grad() * 185;
+    if (x > -40 && x < 40 && z > -20 && z < 40) continue;
+    if (z > -23.6 && z < -13.55 && x > -80 && x < 80) continue;
+    dummy.position.set(x, 0.02, z);
+    dummy.rotation.set(0, grad() * Math.PI * 2, 0);
+    const h = 0.9 + grad() * 1.3;
+    dummy.scale.set(1.1 + grad() * 1.3, h, 1);
+    dummy.updateMatrix();
+    grassOuter.setMatrixAt(outerPlaced, dummy.matrix);
+    grassColor.setHSL(0.245 + grad() * 0.06, 0.3 + grad() * 0.24, 0.2 + grad() * 0.18);
+    grassOuter.setColorAt(outerPlaced, grassColor);
+    outerPlaced++;
+  }
+  grassOuter.count = outerPlaced;
+  if (grassOuter.instanceColor) grassOuter.instanceColor.needsUpdate = true;
+  root.add(grassOuter);
 
   // street lights
   for (const x of [-18, 0, 18]) {
@@ -1241,8 +1285,6 @@ export function buildWorld(): World {
     for (let i = 0; i < 4; i++) cyl(M.frameDark, 0.025, 0.025, 1.4, -w / 2 + 0.6 + i * (w / 4), 1.7, -(d / 2 + 0.06), g, 4);
     root.add(g);
   };
-  neighbour(-27, -2, 0.18, 10, 8, M.plasterExt);
-  neighbour(27, 5, -0.14, 9, 8, M.plasterGrey);
   neighbour(2, 27, Math.PI, 11, 8, M.plasterExt);
 
   // street
@@ -1373,10 +1415,10 @@ export function buildWorld(): World {
   const sky = new Sky();
   sky.scale.setScalar(2000);
   const su = sky.material.uniforms;
-  su["turbidity"].value = 4.6;
-  su["rayleigh"].value = 2.0;
-  su["mieCoefficient"].value = 0.005;
-  su["mieDirectionalG"].value = 0.82;
+  su["turbidity"].value = 7.0;
+  su["rayleigh"].value = 2.8;
+  su["mieCoefficient"].value = 0.006;
+  su["mieDirectionalG"].value = 0.88;
   su["sunPosition"].value.copy(SUN_DIRECTION);
   root.add(sky);
 
@@ -1414,7 +1456,7 @@ export function buildWorld(): World {
   cloudTex.colorSpace = THREE.SRGBColorSpace;
   textures.push(cloudTex);
   const cloudMat = new THREE.MeshBasicMaterial({
-    map: cloudTex, transparent: true, opacity: 0.75, depthWrite: false,
+    map: cloudTex, color: 0xffd9b8, transparent: true, opacity: 0.65, depthWrite: false,
     side: THREE.BackSide, fog: false,
   });
   materials.push(cloudMat);
@@ -1422,25 +1464,25 @@ export function buildWorld(): World {
   cloudDome.position.y = -30;
   root.add(cloudDome);
 
-  const p1 = new THREE.PointLight(0xffe0b0, 36, 16, 2);
+  const p1 = new THREE.PointLight(0xffe0b0, 46, 16, 2);
   p1.position.set(-4.2, 3.3, -5.2);
   root.add(p1);
-  const p2 = new THREE.PointLight(0xffe0b0, 30, 15, 2);
+  const p2 = new THREE.PointLight(0xffe0b0, 38, 15, 2);
   p2.position.set(4.2, 3.3, -5.6);
   root.add(p2);
-  const p3 = new THREE.PointLight(0xfff0d8, 24, 14, 2);
+  const p3 = new THREE.PointLight(0xfff0d8, 30, 14, 2);
   p3.position.set(0, 3.3, -3.0);
   root.add(p3);
-  const p4 = new THREE.PointLight(0xffe8c8, 22, 13, 2);
+  const p4 = new THREE.PointLight(0xffe8c8, 28, 13, 2);
   p4.position.set(-3.2, 3.3, 4.8);
   root.add(p4);
-  const p5 = new THREE.PointLight(0xfff0d8, 18, 12, 2);
+  const p5 = new THREE.PointLight(0xfff0d8, 24, 12, 2);
   p5.position.set(4.2, 3.3, 5.6);
   root.add(p5);
-  const p6 = new THREE.PointLight(0xffe8c8, 14, 10, 2);
+  const p6 = new THREE.PointLight(0xffe8c8, 18, 10, 2);
   p6.position.set(4.2, 3.3, -1.5);
   root.add(p6);
-  const porchLight = new THREE.PointLight(0xffd9a0, 16, 9, 2);
+  const porchLight = new THREE.PointLight(0xffd9a0, 24, 9, 2);
   porchLight.position.set(0, 3.0, -9.8);
   root.add(porchLight);
 
@@ -1457,9 +1499,17 @@ export function buildWorld(): World {
   const update = (dt: number) => {
     elapsed += dt;
     windUniforms.uTime.value = elapsed;
+    const gust = 0.62 + 0.38 * Math.sin(elapsed * 0.42 + 1.7) * Math.cos(elapsed * 0.21);
     for (const s of sway) {
-      s.obj.rotation.z = Math.sin(elapsed * s.speed + s.phase) * s.amp;
-      s.obj.rotation.x = Math.cos(elapsed * s.speed * 0.82 + s.phase * 1.3) * s.amp * 0.55;
+      const wave = Math.sin(elapsed * s.speed + s.phase) * 0.7 + Math.sin(elapsed * s.speed * 1.63 + s.phase * 2.1) * 0.3;
+      const tilt = wave * s.amp * gust;
+      s.obj.rotation.z = -WIND_DIR.x * tilt;
+      s.obj.rotation.x = WIND_DIR.y * tilt;
+    }
+    for (const f of flutter) {
+      const m = Math.sin(elapsed * f.speed + f.phase) * f.amp * (0.8 + 0.2 * Math.sin(elapsed * 0.5 + f.phase));
+      f.obj.rotation.x = f.baseX + m;
+      f.obj.rotation.z = f.baseZ + m * 0.7;
     }
     cloudDome.rotation.y += dt * 0.0035;
     cloudTex.offset.x = elapsed * 0.0018;

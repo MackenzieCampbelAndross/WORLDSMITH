@@ -75,26 +75,26 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.66;
+    renderer.toneMappingExposure = 0.75;
     mount.appendChild(renderer.domElement);
     Object.assign(renderer.domElement.style, { display: "block", width: "100%", height: "100%" });
     renderer.domElement.tabIndex = 0;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xc9d4d8, 130, 420);
+    scene.fog = new THREE.Fog(0xd8c3a4, 110, 380);
 
     // Image-based lighting for believable PBR response
     const pmrem = new THREE.PMREMGenerator(renderer);
     const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = envTex;
-    scene.environmentIntensity = 0.6;
+    scene.environmentIntensity = 0.42;
 
     const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.1, 4000);
     camera.position.copy(DEFAULT_VIEWS.overview.pos);
 
-    const hemi = new THREE.HemisphereLight(0xdfe9e2, 0x3a443c, 0.5);
+    const hemi = new THREE.HemisphereLight(0xf3d6b4, 0x3d3a2c, 0.55);
     scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xffeecf, 3.6);
+    const sun = new THREE.DirectionalLight(0xffc07c, 3.1);
     sun.position.copy(SUN_DIRECTION).multiplyScalar(80);
     sun.castShadow = true;
     const coarse = window.matchMedia("(pointer: coarse)").matches;
@@ -105,7 +105,7 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     sun.shadow.camera.bottom = -36;
     sun.shadow.camera.far = 220;
     sun.shadow.bias = -0.00035;
-    sun.shadow.normalBias = 0.02;
+    sun.shadow.normalBias = 0.025;
     sun.shadow.radius = 2.5;
     scene.add(sun);
     scene.add(sun.target);

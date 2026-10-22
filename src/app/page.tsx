@@ -7,6 +7,7 @@ import { ArchitecturalSchematic } from "@/components/ArchitecturalSchematic";
 import { HeroTypography } from "@/components/HeroTypography";
 import { ContactModal } from "@/components/ContactModal";
 import { Section03Showcase } from "@/components/Section03Showcase";
+import { Section04Transformation } from "@/components/Section04Transformation";
 
 export default function Home() {
   const [stage, setStage] = useState<number>(0);
@@ -182,6 +183,12 @@ export default function Home() {
           Dark premium presentation stage — splash render → live 3D environment.
          ========================================================================= */}
       <Section03Showcase />
+
+      {/* =========================================================================
+          SECTION 04: FROM PLAN TO PLACE
+          Golden-hour transformation stage — plan → structure → experience.
+         ========================================================================= */}
+      <Section04Transformation />
 
       {/* Persistent Developer Project Inquiry Dialog */}
       <ContactModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
