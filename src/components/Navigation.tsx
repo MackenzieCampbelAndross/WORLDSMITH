@@ -38,7 +38,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           }`}
           aria-label="WorldSmith Homepage"
         >
-          <span className="relative inline-block select-none font-display text-lg font-bold uppercase leading-none tracking-[0.16em] sm:text-xl">
+          <span className="relative inline-block select-none font-cormorant text-[20px] font-medium uppercase leading-none tracking-[0.16em] sm:text-[22px]">
             <span
               id="wordmark"
               className={`block ${
@@ -69,15 +69,11 @@ export const Navigation: React.FC<NavigationProps> = ({
           type="button"
           onClick={onContactClick}
           aria-label="Contact WorldSmith"
-          className="pointer-events-auto group relative inline-flex items-center justify-center rounded-full border border-[#444238]/60 bg-[#25231b] px-5 py-2 text-xs font-semibold tracking-wider text-[#f0f1e6] shadow-sm transition-all duration-300 hover:border-[#a8cebc]/50 hover:bg-[#1a1813] hover:shadow active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d0e5d3] sm:px-6 sm:py-2.5"
+          className="pointer-events-auto group relative inline-flex items-center justify-center rounded-full border border-[#3a3934] bg-[#0b0b0a]/85 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#e9e6db] transition-all duration-300 hover:border-[#6e6a60] hover:bg-[#151512] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e9e6db] focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:px-5 sm:py-2.5 sm:text-[11px]"
         >
           <span className="relative flex items-center gap-2">
-            <span>Contact</span>
-            <span
-              className={`h-1.5 w-1.5 rounded-full transition-colors duration-200 ${
-                isLight ? "bg-[#1f6651] group-hover:bg-[#d0e5d3]" : "bg-[#a8cebc] group-hover:bg-[#d0e5d3]"
-              }`}
-            />
+            <span>Contact Now</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#e9e6db] transition-colors duration-200 group-hover:bg-white" />
           </span>
         </button>
       </div>

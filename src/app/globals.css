@@ -16,6 +16,8 @@
     --line-subtle: rgba(168, 206, 188, 0.22);
     --line-active: #d0e5d3;
     --btn-surface: #25231b;
+    --paper-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+    --wordmark-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wordmarkNoise' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wordmarkNoise)' opacity='0.13'/%3E%3C/svg%3E");
   }
 
   body {
@@ -38,17 +40,37 @@
   font-family: var(--font-instrument-serif), serif;
 }
 
-/* Subtle architectural paper noise texture overlay */
-.paper-grain {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+.font-anton {
+  font-family: var(--font-anton), sans-serif;
 }
 
-/* Vertical guide lines */
+.font-cormorant {
+  font-family: var(--font-cormorant-garamond), serif;
+}
+
+.footer-wordmark {
+  color: #171717;
+  line-height: 1;
+  background-color: #171717;
+  background-image: var(--wordmark-noise);
+  background-size: 140px 140px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle architectural paper noise texture overlay */
+.paper-grain {
+  background-image: var(--paper-noise);
+}
+
+/* Original hero datum grid, shared by sections with section-specific line colours. */
 .grid-lines {
+  --grid-line-color: rgba(168, 206, 188, 0.07);
   background-size: calc(100% / 8) 100%;
   background-image: linear-gradient(
     to right,
-    rgba(168, 206, 188, 0.08) 1px,
+    var(--grid-line-color) 1px,
     transparent 1px
   );
 }
@@ -59,20 +81,36 @@
   }
 }
 
-/* Light ivory editorial section grid lines (10/12 column architectural datum) */
-.grid-lines-ivory {
-  background-size: calc(100% / 8) 100%;
-  background-image: linear-gradient(
-    to right,
-    rgba(31, 102, 81, 0.08) 1px,
-    transparent 1px
-  );
+/* Quiet signal pulses travelling along the schematic's existing connections. */
+@keyframes diagramSignal {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  72% {
+    opacity: 0.95;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
 }
 
-@media (min-width: 1024px) {
-  .grid-lines-ivory {
-    background-size: calc(100% / 10) 100%;
-  }
+.diagram-signal {
+  stroke-dasharray: 0.045 0.955;
+  stroke-linecap: round;
+  animation: diagramSignal 9s linear infinite;
+  animation-delay: var(--signal-delay, 0s);
+  filter: drop-shadow(0 0 3px rgba(240, 241, 230, 0.35));
+  pointer-events: none;
+}
+
+.diagram-signal--reverse {
+  animation-direction: reverse;
+  animation-duration: 11s;
 }
 
 /* Curtain reveal animation */
@@ -153,5 +191,10 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .diagram-signal {
+    animation: none !important;
+    opacity: 0 !important;
   }
 }

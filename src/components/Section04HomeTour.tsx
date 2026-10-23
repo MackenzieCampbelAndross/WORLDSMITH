@@ -92,23 +92,14 @@ export const Section04HomeTour: React.FC = () => {
         className="pointer-events-none absolute inset-0 paper-grain opacity-[0.16] mix-blend-multiply"
         aria-hidden="true"
       />
+      <div
+        className="pointer-events-none absolute inset-0 grid-lines"
+        style={{ "--grid-line-color": "rgba(31, 102, 81, 0.045)" } as React.CSSProperties}
+        aria-hidden="true"
+      />
 
       <div className="relative z-10 mx-auto w-full max-w-[1760px] px-[4.5vw] pb-10 pt-[6.5rem] lg:pb-14">
-        {/* Section marker */}
-        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
-          <div className="flex items-center gap-4">
-            <span className="font-display text-[12px] font-medium tracking-[0.06em] text-[#1f6651]/85">04</span>
-            <span className="h-px w-[74px] bg-[#1f6651]/30" aria-hidden="true" />
-            <span className="font-display text-[10px] font-medium uppercase tracking-[0.3em] text-[#1f6651]/80 sm:text-[11px]">
-              The Homebuyer Experience
-            </span>
-          </div>
-          <p className="font-accent text-[15px] italic text-[#1f6651]/70 sm:text-[16px]">
-            Casa Verdant <span className="not-italic font-body text-[10px] uppercase tracking-[0.18em]">· 3 bedroom villa</span>
-          </p>
-        </div>
-
-        <div className="mt-8 grid items-center gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.55fr)] xl:gap-x-20">
+        <div className="grid items-center gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.55fr)] xl:gap-x-20">
           {/* Buyer-facing proposition */}
           <div className="max-w-[33rem] lg:py-4">
             <h2 className="font-display text-[clamp(2.55rem,4.1vw,4.6rem)] font-medium leading-[0.98] tracking-[-0.045em] text-[#173f32]">

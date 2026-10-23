@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
   COMPANY_MAX,
   EMAIL_MAX,
@@ -78,7 +79,7 @@ const FIELD_DEFINITIONS: FieldDefinition[] = [
     type: "tel",
     autoComplete: "tel",
     inputMode: "tel",
-    placeholder: "+1 415 555 0132",
+    placeholder: "+91 98765 43210",
     maxLength: PHONE_MAX,
     required: true,
   },
@@ -98,7 +99,7 @@ const FIELD_DEFINITIONS: FieldDefinition[] = [
     type: "url",
     autoComplete: "url",
     inputMode: "url",
-    placeholder: "example.com",
+    placeholder: "https://yourcompany.com",
     maxLength: WEBSITE_MAX,
     required: false,
     fullWidth: true,
@@ -237,52 +238,61 @@ export const FinalCta: React.FC = () => {
     <section
       id="contact"
       aria-labelledby="contact-section-heading"
-      className="relative scroll-mt-24 overflow-hidden bg-[#153f31] font-body text-[#f0f1e6]"
+      className="relative overflow-hidden bg-black font-body text-[#e9e6db] selection:bg-[#e9e6db] selection:text-black"
     >
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/showcase/villa-splash.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover object-[50%_68%] opacity-[0.42]"
-        />
-        <div className="absolute inset-0 bg-[#153f31]/45" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#153f31] via-[#153f31]/70 to-[#153f31]/88" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#153f31] via-transparent to-[#153f31]/50" />
-        <div className="absolute inset-0 grid-lines opacity-35" />
-        <div className="paper-grain absolute inset-0 opacity-40 mix-blend-soft-light" />
-      </div>
+      <div
+        className="pointer-events-none absolute inset-0 grid-lines"
+        style={{ "--grid-line-color": "rgba(233, 230, 219, 0.045)" } as React.CSSProperties}
+        aria-hidden="true"
+      />
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1760px] flex-col px-6 pb-8 pt-24 sm:px-10 sm:pt-28 lg:px-14 lg:pb-10 xl:px-[4.5vw] xl:pt-32">
-        <div className="grid flex-1 items-start gap-12 py-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,620px)] xl:gap-20 xl:py-14">
-          <div className="max-w-[38rem] xl:pt-4">
-            <p className="flex items-center gap-3 font-body text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b9d4c5]/85 sm:text-[11px]">
-              <span className="font-accent text-[15px] font-normal italic tracking-normal text-[#d0e5d3]">
-                08
-              </span>
-              <span className="text-[#a8cebc]/50" aria-hidden="true">
-                —
-              </span>
-              LET&apos;S BEGIN
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1560px] flex-col justify-center px-6 pb-4 pt-[clamp(6rem,13svh,8.5rem)] sm:px-10 sm:pb-5 lg:px-14 lg:pb-6">
+        <div className="overflow-hidden rounded-[14px] bg-black ring-1 ring-white/[0.07] xl:grid xl:min-h-[min(760px,calc(100svh-14rem))] xl:grid-cols-[52%_48%] xl:rounded-[18px]">
+          <div className="relative min-h-[300px] overflow-hidden sm:min-h-[400px] md:min-h-[460px] lg:min-h-[520px] xl:min-h-0">
+            <Image
+              src="/showcase/contact-cantilever.png"
+              alt="Minimal concrete and glass residence cantilevered over a still reflecting pool at dusk"
+              fill
+              sizes="(min-width: 1280px) 52vw, 100vw"
+              className="object-cover object-center brightness-[0.92] saturate-[0.65]"
+            />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage:
+                  "linear-gradient(180deg, rgba(0,0,0,0.24) 0%, rgba(0,0,0,0) 38%, rgba(0,0,0,0.18) 68%, rgba(0,0,0,0.74) 100%)",
+              }}
+              aria-hidden="true"
+            />
+            <div className="absolute inset-x-0 bottom-0 p-7 drop-shadow-[0_1px_18px_rgba(0,0,0,0.55)] sm:p-9 lg:p-10 xl:p-12">
+              <p className="font-body text-[11px] font-medium tracking-[0.08em] text-[#e9e6db]/80">
+                Design environments
+              </p>
+              <p className="mt-2 font-display text-[clamp(1.2rem,1.5vw,1.55rem)] font-medium leading-[1.15] tracking-[-0.02em] text-[#f4f1e8]">
+                that move people.
+              </p>
+              <div className="mt-4 h-px w-9 bg-[#e9e6db]/45" aria-hidden="true" />
+            </div>
+          </div>
+
+          <div className="flex flex-col bg-black px-6 py-10 sm:px-9 sm:py-12 lg:px-12 lg:py-14 xl:justify-center xl:px-[clamp(2.25rem,3.4vw,3.5rem)] xl:py-[clamp(2rem,5.2svh,3.5rem)]">
+            <p className="font-body text-[10px] font-semibold uppercase tracking-[0.26em] text-[#b7b2a6]">
+              Enquiry
             </p>
 
             <h2
               id="contact-section-heading"
-              className="mt-8 font-display text-[clamp(2.9rem,5.2vw,5.4rem)] font-medium leading-[0.98] tracking-[-0.045em] text-[#f0f1e6]"
+              className="mt-[clamp(1rem,2svh,1.5rem)] font-display text-[clamp(2.6rem,min(3.8vw,5.8svh),4rem)] font-medium leading-[1.02] tracking-[-0.045em] text-[#efebe1]"
             >
-              Let&apos;s build{" "}
+              Let&apos;s build
               <br />
               your world.
             </h2>
 
-            <p className="mt-6 max-w-[24rem] font-body text-[15px] leading-[1.75] text-[#d6e5db]/80 sm:text-[16px]">
+            <p className="mt-[clamp(0.75rem,1.4svh,1rem)] max-w-[30rem] text-balance font-body text-[14px] leading-[1.7] text-[#a5a096] sm:text-[15px]">
               Tell us a little about yourself. We&apos;ll take it from there.
             </p>
-          </div>
 
-          <div className="w-full bg-[#f4f1e7] p-6 text-[#173f32] sm:p-8 xl:max-w-[620px] xl:justify-self-end xl:p-10">
             {status === "success" ? (
               <div
                 id="contact-success"
@@ -290,157 +300,137 @@ export const FinalCta: React.FC = () => {
                 role="status"
                 aria-live="polite"
                 tabIndex={-1}
-                className="flex min-h-[380px] flex-col justify-center focus:outline-none"
+                className="mt-[clamp(1rem,2svh,1.5rem)] flex min-h-[clamp(180px,28svh,290px)] flex-col justify-center border-t border-white/10 focus:outline-none"
               >
-                <p className="font-body text-[10px] font-semibold uppercase tracking-[0.24em] text-[#1f6651]/60">
-                  Enquiry
-                </p>
-                <h3 className="mt-5 max-w-[27rem] font-display text-[clamp(1.8rem,2.6vw,2.45rem)] font-medium leading-[1.14] tracking-[-0.03em] text-[#153f31]">
+                <p className="max-w-[24rem] font-display text-[clamp(1.55rem,2.2vw,2.1rem)] font-medium leading-[1.28] tracking-[-0.03em] text-[#efebe1]">
                   Thank you. Your enquiry has been received. We&apos;ll be in touch soon.
-                </h3>
-                <div className="mt-7 h-px w-16 bg-[#1f6651]/20" aria-hidden="true" />
+                </p>
               </div>
             ) : (
-              <>
-                <h3
-                  id="contact-form-heading"
-                  className="font-body text-[10px] font-semibold uppercase tracking-[0.24em] text-[#153f31]/60"
+              <form
+                id="contact-form"
+                aria-labelledby="contact-section-heading"
+                noValidate
+                aria-busy={sending}
+                onSubmit={handleSubmit}
+                className="mt-[clamp(1rem,2svh,1.5rem)]"
+              >
+                <div
+                  aria-hidden="true"
+                  className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
                 >
-                  Enquiry
-                </h3>
-                <div className="mt-4 h-px w-full bg-[#153f31]/10" aria-hidden="true" />
+                  <label htmlFor="contact-hp">Leave this field empty</label>
+                  <input
+                    id="contact-hp"
+                    name="hp"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={values.hp}
+                    onChange={(event) =>
+                      setValues((current) => ({ ...current, hp: event.target.value }))
+                    }
+                  />
+                </div>
 
-                <form
-                  id="contact-form"
-                  aria-labelledby="contact-form-heading"
-                  noValidate
-                  aria-busy={sending}
-                  onSubmit={handleSubmit}
-                  className="mt-6"
-                >
-                  <div
-                    aria-hidden="true"
-                    className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
-                  >
-                    <label htmlFor="contact-hp">Leave this field empty</label>
-                    <input
-                      id="contact-hp"
-                      name="hp"
-                      type="text"
-                      tabIndex={-1}
-                      autoComplete="off"
-                      value={values.hp}
-                      onChange={(event) =>
-                        setValues((current) => ({ ...current, hp: event.target.value }))
-                      }
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
-                    {FIELD_DEFINITIONS.map((field) => {
-                      const error = errors[field.name];
-                      return (
-                        <div key={field.name} className={field.fullWidth ? "sm:col-span-2" : ""}>
-                          <label
-                            htmlFor={fieldId(field.name)}
-                            className="mb-2 flex items-center gap-1.5 font-body text-[11px] font-semibold text-[#173f32]/80"
-                          >
-                            {field.label}
-                            {field.required ? (
-                              <>
-                                <span className="text-[#9a4331]" aria-hidden="true">
-                                  *
-                                </span>
-                                <span className="sr-only">(required)</span>
-                              </>
-                            ) : (
-                              <span className="font-normal text-[#173f32]/40">(optional)</span>
-                            )}
-                          </label>
-                          <input
-                            id={fieldId(field.name)}
-                            name={field.name}
-                            type={field.type}
-                            autoComplete={field.autoComplete}
-                            inputMode={field.inputMode}
-                            required={field.required}
-                            maxLength={field.maxLength}
-                            value={values[field.name]}
-                            onChange={(event) => updateField(field.name, event.target.value)}
-                            onBlur={() => handleBlur(field.name)}
-                            disabled={sending}
-                            aria-invalid={Boolean(error)}
-                            aria-describedby={error ? errorId(field.name) : undefined}
-                            placeholder={field.placeholder}
-                            className={`h-12 w-full rounded-[2px] border bg-[#fbf9f2] px-3.5 font-body text-[14px] text-[#173f32] placeholder:text-[#173f32]/30 transition-colors duration-200 focus:outline-none focus:ring-1 disabled:cursor-wait disabled:opacity-60 ${
-                              error
-                                ? "border-[#9a4331] focus:border-[#9a4331] focus:ring-[#9a4331]/20"
-                                : "border-[#173f32]/15 hover:border-[#173f32]/30 focus:border-[#1f6651] focus:ring-[#1f6651]/25"
-                            }`}
-                          />
-                          {error && (
-                            <p
-                              id={errorId(field.name)}
-                              role="alert"
-                              className="mt-1.5 font-body text-[11px] leading-relaxed text-[#9a4331]"
-                            >
-                              {error}
-                            </p>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {status === "error" && serverMessage && (
-                    <div
-                      role="alert"
-                      className="mt-5 border-l-2 border-[#9a4331] bg-[#9a4331]/[0.06] px-3.5 py-3"
-                    >
-                      <p className="font-body text-[12px] leading-relaxed text-[#7e3527]">
-                        {serverMessage}
-                      </p>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={sending}
-                    aria-busy={sending}
-                    className="group mt-6 flex h-[52px] w-full items-center justify-center gap-2 rounded-[2px] bg-[#153f31] px-6 font-body text-[11px] font-semibold uppercase tracking-[0.2em] text-[#f0f1e6] transition-colors duration-200 hover:bg-[#1f5e44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6651] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1e7] disabled:cursor-wait disabled:bg-[#153f31]/70"
-                  >
-                    {sending ? (
-                      "SENDING…"
-                    ) : (
-                      <>
-                        GET IN TOUCH{" "}
-                        <span
-                          aria-hidden="true"
-                          className="text-[14px] tracking-normal transition-transform duration-200 group-hover:translate-x-1"
+                <div className="grid grid-cols-1 gap-x-5 gap-y-5 xl:grid-cols-2 xl:gap-y-[clamp(0.7rem,1.5svh,1rem)]">
+                  {FIELD_DEFINITIONS.map((field) => {
+                    const error = errors[field.name];
+                    return (
+                      <div key={field.name} className={field.fullWidth ? "xl:col-span-2" : ""}>
+                        <label
+                          htmlFor={fieldId(field.name)}
+                          className="mb-2 flex items-center gap-1.5 font-body text-[11px] font-semibold tracking-[0.02em] text-[#cfcabd]"
                         >
-                          →
-                        </span>
-                      </>
-                    )}
-                  </button>
+                          {field.label}
+                          {field.required ? (
+                            <>
+                              <span
+                                className={error ? "text-[#cf9585]" : "text-[#8a857a]"}
+                                aria-hidden="true"
+                              >
+                                *
+                              </span>
+                              <span className="sr-only">(required)</span>
+                            </>
+                          ) : (
+                            <span className="font-normal text-[#7d786e]">(optional)</span>
+                          )}
+                        </label>
+                        <input
+                          id={fieldId(field.name)}
+                          name={field.name}
+                          type={field.type}
+                          autoComplete={field.autoComplete}
+                          inputMode={field.inputMode}
+                          required={field.required}
+                          maxLength={field.maxLength}
+                          value={values[field.name]}
+                          onChange={(event) => updateField(field.name, event.target.value)}
+                          onBlur={() => handleBlur(field.name)}
+                          disabled={sending}
+                          aria-invalid={Boolean(error)}
+                          aria-describedby={error ? errorId(field.name) : undefined}
+                          placeholder={field.placeholder}
+                          className={`h-12 w-full rounded-[3px] border bg-[#050505] px-3.5 font-body text-[14px] text-[#eeeae0] placeholder:text-[#706c63] transition-colors duration-200 focus:outline-none focus:ring-1 disabled:cursor-wait disabled:opacity-50 xl:h-[clamp(2.65rem,5.4svh,3rem)] ${
+                            error
+                              ? "border-[#9a6a5d] focus:border-[#b98273] focus:ring-[#b98273]/25"
+                              : "border-[#34332e] hover:border-[#4b4942] focus:border-[#b9b4a7] focus:ring-[#b9b4a7]/20"
+                          }`}
+                        />
+                        {error && (
+                          <p
+                            id={errorId(field.name)}
+                            role="alert"
+                            className="mt-1.5 font-body text-[11px] leading-relaxed text-[#cf9585]"
+                          >
+                            {error}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
 
-                  <p className="sr-only" role="status" aria-live="polite">
-                    {sending ? "Sending your enquiry." : ""}
-                  </p>
-                </form>
-              </>
+                {status === "error" && serverMessage && (
+                  <div
+                    role="alert"
+                    className="mt-5 border-l border-[#9a6a5d] bg-[#9a6a5d]/[0.08] px-3.5 py-3"
+                  >
+                    <p className="font-body text-[12px] leading-relaxed text-[#d3a79a]">
+                      {serverMessage}
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={sending}
+                  aria-busy={sending}
+                  className="group mt-[clamp(1rem,2.2svh,1.5rem)] flex h-[52px] w-full items-center justify-center gap-2 rounded-[3px] bg-[#ece7db] px-6 font-body text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0a0a09] transition-colors duration-200 hover:bg-[#f7f3ea] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ece7db] focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-wait disabled:bg-[#c9c4b8] disabled:text-black/45 xl:h-[clamp(2.8rem,5.6svh,3.25rem)]"
+                >
+                  {sending ? (
+                    "SENDING…"
+                  ) : (
+                    <>
+                      GET IN TOUCH{" "}
+                      <span
+                        aria-hidden="true"
+                        className="text-[14px] tracking-normal transition-transform duration-200 group-hover:translate-x-1"
+                      >
+                        →
+                      </span>
+                    </>
+                  )}
+                </button>
+
+                <p className="sr-only" role="status" aria-live="polite">
+                  {sending ? "Sending your enquiry." : ""}
+                </p>
+              </form>
             )}
           </div>
         </div>
-
-        <footer className="mt-16 flex flex-col gap-3 border-t border-[#cfe2d5]/15 pt-5 sm:flex-row sm:items-center sm:justify-between lg:mt-20">
-          <span className="font-display text-base font-bold uppercase tracking-[0.16em] text-[#f0f1e6]/80 sm:text-lg">
-            WORLDSMITH
-          </span>
-          <span className="font-body text-[9px] font-medium uppercase tracking-[0.24em] text-[#a8cebc]/55 sm:text-[10px]">
-            FROM VISION TO EXPERIENCE
-          </span>
-        </footer>
       </div>
     </section>
   );

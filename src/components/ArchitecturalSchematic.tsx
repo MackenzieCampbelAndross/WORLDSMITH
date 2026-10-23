@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 /**
  * ArchitecturalSchematic: An intricate architectural drawing of an entire residential development.
@@ -17,6 +17,15 @@ import React, { useState } from "react";
  */
 export const ArchitecturalSchematic: React.FC = () => {
   const [activeBuilding, setActiveBuilding] = useState<"bldgA" | "bldgB" | "bldgC" | "plaza" | null>(null);
+  const [signalsEnabled, setSignalsEnabled] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setSignalsEnabled(!query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
 
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden font-body">
@@ -699,6 +708,19 @@ export const ArchitecturalSchematic: React.FC = () => {
           {/* Dimension string between West and Central Buildings */}
           <g stroke="#a8cebc" strokeWidth="0.9" opacity="0.75">
             <line x1="330" y1="465" x2="600" y2="600" strokeDasharray="3 3" />
+            {signalsEnabled && (
+              <line
+                x1="330"
+                y1="465"
+                x2="600"
+                y2="600"
+                pathLength={1}
+                className="diagram-signal"
+                stroke="#f0f1e6"
+                strokeWidth="1.6"
+                style={{ "--signal-delay": "-2s" } as React.CSSProperties}
+              />
+            )}
             <line x1="324" y1="458" x2="336" y2="472" stroke="#d0e5d3" />
             <line x1="594" y1="593" x2="606" y2="607" stroke="#d0e5d3" />
             <text
@@ -718,6 +740,19 @@ export const ArchitecturalSchematic: React.FC = () => {
           {/* Dimension string between Central and East Buildings */}
           <g stroke="#a8cebc" strokeWidth="0.9" opacity="0.75">
             <line x1="600" y1="600" x2="870" y2="465" strokeDasharray="3 3" />
+            {signalsEnabled && (
+              <line
+                x1="600"
+                y1="600"
+                x2="870"
+                y2="465"
+                pathLength={1}
+                className="diagram-signal diagram-signal--reverse"
+                stroke="#f0f1e6"
+                strokeWidth="1.6"
+                style={{ "--signal-delay": "-7.5s" } as React.CSSProperties}
+              />
+            )}
             <line x1="594" y1="607" x2="606" y2="593" stroke="#d0e5d3" />
             <line x1="864" y1="472" x2="876" y2="458" stroke="#d0e5d3" />
             <text

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Manrope, Instrument_Serif } from "next/font/google";
+import { Space_Grotesk, Manrope, Instrument_Serif, Anton, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -21,6 +21,20 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: ["400"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-cormorant-garamond",
+  subsets: ["latin"],
+  weight: ["500"],
   display: "swap",
 });
 
@@ -57,7 +71,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${manrope.variable} ${instrumentSerif.variable} h-full`}
+      className={`${spaceGrotesk.variable} ${manrope.variable} ${instrumentSerif.variable} ${anton.variable} ${cormorantGaramond.variable} h-full`}
     >
       <body className="min-h-full bg-[#1f5e44] text-[#f0f1e6] antialiased selection:bg-[#a8cebc] selection:text-[#171713] overflow-x-clip font-manrope">
         {children}

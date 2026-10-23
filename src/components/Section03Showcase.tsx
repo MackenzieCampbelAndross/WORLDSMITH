@@ -10,10 +10,8 @@ const PropertyViewer = dynamic(() => import("./showcase/PropertyViewer"), {
 
 export const Section03Showcase: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
   const [started, setStarted] = useState(false);
   const [viewerReady, setViewerReady] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
@@ -44,37 +42,10 @@ export const Section03Showcase: React.FC = () => {
     return () => io.disconnect();
   }, []);
 
-  useEffect(() => {
-    const onFsChange = () => setIsFullscreen(document.fullscreenElement === panelRef.current);
-    document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
-  }, []);
-
-  const toggleFullscreen = useCallback(() => {
-    const panel = panelRef.current;
-    if (!panel) return;
-    if (document.fullscreenElement === panel) {
-      document.exitFullscreen().catch(() => undefined);
-    } else {
-      panel.requestFullscreen().catch(() => undefined);
-    }
-  }, []);
-
   const handleStart = useCallback(() => {
     setStarted(true);
     if (!preloaded) import("./showcase/PropertyViewer").catch(() => undefined);
   }, [preloaded]);
-
-  const FullscreenIcon = (
-    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-      <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-  const ExitFullscreenIcon = (
-    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-      <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
 
   return (
     <section
@@ -87,22 +58,20 @@ export const Section03Showcase: React.FC = () => {
         className="pointer-events-none absolute inset-0 paper-grain opacity-[0.06] mix-blend-overlay"
         aria-hidden="true"
       />
+      <div
+        className="pointer-events-none absolute inset-0 grid-lines"
+        style={{ "--grid-line-color": "rgba(181, 213, 197, 0.05)" } as React.CSSProperties}
+        aria-hidden="true"
+      />
 
       <div className="relative w-full flex items-center justify-center px-[4vw] sm:px-[6vw] py-[8vh]">
         {/* 16:9 experience panel — ~75% of content width on desktop, height-aware */}
         <div
-          ref={panelRef}
-          className={`relative bg-[#121212] overflow-hidden shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)] ${
-            isFullscreen ? "w-full h-full" : ""
-          }`}
-          style={
-            isFullscreen
-              ? undefined
-              : {
-                  width: "min(75vw, calc((100svh - 16vh) * 1.7778), 1600px)",
-                  aspectRatio: "16 / 9",
-                }
-          }
+          className="relative overflow-hidden border border-[#F0EDE3]/35 bg-[#121212] shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]"
+          style={{
+            width: "min(75vw, calc((100svh - 16vh) * 1.7778), 1600px)",
+            aspectRatio: "16 / 9",
+          }}
         >
           {/* Viewer mounts on start; splash stays painted underneath until ready — no blank frame, no layout shift */}
           {started && (
@@ -125,83 +94,45 @@ export const Section03Showcase: React.FC = () => {
             </div>
           )}
 
-          {/* INITIAL EXPERIENCE SCREEN — art-directed splash */}
+          {/* INITIAL EXPERIENCE SCREEN — a quiet, centered invitation */}
           {!started && (
             <div className="absolute inset-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/showcase/villa-splash.png"
                 alt="Contemporary single-storey villa with projecting flat rooflines, timber entrance screen and landscaped front lawn at dusk"
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
                 draggable={false}
               />
-              {/* Restrained contrast treatment */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/85 via-[#121212]/15 to-[#121212]/45" />
-              <div className="absolute inset-0 bg-[#0c0f0d]/10" />
+              <div className="absolute inset-0 bg-[#040a07]/55" />
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(ellipse at center, rgba(4,10,7,0.04) 0%, rgba(4,10,7,0.42) 100%)",
+                }}
+                aria-hidden="true"
+              />
 
-              {/* Composition */}
-              <div className="absolute inset-0 flex flex-col items-center justify-between py-[7%] px-[6%]">
-                <div className="w-full flex items-start justify-between">
-                  <span className="font-display text-[10px] sm:text-[11px] font-semibold tracking-[0.32em] uppercase text-[#F0EDE3]/70">
-                    A digital twin experience
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+                <h2 className="font-anton text-[clamp(1.8rem,6.9vw,6.25rem)] font-normal uppercase leading-none tracking-[0.06em] text-[#F0EDE3]">
+                  Worldsmith
+                </h2>
+                <p className="mt-3 max-w-[30rem] text-balance font-body text-[10px] uppercase leading-[1.8] tracking-[0.18em] text-[#F0EDE3]/90 sm:mt-5 sm:text-[13px]">
+                  Step inside a living simulation of our work
+                </p>
+                <button
+                  type="button"
+                  onClick={handleStart}
+                  className="group mt-6 inline-flex items-center gap-3 whitespace-nowrap rounded-full bg-[#F0EDE3] px-4 py-3 font-display text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0F1712] shadow-[0_20px_55px_-18px_rgba(0,0,0,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_24px_65px_-18px_rgba(0,0,0,0.95)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0EDE3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212] sm:mt-10 sm:px-11 sm:py-4 sm:text-[12px] sm:tracking-[0.24em]"
+                >
+                  Start Your Experience
+                  <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
+                    →
                   </span>
-                  <button
-                    type="button"
-                    onClick={toggleFullscreen}
-                    aria-label="Enter fullscreen"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#121212]/55 backdrop-blur-sm border border-[#F0EDE3]/20 text-[#F0EDE3]/85 hover:bg-[#121212]/75 hover:border-[#B5D5C5]/50 transition-colors duration-200"
-                  >
-                    {FullscreenIcon}
-                    <span className="hidden sm:inline font-display text-[10px] font-semibold tracking-[0.18em] uppercase">
-                      Fullscreen
-                    </span>
-                  </button>
-                </div>
-
-                <div className="flex flex-col items-center text-center max-w-3xl">
-                  <h2 className="font-display font-bold text-[#F0EDE3] text-[clamp(1.9rem,5.2vw,4.2rem)] tracking-[0.22em] leading-none uppercase">
-                    Worldsmith
-                  </h2>
-                  <p className="mt-3 sm:mt-4 font-body text-[11px] sm:text-[13px] tracking-[0.14em] uppercase text-[#F0EDE3]/75">
-                    Step inside a residence before it is built
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleStart}
-                    className="group mt-7 sm:mt-9 inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-[#206046] hover:bg-[#2a7456] text-[#F0EDE3] font-display text-[11px] sm:text-[12px] font-semibold tracking-[0.24em] uppercase transition-all duration-300 shadow-[0_18px_45px_-15px_rgba(32,96,70,0.9)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B5D5C5]"
-                  >
-                    Start Experience
-                    <span className="group-hover:translate-x-1 transition-transform duration-300" aria-hidden="true">
-                      →
-                    </span>
-                  </button>
-                </div>
-
-                <div className="w-full flex items-end justify-between">
-                  <span className="font-body text-[10px] sm:text-[11px] tracking-[0.1em] text-[#F0EDE3]/55">
-                    Overview · Dollhouse · First person · Third person
-                  </span>
-                  <span className="hidden sm:block font-accent italic text-[13px] text-[#B5D5C5]/85">
-                    Casa Verdant — a Worldsmith demonstration villa
-                  </span>
-                </div>
+                </button>
               </div>
             </div>
-          )}
-
-          {/* Exit-fullscreen control (visible only in fullscreen) */}
-          {isFullscreen && (
-            <button
-              type="button"
-              onClick={toggleFullscreen}
-              aria-label="Exit fullscreen"
-              className="absolute bottom-4 right-4 z-30 inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#121212]/70 backdrop-blur-sm border border-[#F0EDE3]/20 text-[#F0EDE3]/85 hover:border-[#B5D5C5]/50 transition-colors"
-            >
-              {ExitFullscreenIcon}
-              <span className="font-display text-[10px] font-semibold tracking-[0.18em] uppercase">
-                Exit
-              </span>
-            </button>
           )}
         </div>
       </div>

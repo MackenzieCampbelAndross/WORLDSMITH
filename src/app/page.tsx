@@ -9,6 +9,7 @@ import { ContactModal } from "@/components/ContactModal";
 import { Section03Showcase } from "@/components/Section03Showcase";
 import { Section04HomeTour } from "@/components/Section04HomeTour";
 import { FinalCta } from "@/components/FinalCta";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const WORDMARK_PROBE_Y = 24;
 
@@ -151,7 +152,7 @@ export default function Home() {
               aria-hidden="true"
             />
 
-            {/* Subtle vertical architectural grid lines for hero */}
+            {/* Subtle vertical architectural datum lines for hero */}
             <div
               className="pointer-events-none absolute inset-0 z-0 grid-lines"
               aria-hidden="true"
@@ -188,6 +189,11 @@ export default function Home() {
               transform: `translate3d(0, ${(1 - overlayProgress) * 100}%, 0)`,
             }}
           >
+            <div
+              className="pointer-events-none absolute inset-0 z-0 grid-lines"
+              style={{ "--grid-line-color": "rgba(31, 102, 81, 0.05)" } as React.CSSProperties}
+              aria-hidden="true"
+            />
 
             {/* Structured Content Container: Proper vertical spacing below fixed navigation */}
             <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 pt-28 sm:pt-32 md:pt-36 pb-12 sm:pb-16 flex-1 flex flex-col min-h-[calc(100svh-4rem)]">
@@ -222,6 +228,9 @@ export default function Home() {
 
       {/* FINAL CTA: A quiet, human close to the WorldSmith story. */}
       <FinalCta />
+
+      {/* SITE FOOTER: Minimal architectural close. */}
+      <SiteFooter />
 
       {/* Persistent Developer Project Inquiry Dialog */}
       <ContactModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
