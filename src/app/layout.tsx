@@ -61,6 +61,9 @@ export const metadata: Metadata = {
       "We transform architectural plans, renders and project assets into interactive places buyers can explore before they visit.",
     type: "website",
   },
+  verification: {
+    google: "8QmS7pLEWDH9PJ3w_SiWpci2G5-wtYO6bMrgRs2--tY",
+  },
 };
 
 export default function RootLayout({
