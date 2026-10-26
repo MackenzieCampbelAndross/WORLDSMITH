@@ -11,6 +11,7 @@ export type ViewMode = "overview" | "dollhouse" | "fpp" | "tpp";
 interface PropertyViewerProps {
   reducedMotion: boolean;
   onReady: () => void;
+  onGuide?: () => void;
 }
 
 const EYE_HEIGHT = 1.6;
@@ -33,7 +34,7 @@ interface Engine {
   step?: (dt: number) => void;
 }
 
-export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewerProps) {
+export default function PropertyViewer({ reducedMotion, onReady, onGuide }: PropertyViewerProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
   const worldRef = useRef<ReturnType<typeof buildWorld> | null>(null);
@@ -55,6 +56,16 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
   );
 
   const rooms = ROOMS;
+
+  // The loader waits on onReady; release it when WebGL is unavailable so the
+  // fallback message shows instead of a stuck loading screen.
+  const readySent = useRef(false);
+  useEffect(() => {
+    if (!webglOk && !readySent.current) {
+      readySent.current = true;
+      onReady();
+    }
+  }, [webglOk, onReady]);
 
   // ------------------------------------------------------------------
   // Engine bootstrap (once)
@@ -142,6 +153,14 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
     const MOVE_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"];
     const onKeyDown = (e: KeyboardEvent) => {
       if (engine.mode !== "fpp" && engine.mode !== "tpp") return;
+      // Never steal keys from form fields, even while the viewer is mounted.
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+      ) {
+        return;
+      }
       if (MOVE_KEYS.includes(e.code)) {
         e.preventDefault(); // no page scroll while the viewer drives movement
         engine.keys.add(e.code);
@@ -592,7 +611,10 @@ export default function PropertyViewer({ reducedMotion, onReady }: PropertyViewe
           </button>
           <button
             type="button"
-            onClick={() => setShowHelp((v) => !v)}
+            onClick={() => {
+              setShowHelp((v) => !v);
+              onGuide?.();
+            }}
             aria-label="Controls help"
             className="w-8 h-8 rounded-full bg-[#121212]/70 backdrop-blur-sm text-[#B5D5C5] text-sm font-display font-semibold hover:text-[#F0EDE3] transition-colors"
           >

@@ -185,6 +185,85 @@
   opacity: 0;
 }
 
+/* Showcase loading screen — the plan draws itself, then a composited sweep runs
+   while the renderer's scene build blocks the main thread. */
+@keyframes loaderDraw {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.loader-line {
+  stroke-dasharray: 1;
+  animation: loaderDraw 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: var(--loader-delay, 0s);
+  opacity: 0;
+}
+
+@keyframes loaderFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.loader-fade {
+  animation: loaderFade 0.7s ease forwards;
+  animation-delay: var(--loader-delay, 0s);
+  opacity: 0;
+}
+
+@keyframes loaderSweep {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+.loader-sweep {
+  animation: loaderSweep 1.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+
+@keyframes loaderBreathe {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.loader-breathe {
+  animation: loaderBreathe 2.4s ease-in-out infinite;
+}
+
+@keyframes guideRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.guide-rise {
+  animation: guideRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
