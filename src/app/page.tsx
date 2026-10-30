@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/components/auth-provider";
 import { Navigation } from "@/components/Navigation";
 import { CurtainReveal } from "@/components/CurtainReveal";
 import { ArchitecturalSchematic } from "@/components/ArchitecturalSchematic";
@@ -14,6 +15,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 const WORDMARK_PROBE_Y = 24;
 
 export default function Home() {
+  const { user, openAuth, logout } = useAuth();
   const [stage, setStage] = useState<number>(0);
   const [contactOpen, setContactOpen] = useState(false);
   const [navTheme, setNavTheme] = useState<"dark" | "light">("dark");
@@ -127,6 +129,11 @@ export default function Home() {
         visible={stage >= 2}
         wordmarkSplit={wordmarkSplit}
         onContactClick={handleContactClick}
+        onLoginClick={openAuth}
+        signedIn={Boolean(user)}
+        onLogoutClick={() => {
+          void logout();
+        }}
       />
 
       {/* =========================================================================
@@ -201,7 +208,7 @@ export default function Home() {
               {/* Main Statement Container (Prominent, restrained, and elegant) */}
               <div className="max-w-5xl py-8 sm:py-12">
                 <p className="font-body text-xl sm:text-2xl md:text-[2rem] lg:text-[2.35rem] font-normal leading-[1.32] md:leading-[1.28] tracking-[-0.022em] text-[#1f6651] text-left">
-                  Worldsmith transforms{" "}
+                  Crestion Labs transforms{" "}
                   <span className="box-decoration-clone bg-[#a8cebc] text-[#171713]">
                     architectural plans and renderings into immersive 3D worlds
                   </span>
@@ -226,7 +233,7 @@ export default function Home() {
          ========================================================================= */}
       <Section04HomeTour />
 
-      {/* FINAL CTA: A quiet, human close to the WorldSmith story. */}
+      {/* FINAL CTA: A quiet, human close to the Crestion Labs story. */}
       <FinalCta />
 
       {/* SITE FOOTER: Minimal architectural close. */}

@@ -120,14 +120,14 @@ test("mail options set the trusted sender, recipient and visitor reply-to", () =
       company: "Analytical Engines Ltd",
       website: null,
     },
-    { user: "worldsmith.in@gmail.com", to: "worldsmith.in@gmail.com" },
+    { user: "crestionlabs@gmail.com", to: "crestionlabs@gmail.com" },
     new Date("2026-10-23T10:15:00Z"),
   );
 
-  assert.deepEqual(mail.from, { name: "WorldSmith", address: "worldsmith.in@gmail.com" });
-  assert.equal(mail.to, "worldsmith.in@gmail.com");
+  assert.deepEqual(mail.from, { name: "Crestion Labs", address: "crestionlabs@gmail.com" });
+  assert.equal(mail.to, "crestionlabs@gmail.com");
   assert.deepEqual(mail.replyTo, { name: "Ada Lovelace", address: "ada@example.com" });
-  assert.equal(mail.subject, "New WorldSmith Enquiry — Ada Lovelace");
+  assert.equal(mail.subject, "New Crestion Labs Enquiry — Ada Lovelace");
   assert.match(mail.text ?? "", /23 October 2026, 10:15 UTC/);
   assert.match(mail.text ?? "", /Company website: Not provided/);
   assert.doesNotMatch(mail.html ?? "", /<script>/i);
@@ -139,7 +139,7 @@ test("a mocked SMTP transport receives the branded message and routing headers",
     {
       sendMail: async (options) => {
         received = options;
-        return { accepted: ["worldsmith.in@gmail.com"] };
+        return { accepted: ["crestionlabs@gmail.com"] };
       },
     },
     {
@@ -149,21 +149,21 @@ test("a mocked SMTP transport receives the branded message and routing headers",
       company: "Analytical Engines Ltd",
       website: "https://example.com/",
     },
-    { user: "worldsmith.in@gmail.com", to: "worldsmith.in@gmail.com" },
+    { user: "crestionlabs@gmail.com", to: "crestionlabs@gmail.com" },
     new Date("2026-10-23T10:15:00Z"),
   );
 
   assert.ok(received);
   assert.deepEqual(received.from, {
-    name: "WorldSmith",
-    address: "worldsmith.in@gmail.com",
+    name: "Crestion Labs",
+    address: "crestionlabs@gmail.com",
   });
-  assert.equal(received.to, "worldsmith.in@gmail.com");
+  assert.equal(received.to, "crestionlabs@gmail.com");
   assert.deepEqual(received.replyTo, {
     name: "Ada Lovelace",
     address: "ada@example.com",
   });
-  assert.match(received.subject, /New WorldSmith Enquiry — Ada Lovelace/);
+  assert.match(received.subject, /New Crestion Labs Enquiry — Ada Lovelace/);
   assert.match(received.html, /https:\/\/example\.com\//);
 });
 
@@ -176,7 +176,7 @@ test("email HTML escapes visitor input and includes the website", () => {
       company: "Acme & Sons <b>Ltd</b>",
       website: "https://example.com/",
     },
-    { user: "worldsmith.in@gmail.com", to: "worldsmith.in@gmail.com" },
+    { user: "crestionlabs@gmail.com", to: "crestionlabs@gmail.com" },
     new Date("2026-10-23T10:15:00Z"),
   );
 
@@ -195,7 +195,7 @@ test("mail header values are sanitized even if called outside normal validation"
       company: "Example Co",
       website: null,
     },
-    { user: "worldsmith.in@gmail.com", to: "worldsmith.in@gmail.com" },
+    { user: "crestionlabs@gmail.com", to: "crestionlabs@gmail.com" },
   );
 
   assert.doesNotMatch(mail.subject ?? "", /[\r\n]/);

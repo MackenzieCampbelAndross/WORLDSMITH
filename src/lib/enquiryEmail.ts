@@ -79,27 +79,27 @@ export function buildEnquiryEmail(
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>New WorldSmith Enquiry</title>
+    <title>New Crestion Labs Enquiry</title>
   </head>
   <body style="margin:0;padding:0;background-color:#ecece2;">
     <div style="max-width:640px;margin:0 auto;padding:28px 16px;">
       <div style="background-color:#153f31;padding:28px 32px;">
-        <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;letter-spacing:0.28em;color:#f0f1e6;">WORLDSMITH</div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;letter-spacing:0.28em;color:#f0f1e6;">CRESTION LABS</div>
         <div style="margin-top:10px;font-family:Arial,Helvetica,sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#a8cebc;">New enquiry</div>
       </div>
       <div style="background-color:#f7f4ea;padding:32px;">
-        <h1 style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:1.3;font-weight:600;color:#173f32;">New WorldSmith Enquiry</h1>
-        <p style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#5d7166;">A new enquiry was submitted through the WorldSmith website.</p>
+        <h1 style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:1.3;font-weight:600;color:#173f32;">New Crestion Labs Enquiry</h1>
+        <p style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#5d7166;">A new enquiry was submitted through the Crestion Labs website.</p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-top:1px solid #d9d6c9;">${tableRows}
         </table>
         <p style="margin:22px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#5d7166;">Reply directly to this email to respond to ${escapeHtml(enquiry.fullName)}.</p>
       </div>
-      <div style="padding:16px 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:1.6;letter-spacing:0.08em;color:#7b8b81;">WorldSmith · From vision to experience</div>
+      <div style="padding:16px 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:1.6;letter-spacing:0.08em;color:#7b8b81;">Crestion Labs · From vision to experience</div>
     </div>
   </body>
 </html>`;
 
-  const text = `NEW WORLDSMITH ENQUIRY
+  const text = `NEW CRESTION LABS ENQUIRY
 
 Full name: ${enquiry.fullName}
 Email address: ${enquiry.email}
@@ -111,7 +111,7 @@ Submitted: ${submitted}
 Reply directly to this email to respond to ${enquiry.fullName}.`;
 
   return {
-    subject: `New WorldSmith Enquiry — ${safeName}`,
+    subject: `New Crestion Labs Enquiry — ${safeName}`,
     html,
     text,
   };
@@ -127,7 +127,7 @@ export function buildMailOptions(
   const to = sanitizeHeaderValue(config.to);
 
   return {
-    from: { name: "WorldSmith", address: user },
+    from: { name: "Crestion Labs", address: user },
     to,
     replyTo: {
       name: sanitizeHeaderValue(enquiry.fullName),

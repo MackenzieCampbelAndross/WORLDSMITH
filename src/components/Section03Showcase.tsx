@@ -322,7 +322,7 @@ export const Section03Showcase: React.FC = () => {
 
               <div className="relative flex h-full w-full flex-col items-center justify-center gap-4 px-6 sm:gap-6">
                 <p className="font-anton text-[9px] uppercase leading-none tracking-[0.42em] text-[#F0EDE3]/85 sm:text-[11px]">
-                  Worldsmith
+                  Crestion Labs
                 </p>
 
                 <svg
@@ -519,7 +519,7 @@ export const Section03Showcase: React.FC = () => {
 
               <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
                 <h2 className="font-anton text-[clamp(1.8rem,6.9vw,6.25rem)] font-normal uppercase leading-none tracking-[0.06em] text-[#F0EDE3]">
-                  Worldsmith
+                  Crestion Labs
                 </h2>
                 <p className="mt-3 max-w-[30rem] text-balance font-body text-[10px] uppercase leading-[1.8] tracking-[0.18em] text-[#F0EDE3]/90 sm:mt-5 sm:text-[13px]">
                   Step inside a living simulation of our work

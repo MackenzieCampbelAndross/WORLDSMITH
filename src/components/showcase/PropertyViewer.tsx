@@ -547,7 +547,7 @@ export default function PropertyViewer({ reducedMotion, onReady, onGuide }: Prop
   if (!webglOk) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-[#121212] text-[#F0EDE3] font-body px-8 text-center">
-        <p className="font-display text-lg tracking-[0.18em] text-[#B5D5C5] mb-3">WORLDSMITH</p>
+        <p className="font-display text-lg tracking-[0.18em] text-[#B5D5C5] mb-3">CRESTION LABS</p>
         <p className="text-sm text-[#F0EDE3]/70 max-w-md leading-relaxed">
           Your browser does not support WebGL, which is required for the interactive villa experience.
           Please try a modern desktop browser, or contact our studio for a guided presentation.

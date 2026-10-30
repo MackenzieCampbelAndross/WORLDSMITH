@@ -6,11 +6,11 @@ interface LogoProps {
 }
 
 /**
- * Original Worldsmith geometric symbol.
+ * Original Crestion Labs geometric symbol.
  * Inspired by architectural drafting coordinate benchmarks, isometric plane intersections,
  * and the act of constructing digital worlds from foundational axes.
  */
-export const WorldsmithLogo: React.FC<LogoProps> = ({ className = "", size = 28 }) => {
+export const CrestionLabsLogo: React.FC<LogoProps> = ({ className = "", size = 28 }) => {
   return (
     <svg
       width={size}
@@ -19,7 +19,7 @@ export const WorldsmithLogo: React.FC<LogoProps> = ({ className = "", size = 28 
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`transition-transform duration-300 group-hover:scale-105 ${className}`}
-      aria-label="Worldsmith symbol"
+      aria-label="Crestion Labs symbol"
     >
       {/* Outer subtle alignment boundary */}
       <rect

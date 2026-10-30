@@ -277,3 +277,80 @@
     opacity: 0 !important;
   }
 }
+
+/* Authentication sheet: rises from the bottom, exits upward into the dashboard. */
+.auth-sheet {
+  transform: translate3d(0, 100%, 0);
+  transition: none;
+  will-change: transform;
+}
+
+.auth-sheet[data-state='open'],
+.auth-sheet[data-state='closing'],
+.auth-sheet[data-state='exiting'] {
+  transition: transform 840ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.auth-sheet[data-state='open'] {
+  transform: translate3d(0, 0, 0);
+}
+
+.auth-sheet[data-state='closing'] {
+  transform: translate3d(0, 100%, 0);
+}
+
+.auth-sheet[data-state='exiting'] {
+  transform: translate3d(0, -100%, 0);
+}
+
+/* Reserve the scrollbar gutter at all times so locking scroll cannot reflow the page. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Keep the scrollbar's width but mute its paint while the overlay is open. */
+html.auth-open {
+  scrollbar-color: transparent #ecece2;
+}
+
+html.auth-open,
+html.auth-open body {
+  background-color: #ecece2;
+}
+
+body.portal-shell {
+  background-color: #f7f4ec;
+}
+
+/* Keep the black auth inputs black through browser autofill. */
+#crestionlabs-auth input:-webkit-autofill,
+#crestionlabs-auth input:-webkit-autofill:hover,
+#crestionlabs-auth input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #000 inset;
+  -webkit-text-fill-color: #f0f1e6;
+  caret-color: #f0f1e6;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+@keyframes authContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-content-enter {
+  animation: authContentIn 480ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-sheet,
+  #crestionlabs-auth section,
+  #crestionlabs-auth aside {
+    transition-duration: 0.01ms !important;
+  }
+}

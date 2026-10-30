@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Manrope, Instrument_Serif, Anton, Cormorant_Garamond } from "next/font/google";
+import { AuthProvider } from "@/components/auth-provider";
+import { AuthExperience } from "@/components/AuthExperience";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -45,18 +47,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "WorldSmith",
+  title: "Crestion Labs",
   description:
     "We transform architectural plans, renders and project assets into interactive places buyers can explore before they visit.",
   keywords: [
-    "Worldsmith",
+    "Crestion Labs",
     "Digital Worlds",
     "Architectural Visualization",
     "Real Estate Technology",
     "Interactive Property Experiences",
   ],
   openGraph: {
-    title: "Worldsmith — A world before it's built.",
+    title: "Crestion Labs — A world before it's built.",
     description:
       "We transform architectural plans, renders and project assets into interactive places buyers can explore before they visit.",
     type: "website",
@@ -77,7 +79,10 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${manrope.variable} ${instrumentSerif.variable} ${anton.variable} ${cormorantGaramond.variable} h-full`}
     >
       <body className="min-h-full bg-[#1f5e44] text-[#f0f1e6] antialiased selection:bg-[#a8cebc] selection:text-[#171713] overflow-x-clip font-manrope">
-        {children}
+        <AuthProvider>
+          {children}
+          <AuthExperience />
+        </AuthProvider>
       </body>
     </html>
   );
