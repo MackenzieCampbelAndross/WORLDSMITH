@@ -14,7 +14,10 @@ export async function uploadProjectObject(
     contentType: file.type || "application/octet-stream",
     upsert: false,
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error("[storage] upload rejected", { path, error });
+    throw new Error(`Storing the plan failed: ${error.message}`);
+  }
   return { path };
 }
 

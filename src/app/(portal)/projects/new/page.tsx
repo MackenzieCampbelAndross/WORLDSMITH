@@ -126,6 +126,9 @@ export default function NewProjectPage() {
           location: "",
           type,
           developmentStage: "",
+          planWidthMeters: widthMeters,
+          planLengthMeters: lengthMeters,
+          furnishingStyle: style,
         });
         project = await fetchProject(id);
         if (!project) throw new Error("The project could not be created.");
@@ -141,12 +144,15 @@ export default function NewProjectPage() {
         setExistingPlan(file.name);
       }
 
-      setBusy("saving");
-      await updateDraftProject(id, {
-        planWidthMeters: widthMeters,
-        planLengthMeters: lengthMeters,
-        furnishingStyle: style,
-      });
+      // A new draft already carries the measurements; only a resumed one needs them rewritten.
+      if (draftId) {
+        setBusy("saving");
+        await updateDraftProject(id, {
+          planWidthMeters: widthMeters,
+          planLengthMeters: lengthMeters,
+          furnishingStyle: style,
+        });
+      }
 
       setBusy("submitting");
       await submitProductionRequest(id);

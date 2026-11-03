@@ -203,6 +203,18 @@ create policy "projects_delete_own" on public.projects
   for delete using (owner_id = auth.uid() and status = 'DRAFT');
 
 drop policy if exists "project_files_update_own" on public.project_files;
+create policy "project_files_update_own" on public.project_files
+  for update using (
+    exists (
+      select 1 from public.projects p
+      where p.id = project_files.project_id and p.owner_id = auth.uid()
+    )
+  ) with check (
+    exists (
+      select 1 from public.projects p
+      where p.id = project_files.project_id and p.owner_id = auth.uid()
+    )
+  );
 drop policy if exists "processing_jobs_select_own" on public.processing_jobs;
 create policy "processing_jobs_select_own" on public.processing_jobs
   for select using (

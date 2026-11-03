@@ -212,6 +212,9 @@ export interface ProjectDraftInput {
   location: string;
   type: string;
   developmentStage: string;
+  planWidthMeters: number;
+  planLengthMeters: number;
+  furnishingStyle: FurnishingStyle;
 }
 
 export interface ProjectDraftPatch extends Partial<ProjectDraftInput> {
@@ -221,9 +224,6 @@ export interface ProjectDraftPatch extends Partial<ProjectDraftInput> {
   unitTypes?: string[];
   interiorStyle?: string;
   exteriorStyle?: string;
-  planWidthMeters?: number;
-  planLengthMeters?: number;
-  furnishingStyle?: FurnishingStyle;
   materials?: string;
   landscape?: string;
   lighting?: string;
@@ -570,6 +570,9 @@ export async function createDraftProject(
       location: input.location.trim(),
       type: input.type,
       development_stage: input.developmentStage,
+      plan_width_meters: input.planWidthMeters,
+      plan_length_meters: input.planLengthMeters,
+      furnishing_style: input.furnishingStyle,
       status: "DRAFT",
     })
     .select("id")
@@ -634,8 +637,9 @@ export async function uploadProjectFile(
     .select("*")
     .single();
   if (error) {
+    console.error("[files] project_files insert rejected", { projectId: project.id, error });
     await deleteProjectObject(uploaded.path).catch(() => {});
-    fail(error);
+    throw new Error(`Recording the plan failed: ${error.message ?? "unknown reason"}`);
   }
 
   await logActivity(
