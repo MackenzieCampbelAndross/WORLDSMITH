@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { SUPABASE_URL } from "@/lib/supabaseConfig";
-import { STAGE_TO_STATUS, deliverWorld, recordActivity } from "@/lib/delivery";
+import { STAGE_TO_STATUS, deliverWorld, recordActivity, siteBase } from "@/lib/delivery";
 
 type Row = Record<string, unknown>;
 
@@ -79,6 +79,7 @@ export async function POST(request: Request) {
       jobId,
       ownerId: String(project.owner_id),
       engineBase: base,
+      siteBase: siteBase(request),
       authHeaders: headers,
     });
     delivered = result.delivered;

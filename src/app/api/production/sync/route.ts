@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabaseConfig";
-import { STAGE_TO_STATUS, deliverWorld, recordActivity } from "@/lib/delivery";
+import { STAGE_TO_STATUS, deliverWorld, recordActivity, siteBase } from "@/lib/delivery";
 
 type Row = Record<string, unknown>;
 
@@ -95,7 +95,14 @@ export async function POST(request: Request) {
   let deliveryError: string | null = null;
 
   if (jobId && job?.status === "completed") {
-    const delivery = await deliverWorld({ projectId, jobId, ownerId: user.id, engineBase: base, authHeaders });
+    const delivery = await deliverWorld({
+            projectId,
+            jobId,
+            ownerId: user.id,
+            engineBase: base,
+            siteBase: siteBase(request),
+            authHeaders,
+          });
     delivered = delivery.delivered;
     deliveryError = delivery.error;
     if (delivered) nextStatus = "COMPLETED";

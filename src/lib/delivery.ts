@@ -22,9 +22,36 @@ export interface DeliveryResult {
   delivered: boolean;
   error: string | null;
   glbPath: string | null;
+  shareUrl: string | null;
+  embedUrl: string | null;
 }
 
 type Headers = Record<string, string>;
+
+// Absolute base used to build the share and embed links handed to clients.
+export function siteBase(request: Request): string {
+  const configured = process.env.SITE_URL?.trim();
+  const base = configured || new URL(request.url).origin;
+  return base.replace(/\/$/, "");
+}
+
+// The slug is the only thing guarding a shared walkthrough, so it has to be
+// unguessable and stable: re-delivering a project keeps the link the client
+// already handed to their buyers.
+async function shareSlug(
+  projectId: string,
+  authHeaders: Headers,
+): Promise<string> {
+  const existing = await fetch(
+    `${SUPABASE_URL}/rest/v1/worlds?project_id=eq.${encodeURIComponent(projectId)}&select=share_slug&limit=1`,
+    { headers: { ...authHeaders, "Content-Type": "application/json" } },
+  )
+    .then((response) => response.json())
+    .catch(() => []);
+  const held = (Array.isArray(existing) ? existing[0] : undefined)?.share_slug;
+  if (typeof held === "string" && held.length >= 8) return held;
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+}
 
 async function storeObject(
   headers: Headers,
@@ -53,18 +80,20 @@ export async function deliverWorld(
     jobId: string;
     ownerId: string;
     engineBase: string;
+    siteBase: string;
     authHeaders: Headers;
   },
 ): Promise<DeliveryResult> {
-  const { projectId, jobId, ownerId, engineBase, authHeaders } = options;
+  const { projectId, jobId, ownerId, engineBase, siteBase, authHeaders } = options;
   const jsonHeaders = { ...authHeaders, "Content-Type": "application/json" };
+  const none: DeliveryResult = { delivered: false, error: null, glbPath: null, shareUrl: null, embedUrl: null };
 
   const glbResponse = await fetch(
     `${engineBase}/reconstructions/${encodeURIComponent(jobId)}/assets/scene.glb`,
     { signal: AbortSignal.timeout(ASSET_TIMEOUT_MS) },
   );
   if (!glbResponse.ok) {
-    return { delivered: false, error: "The finished world could not be downloaded from production.", glbPath: null };
+    return { ...none, error: "The finished world could not be downloaded from production." };
   }
   const glb = await glbResponse.arrayBuffer();
 
@@ -76,11 +105,15 @@ export async function deliverWorld(
 
   const glbPath = `${projectId}/world/scene.glb`;
   if (!(await storeObject(authHeaders, glbPath, glb, "model/gltf-binary"))) {
-    return { delivered: false, error: "The finished world could not be stored.", glbPath: null };
+    return { ...none, error: "The finished world could not be stored." };
   }
   if (collision) {
     await storeObject(authHeaders, `${projectId}/world/collision.json`, collision, "application/json");
   }
+
+  const slug = await shareSlug(projectId, authHeaders);
+  const shareUrl = `${siteBase}/share/${slug}`;
+  const embedUrl = `${siteBase}/embed/${slug}`;
 
   const worldResponse = await fetch(`${SUPABASE_URL}/rest/v1/worlds`, {
     method: "POST",
@@ -91,13 +124,22 @@ export async function deliverWorld(
         status: "ready",
         glb_path: glbPath,
         preview_path: null,
+        share_slug: slug,
+        world_url: shareUrl,
+        embed_url: embedUrl,
         source_available: true,
         updated_at: new Date().toISOString(),
       },
     ]),
   });
   if (!worldResponse.ok) {
-    return { delivered: false, error: await worldResponse.text().catch(() => "world row rejected"), glbPath };
+    return {
+      ...none,
+      error: await worldResponse.text().catch(() => "world row rejected"),
+      glbPath,
+      shareUrl,
+      embedUrl,
+    };
   }
 
   if (collision) {
@@ -119,7 +161,7 @@ export async function deliverWorld(
     }).catch(() => undefined);
   }
 
-  return { delivered: true, error: null, glbPath };
+  return { delivered: true, error: null, glbPath, shareUrl, embedUrl };
 }
 
 export async function recordActivity(
