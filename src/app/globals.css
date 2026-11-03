@@ -42,8 +42,17 @@
 
 body.portal-shell,
 body.portal-shell .font-body,
-body.portal-shell .font-display {
+body.portal-shell .font-display,
+body.portal-shell .font-accent,
+body.portal-shell .font-cormorant {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.portal-shell .font-accent,
+body.portal-shell .font-cormorant {
+  font-weight: 600;
 }
 
 .font-anton {
