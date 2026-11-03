@@ -145,6 +145,8 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   const isActive = (item: (typeof NAV)[number]) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
+  const isDashboard = pathname === "/dashboard";
+
   const pageTitle = pathname.startsWith("/dashboard")
     ? "Overview"
     : pathname.startsWith("/settings")
@@ -187,7 +189,9 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
         const q = query.trim();
         window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
       }}
-      className="hidden h-9 w-[248px] items-center gap-2 rounded-full border border-[#e3ded2] bg-[#f7f4ec]/80 px-4 text-[#716b5d] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-colors focus-within:border-[#b9b09c] sm:flex"
+      className={`hidden h-9 items-center gap-2 rounded-full border border-[#e3ded2] bg-[#f7f4ec]/80 px-4 text-[#716b5d] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-colors focus-within:border-[#b9b09c] sm:flex ${
+        isDashboard ? "w-[188px]" : "w-[248px]"
+      }`}
     >
       <SearchIcon />
       <input
@@ -201,10 +205,11 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <div className="flex min-h-[100svh] items-center justify-center bg-[#eef2ec] p-3 text-[#171713] sm:p-5 lg:p-10">
-      <div className="flex h-[calc(100svh-1.5rem)] w-full max-w-[1560px] flex-col overflow-hidden rounded-[18px] border border-[#1b4a36]/55 bg-white shadow-[0_35px_90px_-50px_rgba(27,74,54,0.55)] sm:h-[calc(100svh-2.5rem)] sm:rounded-[22px] lg:h-[calc(100svh-5rem)] lg:rounded-[26px]">
-        <div className="flex min-h-0 flex-1">
-          <aside className="hidden w-[80px] shrink-0 flex-col items-center rounded-l-[26px] bg-[#1b4a36] px-2 py-5 lg:flex">
+    <div className="flex min-h-[100svh] items-center justify-center bg-[#eef3ec] p-3 text-[#171713] sm:p-5 lg:p-10">
+      <div className={`${isDashboard ? "dashboard-preview-window" : "lg:h-[calc(100svh-5rem)]"} flex h-[calc(100svh-1.5rem)] w-full max-w-[1560px] flex-col overflow-hidden rounded-[22px] bg-[#1b4a36] p-[10px] shadow-[0_40px_100px_-55px_rgba(27,74,54,0.7)] sm:h-[calc(100svh-2.5rem)] sm:rounded-[28px] lg:rounded-[32px] lg:p-[14px]`}>
+        <div className="flex h-full w-full overflow-hidden rounded-[16px] bg-white sm:rounded-[20px]">
+          <div className="flex min-h-0 flex-1">
+            <aside className={`hidden ${isDashboard ? "w-[64px]" : "w-[80px]"} shrink-0 flex-col items-center bg-[#1b4a36] px-2 py-5 lg:flex`}>
             <Link
               href="/dashboard"
               aria-label="Crestion Labs home"
@@ -248,12 +253,12 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             </div>
           </aside>
 
-          <main className="relative flex min-w-0 flex-1 flex-col overflow-y-auto bg-white">
-            <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[#e8ebe5] bg-white/85 px-5 backdrop-blur-xl sm:px-8 lg:px-10">
-              <Link href="/dashboard" className="font-body text-[15px] font-semibold tracking-[0.08em] text-[#1b4a36] lg:hidden">
+          <main className={`relative flex min-w-0 flex-1 flex-col bg-white ${isDashboard ? "overflow-y-auto lg:overflow-hidden" : "overflow-y-auto"}`}>
+            <header className={`sticky top-0 z-30 flex shrink-0 items-center justify-between gap-3 border-b border-[#e8ebe5] bg-white/85 backdrop-blur-xl ${isDashboard ? "h-12 px-4 sm:px-5" : "h-16 px-5 sm:px-8 lg:px-10"}`}>
+              <Link href="/dashboard" className={`font-body font-semibold tracking-[0.08em] text-[#1b4a36] lg:hidden ${isDashboard ? "text-[13px]" : "text-[15px]"}`}>
                 CRESTION LABS
               </Link>
-              <span className="hidden font-body text-[15px] font-semibold tracking-[-0.01em] text-[#171713] lg:block">
+              <span className={`hidden font-body font-semibold tracking-[-0.01em] text-[#171713] lg:block ${isDashboard ? "text-[13px]" : "text-[15px]"}`}>
                 {pageTitle}
               </span>
 
@@ -281,10 +286,15 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
               </div>
             </header>
 
-            <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-10 lg:pt-8">
-              {children}
-            </div>
+            {isDashboard ? (
+              <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-4">{children}</div>
+            ) : (
+              <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-10 lg:pt-8">
+                {children}
+              </div>
+            )}
           </main>
+        </div>
         </div>
       </div>
 

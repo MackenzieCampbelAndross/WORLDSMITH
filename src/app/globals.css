@@ -55,6 +55,14 @@ body.portal-shell .font-cormorant {
   font-weight: 600;
 }
 
+@media (min-width: 1024px) {
+  .dashboard-preview-window {
+    width: min(88vw, 1200px, calc((100svh - 5rem) * 16 / 9)) !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+  }
+}
+
 .font-anton {
   font-family: var(--font-anton), sans-serif;
 }
