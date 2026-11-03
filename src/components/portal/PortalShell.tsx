@@ -175,26 +175,28 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   );
 
   const desktopControls = (
-    <div className="fixed right-6 top-6 z-40 hidden items-center gap-3 lg:flex">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          const q = query.trim();
-          window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
-        }}
-        className="flex h-9 w-[248px] items-center gap-2 rounded-full border border-[#e2ddd1] bg-[#fbf8f1] px-4 text-[#8a8374] transition-colors focus-within:border-[#b9b09c]"
-      >
-        <SearchIcon />
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search projects..."
-          aria-label="Search projects"
-          className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#171713] outline-none placeholder:text-[#a0988a]"
-        />
-      </form>
-      <NotificationsMenu />
-      <AccountMenu />
+    <div className="fixed left-0 right-0 top-0 z-30 hidden h-16 border-b border-white/60 bg-[#f7f4ec]/70 shadow-[0_14px_40px_-30px_rgba(23,23,19,0.45)] backdrop-blur-xl lg:flex lg:left-[248px]">
+      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-end gap-3 px-12">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const q = query.trim();
+            window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
+          }}
+          className="flex h-9 w-[248px] items-center gap-2 rounded-full border border-white/70 bg-white/55 px-4 text-[#716b5d] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] transition-colors focus-within:border-[#b9b09c]"
+        >
+          <SearchIcon />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search projects..."
+            aria-label="Search projects"
+            className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#171713] outline-none placeholder:text-[#8a8374]"
+          />
+        </form>
+        <NotificationsMenu />
+        <AccountMenu />
+      </div>
     </div>
   );
 
@@ -206,7 +208,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
         <div className="my-5 h-px bg-white/10" />
       </aside>
 
-      <header className="sticky top-3 z-30 mx-3 flex items-center justify-between gap-2 rounded-[14px] border border-[#e2ddd1] bg-[#f7f4ec]/95 px-4 py-2.5 shadow-[0_12px_32px_-24px_rgba(0,0,0,0.35)] backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-white/60 bg-[#f7f4ec]/70 px-4 py-2.5 shadow-[0_14px_40px_-30px_rgba(23,23,19,0.35)] backdrop-blur-xl lg:hidden">
         <Link href="/dashboard" className="font-cormorant text-[19px] uppercase tracking-[0.16em] text-[#1b4a36]">
           Crestion Labs
         </Link>
