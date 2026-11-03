@@ -10,18 +10,28 @@ import {
   createDraftProject,
   fetchProject,
   fetchProjectFiles,
+  FURNISHING_STYLES,
+  FURNISHING_STYLE_LABELS,
   PROJECT_TYPES,
+  updateDraftProject,
   uploadProjectFile,
+  type FurnishingStyle,
   type Project,
 } from "@/lib/portal";
 
-const ACCEPTED = ".pdf,.dwg,.dxf,.rvt,.jpg,.jpeg,.png,.webp";
+const ACCEPTED = ".png,.jpg,.jpeg,.pdf";
+const MAX_PLAN_BYTES = 15 * 1024 * 1024;
+
+const isSpan = (value: number): boolean => Number.isFinite(value) && value >= 2 && value <= 100;
 
 export default function NewProjectPage() {
   const router = useRouter();
   const { user, profile } = useAuth();
   const [name, setName] = useState("");
   const [type, setType] = useState<(typeof PROJECT_TYPES)[number]>(PROJECT_TYPES[0]);
+  const [width, setWidth] = useState("");
+  const [length, setLength] = useState("");
+  const [style, setStyle] = useState<FurnishingStyle>("modern");
   const [file, setFile] = useState<File | null>(null);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [draftProject, setDraftProject] = useState<Project | null>(null);
@@ -59,6 +69,13 @@ export default function NewProjectPage() {
             ? (existing.type as (typeof PROJECT_TYPES)[number])
             : PROJECT_TYPES[0],
         );
+        if (
+          FURNISHING_STYLES.includes(existing.furnishingStyle as FurnishingStyle)
+        ) {
+          setStyle(existing.furnishingStyle as FurnishingStyle);
+        }
+        if (existing.planWidthMeters) setWidth(String(existing.planWidthMeters));
+        if (existing.planLengthMeters) setLength(String(existing.planLengthMeters));
         if (plan) {
           setUploaded(true);
           setExistingPlan(plan.name);
@@ -80,6 +97,16 @@ export default function NewProjectPage() {
 
     if (!name.trim()) {
       setError("Add a project name.");
+      return;
+    }
+    const widthMeters = Number(width);
+    const lengthMeters = Number(length);
+    if (!isSpan(widthMeters) || !isSpan(lengthMeters)) {
+      setError("Enter the plan's overall width and length in metres, between 2 and 100.");
+      return;
+    }
+    if (file && file.size > MAX_PLAN_BYTES) {
+      setError("The floor plan must stay under 15 MB.");
       return;
     }
     if (!file && !uploaded) {
@@ -114,6 +141,13 @@ export default function NewProjectPage() {
         setExistingPlan(file.name);
       }
 
+      setBusy("saving");
+      await updateDraftProject(id, {
+        planWidthMeters: widthMeters,
+        planLengthMeters: lengthMeters,
+        furnishingStyle: style,
+      });
+
       setBusy("submitting");
       await submitProductionRequest(id);
       router.push(`/projects/${id}?submitted=1`);
@@ -125,7 +159,7 @@ export default function NewProjectPage() {
 
   const busyLabel =
     busy === "saving"
-      ? "Creating project…"
+      ? "Saving project…"
       : busy === "uploading"
         ? "Uploading floor plan…"
         : busy === "submitting"
@@ -178,6 +212,65 @@ export default function NewProjectPage() {
           </select>
         </div>
 
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="submission-width" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+              Plan width (m)
+            </label>
+            <input
+              id="submission-width"
+              type="number"
+              inputMode="decimal"
+              min={2}
+              max={100}
+              step="0.1"
+              value={width}
+              onChange={(event) => setWidth(event.target.value)}
+              placeholder="12.0"
+              className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+            />
+          </div>
+          <div>
+            <label htmlFor="submission-length" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+              Plan length (m)
+            </label>
+            <input
+              id="submission-length"
+              type="number"
+              inputMode="decimal"
+              min={2}
+              max={100}
+              step="0.1"
+              value={length}
+              onChange={(event) => setLength(event.target.value)}
+              placeholder="9.0"
+              className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+            />
+          </div>
+        </div>
+        <p className="mt-2 font-body text-[10.5px] leading-5 text-[#8a8374]">
+          Measure the outer edge of the plan on both axes. With both numbers Creston builds your world
+          at true scale; without them room sizes are estimated.
+        </p>
+
+        <div className="mt-5">
+          <label htmlFor="submission-style" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+            Furnishing style
+          </label>
+          <select
+            id="submission-style"
+            value={style}
+            onChange={(event) => setStyle(event.target.value as FurnishingStyle)}
+            className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
+          >
+            {FURNISHING_STYLES.map((option) => (
+              <option key={option} value={option}>
+                {FURNISHING_STYLE_LABELS[option]}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="mt-5">
           <p className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">Floor plan</p>
           {uploaded ? (
@@ -191,7 +284,10 @@ export default function NewProjectPage() {
           ) : (
             <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-[7px] border border-dashed border-[#cfc8b8] bg-[#faf6ec] px-5 py-8 text-center transition-colors hover:border-[#1f5e44]">
               <span className="font-body text-[12px] text-[#3f3b33]">Choose the floor plan</span>
-              <span className="mt-1 font-body text-[10px] text-[#8a8374]">PDF, DWG, DXF, RVT or image · up to 25 MB</span>
+              <span className="mt-1 font-body text-[10px] text-[#8a8374]">PNG, JPG or PDF · up to 15 MB</span>
+              <span className="mt-1 font-body text-[10px] text-[#8a8374]">
+                Use the line drawing of the plan, not a 3D view or a furnished render.
+              </span>
               <span className="mt-3 rounded-[6px] border border-[#d8d2c4] bg-[#fdfbf6] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#3f3b33]">
                 Browse
               </span>

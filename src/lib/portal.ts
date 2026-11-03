@@ -21,6 +21,24 @@ export const DEVELOPMENT_STAGES = [
 
 export const UNIT_TYPES = ["2 BHK", "3 BHK", "4 BHK", "Penthouse", "Villa"] as const;
 
+// The reconstruction engine furnishes from a fixed procedural library, so the
+// style choice is constrained to the values it can actually build.
+export const FURNISHING_STYLES = [
+  "modern",
+  "minimalist",
+  "scandinavian",
+  "warm_luxury",
+] as const;
+
+export type FurnishingStyle = (typeof FURNISHING_STYLES)[number];
+
+export const FURNISHING_STYLE_LABELS: Record<FurnishingStyle, string> = {
+  modern: "Modern",
+  minimalist: "Minimalist",
+  scandinavian: "Scandinavian",
+  warm_luxury: "Warm luxury",
+};
+
 export const PROJECT_STATUSES = [
   "DRAFT",
   "SUBMITTED",
@@ -126,6 +144,9 @@ export interface Project {
   unitTypes: string[];
   interiorStyle: string;
   exteriorStyle: string;
+  planWidthMeters: number;
+  planLengthMeters: number;
+  furnishingStyle: string;
   materials: string;
   landscape: string;
   lighting: string;
@@ -200,6 +221,9 @@ export interface ProjectDraftPatch extends Partial<ProjectDraftInput> {
   unitTypes?: string[];
   interiorStyle?: string;
   exteriorStyle?: string;
+  planWidthMeters?: number;
+  planLengthMeters?: number;
+  furnishingStyle?: FurnishingStyle;
   materials?: string;
   landscape?: string;
   lighting?: string;
@@ -256,6 +280,9 @@ const mapProject = (row: Row): Project => ({
   unitTypes: toStringArray(row.unit_types),
   interiorStyle: String(row.interior_style ?? ""),
   exteriorStyle: String(row.exterior_style ?? ""),
+  planWidthMeters: toNumber(row.plan_width_meters),
+  planLengthMeters: toNumber(row.plan_length_meters),
+  furnishingStyle: String(row.furnishing_style ?? ""),
   materials: String(row.materials ?? ""),
   landscape: String(row.landscape ?? ""),
   lighting: String(row.lighting ?? ""),
@@ -568,6 +595,9 @@ export async function updateDraftProject(
   if (patch.unitTypes !== undefined) payload.unit_types = patch.unitTypes;
   if (patch.interiorStyle !== undefined) payload.interior_style = patch.interiorStyle;
   if (patch.exteriorStyle !== undefined) payload.exterior_style = patch.exteriorStyle;
+  if (patch.planWidthMeters !== undefined) payload.plan_width_meters = patch.planWidthMeters;
+  if (patch.planLengthMeters !== undefined) payload.plan_length_meters = patch.planLengthMeters;
+  if (patch.furnishingStyle !== undefined) payload.furnishing_style = patch.furnishingStyle;
   if (patch.materials !== undefined) payload.materials = patch.materials;
   if (patch.landscape !== undefined) payload.landscape = patch.landscape;
   if (patch.lighting !== undefined) payload.lighting = patch.lighting;

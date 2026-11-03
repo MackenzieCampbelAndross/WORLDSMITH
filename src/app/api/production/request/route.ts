@@ -6,6 +6,29 @@ type Row = Record<string, unknown>;
 
 const TIMEOUT_MS = 15_000;
 
+const numericOrNull = (value: unknown): number | null => {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+// Without both spans the engine has to estimate real-world size from room areas.
+const isMeasured = (value: number | null): value is number =>
+  value !== null && value >= 2 && value <= 100;
+
+const PLAN_EXTENSIONS = [".png", ".jpg", ".jpeg", ".pdf"];
+const MAX_PLAN_BYTES = 15 * 1024 * 1024;
+
+const isReadablePlan = (file: Row): boolean => {
+  const name = String(file.name ?? "").toLowerCase();
+  const size = Number(file.size_bytes ?? 0);
+  return (
+    file.kind === "plan" &&
+    PLAN_EXTENSIONS.some((extension) => name.endsWith(extension)) &&
+    size > 0 &&
+    size <= MAX_PLAN_BYTES
+  );
+};
+
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status });
 
 export async function POST(request: Request) {
@@ -60,6 +83,18 @@ export async function POST(request: Request) {
     return json({ message: "This project has already been submitted." }, 409);
   }
 
+  const planWidthMeters = numericOrNull(project.plan_width_meters);
+  const planLengthMeters = numericOrNull(project.plan_length_meters);
+  if (!isMeasured(planWidthMeters) || !isMeasured(planLengthMeters)) {
+    return json(
+      {
+        message:
+          "Enter the floor plan's overall width and length in metres (2 to 100) so the world is built at true scale.",
+      },
+      422,
+    );
+  }
+
   const [profileResponse, filesResponse] = await Promise.all([
     fetch(
       `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=*`,
@@ -77,6 +112,15 @@ export async function POST(request: Request) {
   }
   if (!files.some((file) => file.kind === "plan")) {
     return json({ message: "Upload at least one architectural plan before submitting." }, 422);
+  }
+  if (!files.some(isReadablePlan)) {
+    return json(
+      {
+        message:
+          "Plans are read from PNG, JPG or PDF files up to 15 MB. CAD and Revit exports are not readable yet, so re-upload the floor plan as an image or PDF.",
+      },
+      422,
+    );
   }
 
   const companyId = typeof project.company_id === "string" ? project.company_id : null;
@@ -162,6 +206,9 @@ export async function POST(request: Request) {
       unitTypes: project.unit_types,
       interiorStyle: project.interior_style,
       exteriorStyle: project.exterior_style,
+      planWidthMeters,
+      planLengthMeters,
+      furnishingStyle: String(project.furnishing_style ?? "modern"),
       materials: project.materials,
       landscape: project.landscape,
       lighting: project.lighting,
