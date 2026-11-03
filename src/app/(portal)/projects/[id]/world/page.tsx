@@ -76,23 +76,39 @@ export default function ProjectWorldPage() {
   }
 
   if (!world || world.status !== "ready") {
+    const waiting = ["SUBMITTED", "REVIEWING", "ASSETS_RECEIVED"].includes(project.status);
+    const inProduction = ["PROCESSING", "INTERNAL_REVIEW"].includes(project.status);
     return (
       <div>
-        <div className="relative overflow-hidden border border-[#e2ddd1] bg-[#1b4a36] px-6 py-12 text-center sm:px-12">
+        <div className="relative overflow-hidden rounded-[12px] border border-[#e2ddd1] bg-[#1b4a36] px-6 py-12 text-center sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-20">
             <svg viewBox="0 0 400 200" className="h-full w-full" fill="none" aria-hidden="true">
               <path d="M40 160h320M80 160V95l45-28 45 28v65M170 160V72l60-34 60 34v88M230 160v-46h52M80 118h90M170 92h120" stroke="#f4f1e6" strokeWidth="0.7" />
             </svg>
           </div>
           <p className="relative font-body text-[9.5px] uppercase tracking-[0.22em] text-[#f4f1e6]/50">
-            {project.status === "DRAFT" ? "Awaiting submission" : "World in production"}
+            {project.status === "DRAFT"
+              ? "Awaiting submission"
+              : project.status === "COMPLETED"
+                ? "Delivery pending"
+                : project.status === "CLIENT_REVIEW"
+                  ? "Ready for review"
+                  : waiting
+                    ? "Request received"
+                    : "World in production"}
           </p>
           <h2 className="relative mt-4 font-display text-[28px] leading-tight text-[#fbf8ee] sm:text-[34px]">
             {project.status === "DRAFT"
               ? "Your world hasn't started yet."
               : project.status === "COMPLETED"
                 ? "Delivery details are being prepared."
-                : "Your world is being created."}
+                : project.status === "CLIENT_REVIEW"
+                  ? "Your world is ready for review."
+                  : waiting
+                    ? "Your request is with the Crestion Labs team."
+                    : inProduction
+                      ? "Your world is being created."
+                      : "Production update available."}
           </h2>
           <p className="relative mx-auto mt-3 max-w-[480px] font-body text-[12.5px] leading-6 text-[#f4f1e6]/60">
             {STATUS_DESCRIPTIONS[project.status]}
@@ -156,7 +172,7 @@ export default function ProjectWorldPage() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <section className="border border-[#e2ddd1] bg-[#fdfbf6]">
+        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
           <div className="border-b border-[#e2ddd1] px-5 py-4">
             <h3 className="font-accent text-[21px] leading-none text-[#171713]">Delivery</h3>
           </div>
@@ -229,7 +245,7 @@ export default function ProjectWorldPage() {
           {exportError && <p className="px-5 pb-4 font-body text-[11px] text-[#8a5a2f]">{exportError}</p>}
         </section>
 
-        <section className="border border-[#e2ddd1] bg-[#fdfbf6]">
+        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
           <div className="border-b border-[#e2ddd1] px-5 py-4">
             <h3 className="font-accent text-[21px] leading-none text-[#171713]">World record</h3>
           </div>

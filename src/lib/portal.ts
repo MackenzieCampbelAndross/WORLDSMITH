@@ -679,6 +679,8 @@ export interface DashboardData {
   newProjectsThisMonth: number;
   processingCount: number;
   activeProject: Project | null;
+  activeFiles: ProjectFile[];
+  activeWorld: World | null;
 }
 
 export async function fetchDashboard(uid: string): Promise<DashboardData> {
@@ -707,6 +709,17 @@ export async function fetchDashboard(uid: string): Promise<DashboardData> {
     projects[0] ??
     null;
 
+  let activeFiles: ProjectFile[] = [];
+  let activeWorld: World | null = null;
+  if (activeProject) {
+    const [files, world] = await Promise.all([
+      fetchProjectFiles(activeProject.id).catch(() => []),
+      fetchWorld(activeProject.id).catch(() => null),
+    ]);
+    activeFiles = files;
+    activeWorld = world;
+  }
+
   return {
     projects,
     activity,
@@ -715,7 +728,9 @@ export async function fetchDashboard(uid: string): Promise<DashboardData> {
     newProjectsThisMonth: projects.filter(
       (project) => project.createdAt && project.createdAt >= monthStart,
     ).length,
-    processingCount: projects.filter((project) => activeStatuses.includes(project.status)).length,
+    processingCount: projects.filter((project) => ["REVIEWING", "ASSETS_RECEIVED", "PROCESSING", "INTERNAL_REVIEW"].includes(project.status)).length,
     activeProject,
+    activeFiles,
+    activeWorld,
   };
 }

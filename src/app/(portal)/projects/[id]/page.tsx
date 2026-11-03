@@ -47,7 +47,7 @@ export default function ProjectOverviewPage() {
   return (
     <div>
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="border border-[#e2ddd1] bg-[#fdfbf6]">
+        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
           <div className="border-b border-[#e2ddd1] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Project summary</h2>
           </div>
@@ -71,14 +71,14 @@ export default function ProjectOverviewPage() {
           </div>
         </section>
 
-        <section className="border border-[#e2ddd1] bg-[#fdfbf6]">
+        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
           <div className="flex items-center justify-between border-b border-[#e2ddd1] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Production status</h2>
             <Link
-              href={`/projects/${project.id}/status`}
+              href={`/projects/${project.id}/activity`}
               className="font-body text-[10px] text-[#1f5e44] transition-opacity hover:opacity-70"
             >
-              View status →
+              View activity →
             </Link>
           </div>
           <div className="px-5 py-6">
@@ -116,7 +116,7 @@ export default function ProjectOverviewPage() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <section className="border border-[#e2ddd1] bg-[#fdfbf6]">
+        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
           <div className="flex items-center justify-between border-b border-[#e2ddd1] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Project activity</h2>
           </div>
@@ -148,16 +148,16 @@ export default function ProjectOverviewPage() {
           </div>
         </section>
 
-        <section className="border border-[#e2ddd1] bg-[#fdfbf6]">
+        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
           <div className="border-b border-[#e2ddd1] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Quick actions</h2>
           </div>
           <div className="grid grid-cols-1">
             {[
-              { href: `/projects/${project.id}/plans`, label: "View 2D plans", hint: "Architectural inputs" },
-              { href: `/projects/${project.id}/status`, label: "View status", hint: "Production updates" },
-              { href: `/projects/${project.id}/world`, label: "Open 3D world", hint: "Interactive experience" },
-              { href: `/projects/${project.id}/files`, label: "View files", hint: "Project repository" },
+              { href: `/projects/${project.id}/source`, label: "Source assets", hint: "Plans and files" },
+              { href: `/projects/${project.id}/activity`, label: "Project activity", hint: "Production updates" },
+              { href: `/projects/${project.id}/world`, label: "Open world", hint: "Interactive experience" },
+              { href: `/projects/${project.id}/presentation`, label: "Presentation", hint: "Share with buyers" },
             ].map((action) => (
               <Link
                 key={action.href}

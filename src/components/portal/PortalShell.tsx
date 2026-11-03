@@ -6,12 +6,13 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 
 const NAV = [
-  { href: "/dashboard", label: "Overview", exact: true, icon: "overview" as const },
+  { href: "/dashboard", label: "Home", exact: true, icon: "home" as const },
   { href: "/projects", label: "Projects", exact: false, icon: "projects" as const },
+  { href: "/insights", label: "Insights", exact: false, icon: "insights" as const },
 ];
 
-const Icon = ({ name, className = "h-4 w-4" }: { name: "overview" | "projects" | "settings"; className?: string }) => {
-  if (name === "overview") {
+const Icon = ({ name, className = "h-4 w-4" }: { name: "home" | "projects" | "insights"; className?: string }) => {
+  if (name === "home") {
     return (
       <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
         <path d="M3.5 9.2 10 3.6l6.5 5.6M5.2 8.1v8.1h9.6V8.1M8.3 16.2v-4.4h3.4v4.4" stroke="currentColor" strokeWidth="1.2" />
@@ -27,22 +28,106 @@ const Icon = ({ name, className = "h-4 w-4" }: { name: "overview" | "projects" |
   }
   return (
     <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
-      <circle cx="10" cy="10" r="2.6" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M16 10a6.4 6.4 0 0 0-.1-1.1l1.6-1.2-1.7-2.9-1.9.7a6.7 6.7 0 0 0-1.9-1.1L11.7 2H8.3l-.3 2.4a6.7 6.7 0 0 0-1.9 1.1l-1.9-.7L2.5 7.7l1.6 1.2a6.4 6.4 0 0 0 0 2.2l-1.6 1.2 1.7 2.9 1.9-.7a6.7 6.7 0 0 0 1.9 1.1l.3 2.4h3.4l.3-2.4a6.7 6.7 0 0 0 1.9-1.1l1.9.7 1.7-2.9-1.6-1.2c.1-.4.1-.7.1-1.1Z" stroke="currentColor" strokeWidth="1" />
+      <path d="M3 16.5h14M5 16.5V10M10 16.5V5M15 16.5v-4" stroke="currentColor" strokeWidth="1.2" />
     </svg>
   );
 };
 
+const SearchIcon = () => (
+  <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" aria-hidden="true">
+    <circle cx="8" cy="8" r="4.6" stroke="currentColor" strokeWidth="1.2" />
+    <path d="m11.4 11.4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
+const BellIcon = () => (
+  <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" aria-hidden="true">
+    <path d="M4.6 12.6h8.8l-1-1.7V8a3.4 3.4 0 0 0-6.8 0v2.9l-1 1.7ZM7.4 14.5a1.9 1.9 0 0 0 3.2 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const Chevron = () => (
+  <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" aria-hidden="true">
+    <path d="m2.5 4.5 3.5 3 3.5-3" stroke="currentColor" strokeWidth="1" />
+  </svg>
+);
+
 const initialsFor = (name: string, email: string) => {
   const source = name.trim() || email;
   const parts = source.split(/\s+|@/).filter(Boolean);
-  return (parts[0]?.[0] ?? "W").toUpperCase() + (parts[1]?.[0] ?? "").toUpperCase();
+  return (parts[0]?.[0] ?? "C").toUpperCase() + (parts[1]?.[0] ?? "").toUpperCase();
 };
+
+const AccountMenu = () => {
+  const { user, profile, logout } = useAuth();
+  const displayName =
+    [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") ||
+    String((user?.user_metadata as Record<string, unknown> | undefined)?.first_name ?? "") ||
+    user?.email ||
+    "Client";
+  const initials = initialsFor(displayName, user?.email ?? "");
+
+  return (
+    <details className="relative">
+      <summary
+        aria-label="Open account menu"
+        className="flex cursor-pointer list-none items-center gap-2 rounded-full transition-opacity hover:opacity-80 [&::-webkit-details-marker]:hidden"
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1f5e44] font-body text-[10px] font-semibold text-[#f7f4ec]">
+          {initials}
+        </span>
+        <span className="hidden text-[#716b5d] sm:block">
+          <Chevron />
+        </span>
+      </summary>
+      <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-[10px] border border-[#e2ddd1] bg-[#fdfbf6] shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
+        <div className="border-b border-[#eee9df] px-4 py-3">
+          <p className="truncate font-body text-[12px] text-[#171713]">{displayName}</p>
+          <p className="mt-0.5 truncate font-body text-[10.5px] text-[#8a8374]">{profile?.companyName || user?.email}</p>
+        </div>
+        <Link href="/settings#profile" className="block px-4 py-2.5 font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]">
+          Profile
+        </Link>
+        <Link href="/settings#security" className="block px-4 py-2.5 font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]">
+          Account settings
+        </Link>
+        <Link href="/settings#company" className="block px-4 py-2.5 font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]">
+          Company settings
+        </Link>
+        <button
+          type="button"
+          onClick={() => void logout()}
+          className="block w-full border-t border-[#eee9df] px-4 py-2.5 text-left font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]"
+        >
+          Sign out
+        </button>
+      </div>
+    </details>
+  );
+};
+
+const NotificationsMenu = () => (
+  <details className="relative">
+    <summary
+      aria-label="Notifications"
+      className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full text-[#716b5d] transition-colors hover:bg-[#f1ebdf] hover:text-[#171713] [&::-webkit-details-marker]:hidden"
+    >
+      <BellIcon />
+    </summary>
+    <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-[10px] border border-[#e2ddd1] bg-[#fdfbf6] px-4 py-4 shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
+      <p className="font-body text-[12px] text-[#171713]">No new notifications</p>
+      <p className="mt-1 font-body text-[10.5px] leading-4 text-[#8a8374]">
+        Project updates appear in each project&apos;s Activity.
+      </p>
+    </div>
+  </details>
+);
 
 export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
-  const { user, profile, logout } = useAuth();
+  const { user } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     document.body.classList.add("portal-shell");
@@ -58,35 +143,25 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
     return <div className="min-h-[100svh] bg-[#f7f4ec]" />;
   }
 
-  const displayName =
-    [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") ||
-    String((user.user_metadata as Record<string, unknown> | undefined)?.first_name ?? "") ||
-    user.email ||
-    "Client";
-  const company = profile?.companyName || "Crestion Labs client";
-  const initials = initialsFor(displayName, user.email ?? "");
-
   const isActive = (item: (typeof NAV)[number]) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
   const brand = (
-    <div>
-      <Link href="/dashboard" className="font-cormorant text-[22px] uppercase leading-none tracking-[0.17em] text-[#f4f1e6] transition-opacity hover:opacity-75">
-        Crestion Labs
-      </Link>
-      <p className="mt-3 font-body text-[9px] uppercase tracking-[0.22em] text-[#f4f1e6]/35">Client portal</p>
-    </div>
+    <Link href="/dashboard" className="inline-flex flex-col font-cormorant text-[22px] uppercase leading-[0.92] tracking-[0.2em] text-[#f4f1e6] transition-opacity hover:opacity-75">
+      <span>Crestion</span>
+      <span>Labs</span>
+    </Link>
   );
 
   const navLinks = (
-    <nav className="mt-12 flex flex-col gap-1">
+    <nav className="mt-12 flex flex-col gap-1.5">
       {NAV.map((item) => {
         const active = isActive(item);
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-3 rounded-[5px] px-3 py-2.5 font-body text-[13px] transition-colors ${
+            className={`flex items-center gap-3 rounded-[8px] px-3 py-2.5 font-body text-[13px] transition-colors ${
               active
                 ? "bg-white/10 text-[#f7f2e5]"
                 : "text-[#f4f1e6]/62 hover:bg-white/5 hover:text-[#f7f2e5]"
@@ -97,79 +172,71 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
           </Link>
         );
       })}
-      <div className="my-5 h-px bg-white/12" />
-      <Link
-        href="/settings"
-        className={`flex items-center gap-3 rounded-[5px] px-3 py-2.5 font-body text-[13px] transition-colors ${
-          pathname.startsWith("/settings")
-            ? "bg-white/10 text-[#f7f2e5]"
-            : "text-[#f4f1e6]/62 hover:bg-white/5 hover:text-[#f7f2e5]"
-        }`}
-      >
-        <Icon name="settings" />
-        Settings
-      </Link>
     </nav>
   );
 
-  const profileMenu = (
-    <details className="group relative mt-auto">
-      <summary className="flex cursor-pointer list-none items-center gap-3 border-t border-white/12 pt-5 [&::-webkit-details-marker]:hidden">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f0e9d8] font-body text-[11px] font-semibold text-[#1b4a36]">
-          {initials}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate font-body text-[12.5px] text-[#f7f2e5]">{displayName}</span>
-          <span className="mt-0.5 block truncate font-body text-[10.5px] text-[#f4f1e6]/40">{company}</span>
-        </span>
-        <svg viewBox="0 0 12 12" className="h-3 w-3 text-[#f4f1e6]/40 transition-transform group-open:rotate-180" fill="none" aria-hidden="true">
-          <path d="m2.5 4.5 3.5 3 3.5-3" stroke="currentColor" strokeWidth="1" />
-        </svg>
-      </summary>
-      <div className="absolute bottom-full left-0 mb-2 w-full border border-white/15 bg-[#173f2e] py-1.5 shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
-        <Link href="/settings#profile" className="block px-3.5 py-2 font-body text-[11.5px] text-[#f4f1e6]/75 transition-colors hover:bg-white/8 hover:text-white">
-          Account
-        </Link>
-        <Link href="/settings" className="block px-3.5 py-2 font-body text-[11.5px] text-[#f4f1e6]/75 transition-colors hover:bg-white/8 hover:text-white">
-          Settings
-        </Link>
-        <button
-          type="button"
-          onClick={() => void logout()}
-          className="block w-full px-3.5 py-2 text-left font-body text-[11.5px] text-[#f4f1e6]/75 transition-colors hover:bg-white/8 hover:text-white"
-        >
-          Sign out
-        </button>
-      </div>
-    </details>
+  const desktopControls = (
+    <div className="hidden items-center gap-3 pb-6 lg:flex">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          const q = query.trim();
+          window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
+        }}
+        className="flex h-9 w-[248px] items-center gap-2 rounded-full border border-[#e2ddd1] bg-[#fbf8f1] px-4 text-[#8a8374] transition-colors focus-within:border-[#b9b09c]"
+      >
+        <SearchIcon />
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search projects..."
+          aria-label="Search projects"
+          className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#171713] outline-none placeholder:text-[#a0988a]"
+        />
+      </form>
+      <NotificationsMenu />
+      <AccountMenu />
+    </div>
   );
 
   return (
     <div className="min-h-[100svh] bg-[#f7f4ec] text-[#171713]">
       <aside className="fixed bottom-3 left-3 top-3 z-40 hidden w-[248px] flex-col overflow-hidden rounded-[16px] bg-[#1b4a36] px-5 py-6 lg:flex">
-        {brand}
+        <div>{brand}</div>
         {navLinks}
-        {profileMenu}
+        <div className="my-5 h-px bg-white/10" />
       </aside>
 
-      <header className="sticky top-3 z-30 mx-3 flex items-center justify-between rounded-[14px] border border-[#e2ddd1] bg-[#f7f4ec]/95 px-4 py-3 shadow-[0_12px_32px_-24px_rgba(0,0,0,0.35)] backdrop-blur lg:hidden">
+      <header className="sticky top-3 z-30 mx-3 flex items-center justify-between gap-2 rounded-[14px] border border-[#e2ddd1] bg-[#f7f4ec]/95 px-4 py-2.5 shadow-[0_12px_32px_-24px_rgba(0,0,0,0.35)] backdrop-blur lg:hidden">
         <Link href="/dashboard" className="font-cormorant text-[19px] uppercase tracking-[0.16em] text-[#1b4a36]">
           Crestion Labs
         </Link>
-        <button
-          type="button"
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Open portal navigation"
-          className="flex h-9 w-9 items-center justify-center border border-[#d8d2c4] text-[#1b4a36]"
-        >
-          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-            <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.2" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          <Link
+            href="/projects"
+            aria-label="Search projects"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-[#716b5d] transition-colors hover:bg-[#f1ebdf] hover:text-[#171713]"
+          >
+            <SearchIcon />
+          </Link>
+          <NotificationsMenu />
+          <AccountMenu />
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open portal navigation"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-[#1b4a36] transition-colors hover:bg-[#f1ebdf]"
+          >
+            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
+              <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.2" />
+            </svg>
+          </button>
+        </div>
       </header>
 
       <main className="min-h-[100svh] lg:pl-[272px]">
-        <div className="mx-auto w-full max-w-[1280px] px-5 pb-16 pt-9 sm:px-8 lg:px-12 lg:pb-20 lg:pt-12">
+        <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-12 lg:pt-7">
+          {desktopControls}
           {children}
         </div>
       </main>
@@ -197,7 +264,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
               </button>
             </div>
             {navLinks}
-            {profileMenu}
+            <div className="my-5 h-px bg-white/10" />
           </aside>
         </div>
       )}

@@ -6,10 +6,10 @@ import { EmptyState, LoadingBlock } from "@/components/portal/EmptyState";
 import { useProjectWorkspace } from "@/components/portal/ProjectWorkspaceContext";
 import { StatusPill } from "@/components/portal/StatusPill";
 import { formatDate, formatRelative } from "@/lib/format";
-import { STATUS_LABELS, fetchProjectActivity, type Activity } from "@/lib/portal";
+import { fetchProjectActivity, type Activity } from "@/lib/portal";
 import { STATUS_DESCRIPTIONS } from "@/lib/productionStatus";
 
-export default function ProjectStatusPage() {
+export default function ProjectActivityPage() {
   const { project } = useProjectWorkspace();
   const [activity, setActivity] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,10 +49,9 @@ export default function ProjectStatusPage() {
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="font-accent text-[26px] leading-none text-[#171713]">Production status</h2>
+          <h2 className="font-accent text-[30px] leading-none text-[#171713]">Activity</h2>
           <p className="mt-2 max-w-[560px] font-body text-[12px] leading-5 text-[#716b5d]">
-            The Crestion Labs team handles production directly. This page mirrors the status they
-            publish for your project.
+            Production status and updates from the Crestion Labs team.
           </p>
         </div>
         <button
@@ -61,13 +60,13 @@ export default function ProjectStatusPage() {
             void load();
             setRefreshKey((key) => key + 1);
           }}
-          className="border border-[#d8d2c4] px-3 py-2 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
+          className="rounded-[7px] border border-[#d8d2c4] px-3 py-2 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
         >
           Refresh
         </button>
       </div>
 
-      <div className="mt-6 border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-6">
+      <div className="mt-6 rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">
@@ -99,14 +98,14 @@ export default function ProjectStatusPage() {
             href={`/projects/${project.id}/world`}
             className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f7f4ec]"
           >
-            Open 3D World →
+            Open World →
           </Link>
         )}
       </div>
 
       <div className="mt-8">
         <h3 className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">
-          Production updates
+          Project activity
         </h3>
         {loading ? (
           <div className="mt-4 space-y-3">
@@ -116,12 +115,12 @@ export default function ProjectStatusPage() {
         ) : error ? (
           <div className="mt-4">
             <EmptyState
-              title="We couldn't load production updates."
+              title="We couldn't load project activity."
               body="The status is available above, but the activity history did not come through. Try refreshing in a moment."
             />
           </div>
         ) : activity.length === 0 ? (
-          <div className="mt-4 border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-8">
+          <div className="mt-4 rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-8">
             <p className="font-accent text-[21px] leading-tight text-[#171713]">
               {project.status === "DRAFT" ? "No request has been sent yet." : "Your request is queued."}
             </p>
@@ -147,10 +146,6 @@ export default function ProjectStatusPage() {
           </div>
         )}
       </div>
-
-      <p className="mt-6 font-body text-[10px] text-[#8a8374]">
-        Current label: {STATUS_LABELS[project.status]}
-      </p>
     </div>
   );
 }

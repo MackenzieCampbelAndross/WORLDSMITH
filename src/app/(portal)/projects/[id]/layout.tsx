@@ -12,11 +12,10 @@ import { fetchProject, type Project } from "@/lib/portal";
 
 const TABS = [
   { href: "", label: "Overview", exact: true },
-  { href: "/plans", label: "2D Plans" },
-  { href: "/status", label: "Status" },
-  { href: "/world", label: "3D World" },
-  { href: "/files", label: "Files" },
-  { href: "/analytics", label: "Project Analytics" },
+  { href: "/source", label: "Source" },
+  { href: "/world", label: "World" },
+  { href: "/presentation", label: "Presentation" },
+  { href: "/activity", label: "Activity" },
 ];
 
 export default function ProjectWorkspaceLayout({ children }: { children: React.ReactNode }) {
@@ -105,7 +104,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
             {project.type}
             {project.developmentStage ? ` · ${project.developmentStage}` : ""}
           </p>
-          <h1 className="mt-2 font-display text-[31px] font-medium leading-none tracking-[-0.035em] text-[#171713] sm:text-[40px]">
+          <h1 className="mt-2 font-accent text-[38px] font-normal leading-none tracking-[-0.02em] text-[#171713] sm:text-[46px]">
             {project.name}
           </h1>
           <p className="mt-3 font-body text-[12px] text-[#716b5d]">
