@@ -40,6 +40,12 @@
   font-family: var(--font-instrument-serif), serif;
 }
 
+body.portal-shell,
+body.portal-shell .font-body,
+body.portal-shell .font-display {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 .font-anton {
   font-family: var(--font-anton), sans-serif;
 }
