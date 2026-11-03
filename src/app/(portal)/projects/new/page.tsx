@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { formatBytes } from "@/lib/format";
+import { inspectPlanFile } from "@/lib/planCheck";
 import { submitProductionRequest } from "@/lib/production";
 import {
   createDraftProject,
@@ -303,7 +304,26 @@ export default function NewProjectPage() {
                 className="sr-only"
                 onChange={(event) => {
                   const next = event.target.files?.[0] ?? null;
-                  setFile(next);
+                  if (!next) {
+                    setFile(null);
+                    return;
+                  }
+                  if (next.size > MAX_PLAN_BYTES) {
+                    event.target.value = "";
+                    setFile(null);
+                    setError("The floor plan must stay under 15 MB.");
+                    return;
+                  }
+                  setError(null);
+                  void inspectPlanFile(next).then(({ ok, errors }) => {
+                    if (ok) {
+                      setFile(next);
+                      return;
+                    }
+                    event.target.value = "";
+                    setFile(null);
+                    setError(errors[0] ?? "That plan can't be read. Try a different export.");
+                  });
                 }}
               />
             </label>
