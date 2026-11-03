@@ -11,7 +11,7 @@ const NAV = [
   { href: "/projects", label: "Projects", exact: false, icon: "projects" as const },
 ];
 
-const Icon = ({ name, className = "h-4 w-4" }: { name: "home" | "projects" | "insights"; className?: string }) => {
+const Icon = ({ name, className = "h-4 w-4" }: { name: "home" | "projects"; className?: string }) => {
   if (name === "home") {
     return (
       <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
@@ -19,16 +19,9 @@ const Icon = ({ name, className = "h-4 w-4" }: { name: "home" | "projects" | "in
       </svg>
     );
   }
-  if (name === "projects") {
-    return (
-      <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
-        <path d="M3.2 6.1h13.6v9.7H3.2zM3.2 6.1l1.6-2.3h5l1.6 2.3M7.2 9.5h5.6M7.2 12.1h3.8" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    );
-  }
   return (
     <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
-      <path d="M3 16.5h14M5 16.5V10M10 16.5V5M15 16.5v-4" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M3.2 6.1h13.6v9.7H3.2zM3.2 6.1l1.6-2.3h5l1.6 2.3M7.2 9.5h5.6M7.2 12.1h3.8" stroke="currentColor" strokeWidth="1.2" />
     </svg>
   );
 };
@@ -49,6 +42,12 @@ const BellIcon = () => (
 const Chevron = () => (
   <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" aria-hidden="true">
     <path d="m2.5 4.5 3.5 3 3.5-3" stroke="currentColor" strokeWidth="1" />
+  </svg>
+);
+
+const LogoutIcon = () => (
+  <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden="true">
+    <path d="M12.5 6.2V3.8H4v12.4h8.5v-2.4M8.7 10h8M14.4 7.2 17.2 10l-2.8 2.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -125,7 +124,7 @@ const NotificationsMenu = () => (
 
 export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -152,48 +151,15 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
       ? "Settings"
       : "Projects";
 
-  const railBrand = (
-    <Link
-      href="/dashboard"
-      aria-label="Crestion Labs home"
-      className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-white/10 transition-colors hover:bg-white/15"
-    >
-      <CrestionLabsLogo size={25} />
-    </Link>
-  );
-
-  const railNav = (
-    <nav className="mt-8 flex flex-col items-center gap-2">
-      {NAV.map((item) => {
-        const active = isActive(item);
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-label={item.label}
-            title={item.label}
-            className={`flex h-11 w-11 items-center justify-center rounded-[10px] transition-colors ${
-              active
-                ? "bg-white/12 text-[#f7f2e5]"
-                : "text-[#f4f1e6]/55 hover:bg-white/6 hover:text-white"
-            }`}
-          >
-            <Icon name={item.icon} className="h-5 w-5" />
-          </Link>
-        );
-      })}
-    </nav>
-  );
-
   const brand = (
-    <Link href="/dashboard" className="inline-flex flex-col font-cormorant text-[19px] uppercase leading-[1.05] tracking-[0.16em] text-[#f4f1e6] transition-opacity hover:opacity-75">
+    <Link href="/dashboard" className="inline-flex flex-col font-cormorant text-[22px] uppercase leading-[0.92] tracking-[0.2em] text-[#f4f1e6] transition-opacity hover:opacity-75">
       <span>Crestion</span>
       <span>Labs</span>
     </Link>
   );
 
   const navLinks = (
-    <nav className="mt-12 flex flex-col gap-1.5">
+    <nav className="mt-10 flex flex-col gap-1.5">
       {NAV.map((item) => {
         const active = isActive(item);
         return (
@@ -214,79 +180,113 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
     </nav>
   );
 
-  const desktopControls = (
-    <div className="fixed left-0 right-0 top-0 z-30 hidden h-16 border-b border-white/60 bg-[#f7f4ec]/70 shadow-[0_14px_40px_-30px_rgba(23,23,19,0.45)] backdrop-blur-xl lg:flex lg:left-[80px]">
-      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-4 px-8 lg:px-12">
-        <span className="font-body text-[14px] font-semibold tracking-[-0.01em] text-[#171713]">
-          {pageTitle}
-        </span>
-        <div className="flex items-center gap-3">
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            const q = query.trim();
-            window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
-          }}
-          className="flex h-9 w-[248px] items-center gap-2 rounded-full border border-white/70 bg-white/55 px-4 text-[#716b5d] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] transition-colors focus-within:border-[#b9b09c]"
-        >
-          <SearchIcon />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search projects..."
-            aria-label="Search projects"
-            className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#171713] outline-none placeholder:text-[#8a8374]"
-          />
-        </form>
-        <NotificationsMenu />
-        <AccountMenu />
-        </div>
-      </div>
-    </div>
+  const searchForm = (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        const q = query.trim();
+        window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
+      }}
+      className="hidden h-9 w-[248px] items-center gap-2 rounded-full border border-[#e3ded2] bg-[#f7f4ec]/80 px-4 text-[#716b5d] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-colors focus-within:border-[#b9b09c] sm:flex"
+    >
+      <SearchIcon />
+      <input
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Search projects..."
+        aria-label="Search projects"
+        className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#171713] outline-none placeholder:text-[#8a8374]"
+      />
+    </form>
   );
 
   return (
-    <div className="min-h-[100svh] bg-[#f7f4ec] text-[#171713]">
-      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-[80px] flex-col items-center overflow-hidden rounded-r-[16px] bg-[#1b4a36] px-2 py-6 lg:flex">
-        {railBrand}
-        {railNav}
-        <div className="mt-5 h-px w-8 bg-white/10" />
-      </aside>
+    <div className="min-h-[100svh] bg-[#e9eef6] text-[#171713]">
+      <div className="flex min-h-[100svh] flex-col lg:m-3 lg:h-[calc(100svh-1.5rem)] lg:min-h-0 lg:overflow-hidden lg:rounded-[22px] lg:bg-[#fbfaf6] lg:shadow-[0_30px_80px_-55px_rgba(23,23,19,0.6)]">
+        <div className="flex min-h-0 flex-1">
+          <aside className="hidden w-[80px] shrink-0 flex-col items-center bg-[#1a1d1b] px-2 py-5 lg:flex">
+            <Link
+              href="/dashboard"
+              aria-label="Crestion Labs home"
+              className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-white/10 transition-colors hover:bg-white/15"
+            >
+              <CrestionLabsLogo size={25} />
+            </Link>
 
-      <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-white/60 bg-[#f7f4ec]/70 px-4 py-2.5 shadow-[0_14px_40px_-30px_rgba(23,23,19,0.35)] backdrop-blur-xl lg:hidden">
-        <Link href="/dashboard" className="font-cormorant text-[19px] uppercase tracking-[0.16em] text-[#1b4a36]">
-          Crestion Labs
-        </Link>
-        <div className="flex items-center gap-1">
-          <Link
-            href="/projects"
-            aria-label="Search projects"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[#716b5d] transition-colors hover:bg-[#f1ebdf] hover:text-[#171713]"
-          >
-            <SearchIcon />
-          </Link>
-          <NotificationsMenu />
-          <AccountMenu />
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open portal navigation"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[#1b4a36] transition-colors hover:bg-[#f1ebdf]"
-          >
-            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-              <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.2" />
-            </svg>
-          </button>
+            <nav className="mt-8 flex flex-col items-center gap-2">
+              {NAV.map((item) => {
+                const active = isActive(item);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-label={item.label}
+                    title={item.label}
+                    className={`flex h-11 w-11 items-center justify-center rounded-[10px] transition-colors ${
+                      active
+                        ? "bg-white/12 text-[#f7f2e5]"
+                        : "text-[#f4f1e6]/50 hover:bg-white/6 hover:text-white"
+                    }`}
+                  >
+                    <Icon name={item.icon} className="h-5 w-5" />
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="mt-auto flex flex-col items-center">
+              <div className="mb-4 h-px w-8 bg-white/10" />
+              <button
+                type="button"
+                onClick={() => void logout()}
+                aria-label="Sign out"
+                title="Sign out"
+                className="flex h-11 w-11 items-center justify-center rounded-[10px] text-[#f4f1e6]/45 transition-colors hover:bg-white/6 hover:text-white"
+              >
+                <LogoutIcon />
+              </button>
+            </div>
+          </aside>
+
+          <main className="relative flex min-w-0 flex-1 flex-col bg-[#fbfaf6] lg:min-h-0 lg:overflow-y-auto">
+            <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[#eee9df] bg-[#fbfaf6]/80 px-5 backdrop-blur-xl sm:px-8 lg:px-10">
+              <Link href="/dashboard" className="font-body text-[15px] font-semibold tracking-[0.08em] text-[#1b4a36] lg:hidden">
+                CRESTION LABS
+              </Link>
+              <span className="hidden font-body text-[15px] font-semibold tracking-[-0.01em] text-[#171713] lg:block">
+                {pageTitle}
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                {searchForm}
+                <Link
+                  href="/projects"
+                  aria-label="Search projects"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#716b5d] transition-colors hover:bg-[#f1ebdf] hover:text-[#171713] sm:hidden"
+                >
+                  <SearchIcon />
+                </Link>
+                <NotificationsMenu />
+                <AccountMenu />
+                <button
+                  type="button"
+                  onClick={() => setDrawerOpen(true)}
+                  aria-label="Open portal navigation"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#1b4a36] transition-colors hover:bg-[#f1ebdf] lg:hidden"
+                >
+                  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
+                    <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.2" />
+                  </svg>
+                </button>
+              </div>
+            </header>
+
+            <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-10 lg:pt-8">
+              {children}
+            </div>
+          </main>
         </div>
-      </header>
-
-      {desktopControls}
-
-      <main className="min-h-[100svh] lg:pl-[80px]">
-        <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-12 lg:pt-[88px]">
-          {children}
-        </div>
-      </main>
+      </div>
 
       {drawerOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
