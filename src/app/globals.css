@@ -40,6 +40,14 @@
   font-family: var(--font-instrument-serif), serif;
 }
 
+body.portal-shell,
+body.portal-shell .font-body,
+body.portal-shell .font-display,
+body.portal-shell .font-accent,
+body.portal-shell .font-cormorant {
+  font-family: var(--font-alef), ui-sans-serif, system-ui, sans-serif;
+}
+
 .font-anton {
   font-family: var(--font-anton), sans-serif;
 }

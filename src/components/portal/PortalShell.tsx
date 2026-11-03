@@ -147,7 +147,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
   const brand = (
-    <Link href="/dashboard" className="inline-flex flex-col font-cormorant text-[22px] uppercase leading-[0.92] tracking-[0.2em] text-[#f4f1e6] transition-opacity hover:opacity-75">
+    <Link href="/dashboard" className="inline-flex flex-col font-cormorant text-[19px] uppercase leading-[1.05] tracking-[0.16em] text-[#f4f1e6] transition-opacity hover:opacity-75">
       <span>Crestion</span>
       <span>Labs</span>
     </Link>
@@ -176,7 +176,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   );
 
   const desktopControls = (
-    <div className="hidden items-center gap-3 pb-6 lg:flex">
+    <div className="fixed right-6 top-6 z-40 hidden items-center gap-3 lg:flex">
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -201,7 +201,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="min-h-[100svh] bg-[#f7f4ec] text-[#171713]">
-      <aside className="fixed bottom-3 left-3 top-3 z-40 hidden w-[248px] flex-col overflow-hidden rounded-[16px] bg-[#1b4a36] px-5 py-6 lg:flex">
+      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-[248px] flex-col overflow-hidden rounded-r-[16px] bg-[#1b4a36] px-5 py-6 lg:flex">
         <div>{brand}</div>
         {navLinks}
         <div className="my-5 h-px bg-white/10" />
@@ -234,9 +234,10 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
         </div>
       </header>
 
-      <main className="min-h-[100svh] lg:pl-[272px]">
-        <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-12 lg:pt-7">
-          {desktopControls}
+      {desktopControls}
+
+      <main className="min-h-[100svh] lg:pl-[248px]">
+        <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-12 lg:pt-[88px]">
           {children}
         </div>
       </main>
