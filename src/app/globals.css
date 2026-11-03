@@ -326,11 +326,6 @@ body.portal-shell .font-cormorant {
   transform: translate3d(0, -100%, 0);
 }
 
-/* Reserve the scrollbar gutter at all times so locking scroll cannot reflow the page. */
-html {
-  scrollbar-gutter: stable;
-}
-
 /* Keep the scrollbar's width but mute its paint while the overlay is open. */
 html.auth-open {
   scrollbar-color: transparent #ecece2;
@@ -377,3 +372,4 @@ body.portal-shell {
     transition-duration: 0.01ms !important;
   }
 }
+

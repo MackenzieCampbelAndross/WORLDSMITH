@@ -6,28 +6,20 @@ import { useAuth } from "@/components/auth-provider";
 import { LoadingBlock } from "@/components/portal/EmptyState";
 import { formatDate } from "@/lib/format";
 import {
-  fetchCompany,
-  saveCompany,
   saveNotificationPrefs,
-  saveProfile,
-  type Company,
   type NotificationPrefs,
 } from "@/lib/portal";
 import { getSupabaseClient } from "@/lib/supabase";
 
-const inputClass =
-  "mt-1.5 h-10 w-full border border-[#d8d2c4] bg-transparent px-3 font-body text-[12.5px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]";
-const labelClass = "font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]";
-
-const initials = (first: string, last: string, email: string) => {
-  const a = first.trim()[0] ?? email[0] ?? "W";
-  const b = last.trim()[0] ?? "";
-  return `${a}${b}`.toUpperCase();
-};
+const LogoutIcon = () => (
+  <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+    <path d="M12.5 6.2V3.8H4v12.4h8.5v-2.4M8.7 10h8M14.4 7.2 17.2 10l-2.8 2.8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default function SettingsPage() {
   const { user, profile, refreshProfile, logout } = useAuth();
-  const [active, setActive] = useState("profile");
+  const [active, setActive] = useState("security");
 
   if (!user) {
     return <LoadingBlock className="h-64 w-full" />;
@@ -40,15 +32,13 @@ export default function SettingsPage() {
         Your account.
       </h1>
       <p className="mt-3 max-w-[520px] font-body text-[12.5px] leading-5 text-[#716b5d]">
-        Contact details, company information and account security.
+        Security credentials, notification preferences, and account controls.
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[170px_1fr]">
         <nav className="hidden lg:block">
           <div className="sticky top-24 space-y-1">
             {[
-              { id: "profile", label: "Profile" },
-              { id: "company", label: "Company" },
               { id: "security", label: "Security" },
               { id: "notifications", label: "Notifications" },
               { id: "account", label: "Account" },
@@ -70,34 +60,6 @@ export default function SettingsPage() {
         </nav>
 
         <div className="space-y-8">
-          <section id="profile" className="border border-[#e2ddd1] bg-[#fdfbf6]">
-            <div className="flex items-center gap-4 border-b border-[#e2ddd1] px-5 py-4">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f0e9d8] font-body text-[12px] font-semibold text-[#1b4a36]">
-                {initials(profile?.firstName ?? "", profile?.lastName ?? "", user.email ?? "")}
-              </span>
-              <div>
-                <h2 className="font-accent text-[22px] leading-none text-[#171713]">Profile</h2>
-                <p className="mt-1 font-body text-[10.5px] text-[#8a8374]">
-                  Your initials stand in for a profile image.
-                </p>
-              </div>
-            </div>
-            <ProfileForm
-              key={profile?.email ?? "pending-profile"}
-              uid={user.id}
-              email={user.email ?? ""}
-              profile={profile}
-              onSaved={refreshProfile}
-            />
-          </section>
-
-          <section id="company" className="border border-[#e2ddd1] bg-[#fdfbf6]">
-            <div className="border-b border-[#e2ddd1] px-5 py-4">
-              <h2 className="font-accent text-[22px] leading-none text-[#171713]">Company</h2>
-            </div>
-            <CompanySection uid={user.id} onSaved={refreshProfile} />
-          </section>
-
           <section id="security" className="border border-[#e2ddd1] bg-[#fdfbf6]">
             <div className="border-b border-[#e2ddd1] px-5 py-4">
               <h2 className="font-accent text-[22px] leading-none text-[#171713]">Security</h2>
@@ -130,21 +92,6 @@ export default function SettingsPage() {
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-5">
               <div>
-                <p className="font-body text-[11.5px] text-[#3f3b33]">Sign out of Crestion Labs</p>
-                <p className="mt-1 font-body text-[10.5px] text-[#8a8374]">
-                  You will need your email to request a new one-time code.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => void logout()}
-                className="border border-[#d8d2c4] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
-              >
-                Sign out
-              </button>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#eee9df] px-5 py-5">
-              <div>
                 <p className="font-body text-[11.5px] text-[#3f3b33]">Request account deletion</p>
                 <p className="mt-1 font-body text-[10.5px] text-[#8a8374]">
                   Account contents and project records are removed after review.
@@ -157,148 +104,26 @@ export default function SettingsPage() {
                 Contact Crestion Labs
               </a>
             </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#fecdca]/60 bg-[#fffbfa] px-5 py-5">
+              <div>
+                <p className="font-body text-[12px] font-semibold text-[#b42318]">Sign out</p>
+                <p className="mt-1 font-body text-[10.5px] text-[#8c4a45]">
+                  Sign out of your session on this device. You will need your email to sign back in.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void logout()}
+                className="inline-flex items-center gap-2 rounded-[7px] border border-[#fecdca] bg-[#fee4e2] px-4 py-2 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#b42318] transition-colors hover:border-[#fda29b] hover:bg-[#fecdca] hover:text-[#912018]"
+              >
+                <LogoutIcon />
+                Sign out
+              </button>
+            </div>
           </section>
         </div>
       </div>
     </div>
-  );
-}
-
-function ProfileForm({
-  uid,
-  email,
-  profile,
-  onSaved,
-}: {
-  uid: string;
-  email: string;
-  profile: { firstName: string; lastName: string; phone: string } | null;
-  onSaved: () => Promise<void>;
-}) {
-  const [firstName, setFirstName] = useState(profile?.firstName ?? "");
-  const [lastName, setLastName] = useState(profile?.lastName ?? "");
-  const [phone, setPhone] = useState(profile?.phone ?? "");
-  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
-
-  const save = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (status === "saving") return;
-    setStatus("saving");
-    try {
-      await saveProfile(uid, { firstName, lastName, phone });
-      await onSaved();
-      setStatus("saved");
-    } catch {
-      setStatus("error");
-    }
-  };
-
-  return (
-    <form onSubmit={save} className="px-5 py-5">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="settings-first" className={labelClass}>First name</label>
-          <input id="settings-first" value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="settings-last" className={labelClass}>Last name</label>
-          <input id="settings-last" value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="settings-phone" className={labelClass}>Phone number</label>
-          <input id="settings-phone" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="settings-email" className={labelClass}>Email</label>
-          <input id="settings-email" value={email} readOnly className={`${inputClass} cursor-not-allowed text-[#8a8374]`} />
-          <p className="mt-1 font-body text-[9.5px] text-[#a0988a]">Managed by Supabase Auth.</p>
-        </div>
-      </div>
-      <FormStatus status={status} savedLabel="Profile saved." errorLabel="We couldn't save your profile. Please try again." />
-      <button type="submit" disabled={status === "saving"} className="mt-5 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f7f4ec] disabled:opacity-60">
-        {status === "saving" ? "Saving…" : "Save profile"}
-      </button>
-    </form>
-  );
-}
-
-function CompanySection({ uid, onSaved }: { uid: string; onSaved: () => Promise<void> }) {
-  const [company, setCompany] = useState<Company | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
-  const [name, setName] = useState("");
-  const [website, setWebsite] = useState("");
-  const [details, setDetails] = useState("");
-  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
-
-  useEffect(() => {
-    let active = true;
-    void fetchCompany(uid)
-      .then((next) => {
-        if (!active) return;
-        setCompany(next);
-        setName(next?.name ?? "");
-        setWebsite(next?.website ?? "");
-        setDetails(next?.details ?? "");
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!active) return;
-        setLoading(false);
-        setLoadError(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [uid]);
-
-  const save = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (status === "saving") return;
-    setStatus("saving");
-    try {
-      const saved = await saveCompany(uid, { name, website, details });
-      setCompany(saved);
-      await onSaved();
-      setStatus("saved");
-    } catch {
-      setStatus("error");
-    }
-  };
-
-  if (loading) return <div className="px-5 py-5"><LoadingBlock className="h-24 w-full" /></div>;
-
-  if (loadError) {
-    return (
-      <div className="px-5 py-5">
-        <p className="font-body text-[11.5px] text-[#8a5a2f]">
-          Company details are unavailable right now. Refresh the page to try again.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={save} className="px-5 py-5">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="settings-company" className={labelClass}>Company name</label>
-          <input id="settings-company" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="settings-website" className={labelClass}>Website</label>
-          <input id="settings-website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" className={inputClass} />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="settings-details" className={labelClass}>Company details</label>
-          <textarea id="settings-details" value={details} onChange={(e) => setDetails(e.target.value)} rows={3} className={`${inputClass} h-auto py-2.5 leading-5`} />
-        </div>
-      </div>
-      <FormStatus status={status} savedLabel="Company updated." errorLabel="We couldn't save the company. Please try again." />
-      <button type="submit" disabled={status === "saving"} className="mt-5 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f7f4ec] disabled:opacity-60">
-        {status === "saving" ? "Saving…" : `Save ${company ? "company" : "company details"}`}
-      </button>
-    </form>
   );
 }
 

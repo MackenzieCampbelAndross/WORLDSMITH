@@ -47,3 +47,7 @@ next-env.d.ts
 *.mov
 *.webm
 *.avi
+
+# nested backend repo
+/propertyai
+/Working

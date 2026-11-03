@@ -6,24 +6,74 @@ import { usePathname } from "next/navigation";
 import { CrestionLabsLogo } from "@/components/CrestionLabsLogo";
 import { useAuth } from "@/components/auth-provider";
 
-const NAV = [
-  { href: "/dashboard", label: "Home", exact: true, icon: "home" as const },
-  { href: "/projects", label: "Projects", exact: false, icon: "projects" as const },
+type NavIconName =
+  | "home"
+  | "projects"
+  | "deliverables"
+  | "settings"
+  | "support";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: NavIconName;
+  exact?: boolean;
+};
+
+const NAV_PRIMARY: NavItem[] = [
+  { href: "/dashboard", label: "Overview", icon: "home", exact: true },
+  { href: "/projects", label: "Projects", icon: "projects" },
+  { href: "/deliverables", label: "Deliverables", icon: "deliverables" },
 ];
 
-const Icon = ({ name, className = "h-4 w-4" }: { name: "home" | "projects"; className?: string }) => {
-  if (name === "home") {
-    return (
-      <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
-        <path d="M3.5 9.2 10 3.6l6.5 5.6M5.2 8.1v8.1h9.6V8.1M8.3 16.2v-4.4h3.4v4.4" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    );
+const NAV_BOTTOM: NavItem[] = [
+  { href: "/settings", label: "Settings", icon: "settings" },
+  { href: "/support", label: "Support", icon: "support" },
+];
+
+const Icon = ({ name, className = "h-[18px] w-[18px]" }: { name: NavIconName; className?: string }) => {
+  switch (name) {
+    case "home":
+      return (
+        <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
+          <path d="M3.5 9.2 10 3.6l6.5 5.6M5.2 8.1v8.1h9.6V8.1M8.3 16.2v-4.4h3.4v4.4" stroke="currentColor" strokeWidth="1.2" />
+        </svg>
+      );
+    case "projects":
+      return (
+        <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
+          <path d="m10 2.8 6.4 3.4L10 9.6 3.6 6.2 10 2.8ZM3.6 10l6.4 3.4 6.4-3.4M3.6 13.8 10 17.2l6.4-3.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case "deliverables":
+      return (
+        <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
+          <rect x="3" y="3.6" width="14" height="12.8" rx="2.2" stroke="currentColor" strokeWidth="1.2" />
+          <circle cx="7.3" cy="8" r="1.3" stroke="currentColor" strokeWidth="1.1" />
+          <path d="m4 14.2 3.8-3.6 2.9 2.6 2.5-2.3 2.8 2.9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case "settings":
+      return (
+        <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="2.75" stroke="currentColor" strokeWidth="1.2" />
+          <path
+            d="M8.6 2.5h2.8l.38 1.62c.45.18.87.42 1.25.71l1.58-.6 2 2-.6 1.58c.29.38.53.8.71 1.25l1.62.38v2.8l-1.62.38c-.18.45-.42.87-.71 1.25l.6 1.58-2 2-1.58-.6c-.38.29-.8.53-1.25.71l-.38 1.62H8.6l-.38-1.62a5.6 5.6 0 0 1-1.25-.71l-1.58.6-2-2 .6-1.58a5.6 5.6 0 0 1-.71-1.25L1.66 11.4V8.6l1.62-.38c.18-.45.42-.87.71-1.25l-.6-1.58 2-2 1.58.6c.38-.29.8-.53 1.25-.71L8.6 2.5Z"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="6.9" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M8.1 7.7a2 2 0 1 1 2.7 1.9c-.5.2-.8.6-.8 1.1v.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <circle cx="10" cy="13.7" r=".85" fill="currentColor" />
+        </svg>
+      );
   }
-  return (
-    <svg viewBox="0 0 20 20" className={className} fill="none" aria-hidden="true">
-      <path d="M3.2 6.1h13.6v9.7H3.2zM3.2 6.1l1.6-2.3h5l1.6 2.3M7.2 9.5h5.6M7.2 12.1h3.8" stroke="currentColor" strokeWidth="1.2" />
-    </svg>
-  );
 };
 
 const SearchIcon = () => (
@@ -39,69 +89,39 @@ const BellIcon = () => (
   </svg>
 );
 
-const Chevron = () => (
-  <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" aria-hidden="true">
-    <path d="m2.5 4.5 3.5 3 3.5-3" stroke="currentColor" strokeWidth="1" />
-  </svg>
-);
-
-const LogoutIcon = () => (
-  <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden="true">
-    <path d="M12.5 6.2V3.8H4v12.4h8.5v-2.4M8.7 10h8M14.4 7.2 17.2 10l-2.8 2.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 const initialsFor = (name: string, email: string) => {
   const source = name.trim() || email;
   const parts = source.split(/\s+|@/).filter(Boolean);
   return (parts[0]?.[0] ?? "C").toUpperCase() + (parts[1]?.[0] ?? "").toUpperCase();
 };
 
-const AccountMenu = () => {
-  const { user, profile, logout } = useAuth();
+const ProfileButton = () => {
+  const pathname = usePathname();
+  const { user, profile } = useAuth();
   const displayName =
     [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") ||
     String((user?.user_metadata as Record<string, unknown> | undefined)?.first_name ?? "") ||
     user?.email ||
     "Client";
   const initials = initialsFor(displayName, user?.email ?? "");
+  const isProfileActive = pathname.startsWith("/profile");
 
   return (
-    <details className="relative">
-      <summary
-        aria-label="Open account menu"
-        className="flex cursor-pointer list-none items-center gap-2 rounded-full transition-opacity hover:opacity-80 [&::-webkit-details-marker]:hidden"
-      >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1f5e44] font-body text-[10px] font-semibold text-[#f7f4ec]">
-          {initials}
-        </span>
-        <span className="hidden text-[#716b5d] sm:block">
-          <Chevron />
-        </span>
-      </summary>
-      <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-[10px] border border-[#e2ddd1] bg-[#fdfbf6] shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
-        <div className="border-b border-[#eee9df] px-4 py-3">
-          <p className="truncate font-body text-[12px] text-[#171713]">{displayName}</p>
-          <p className="mt-0.5 truncate font-body text-[10.5px] text-[#8a8374]">{profile?.companyName || user?.email}</p>
-        </div>
-        <Link href="/settings#profile" className="block px-4 py-2.5 font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]">
-          Profile
-        </Link>
-        <Link href="/settings#security" className="block px-4 py-2.5 font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]">
-          Account settings
-        </Link>
-        <Link href="/settings#company" className="block px-4 py-2.5 font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]">
-          Company settings
-        </Link>
-        <button
-          type="button"
-          onClick={() => void logout()}
-          className="block w-full border-t border-[#eee9df] px-4 py-2.5 text-left font-body text-[11.5px] text-[#3f3b33] hover:bg-[#f5f0e5]"
-        >
-          Sign out
-        </button>
-      </div>
-    </details>
+    <Link
+      href="/profile"
+      aria-label="Profile"
+      title={`Profile (${displayName})`}
+      className={`group flex items-center gap-2 rounded-full p-0.5 transition-all focus:outline-none ${
+        isProfileActive ? "ring-2 ring-[#123c2b] ring-offset-2 ring-offset-[#f7f4ec]" : "hover:opacity-85"
+      }`}
+    >
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#123c2b] font-body text-[10.5px] font-semibold text-[#f7f5ea] shadow-sm transition-transform group-hover:scale-105">
+        {initials}
+      </span>
+      <span className="hidden pr-1 font-body text-[11.5px] font-medium text-[#17201b] transition-colors group-hover:text-[#123c2b] sm:inline-block">
+        {displayName.split(" ")[0]}
+      </span>
+    </Link>
   );
 };
 
@@ -109,13 +129,13 @@ const NotificationsMenu = () => (
   <details className="relative">
     <summary
       aria-label="Notifications"
-      className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full text-[#716b5d] transition-colors hover:bg-[#f1ebdf] hover:text-[#171713] [&::-webkit-details-marker]:hidden"
+      className="relative flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full text-[#5f6a62] transition-colors hover:bg-[#efebe0] hover:text-[#17201b] [&::-webkit-details-marker]:hidden"
     >
       <BellIcon />
     </summary>
-    <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-[10px] border border-[#e2ddd1] bg-[#fdfbf6] px-4 py-4 shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
-      <p className="font-body text-[12px] text-[#171713]">No new notifications</p>
-      <p className="mt-1 font-body text-[10.5px] leading-4 text-[#8a8374]">
+    <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-[10px] border border-[#e2ddd1] bg-white px-4 py-4 shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
+      <p className="font-body text-[12px] text-[#17201b]">No new notifications</p>
+      <p className="mt-1 font-body text-[10.5px] leading-4 text-[#8d938b]">
         Project updates appear in each project&apos;s Activity.
       </p>
     </div>
@@ -124,7 +144,7 @@ const NotificationsMenu = () => (
 
 export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -142,36 +162,35 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
     return <div className="min-h-[100svh] bg-[#f7f4ec]" />;
   }
 
-  const isActive = (item: (typeof NAV)[number]) =>
+  const isActive = (item: NavItem) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
-
-  const isDashboard = pathname === "/dashboard";
 
   const pageTitle = pathname.startsWith("/dashboard")
     ? "Overview"
     : pathname.startsWith("/settings")
       ? "Settings"
-      : "Projects";
+      : pathname.startsWith("/support")
+        ? "Support"
+        : pathname.startsWith("/deliverables")
+          ? "Deliverables"
+          : pathname.startsWith("/profile")
+            ? "Profile"
+            : "Projects";
 
-  const brand = (
-    <Link href="/dashboard" className="inline-flex flex-col font-cormorant text-[22px] uppercase leading-[0.92] tracking-[0.2em] text-[#f4f1e6] transition-opacity hover:opacity-75">
-      <span>Crestion</span>
-      <span>Labs</span>
-    </Link>
-  );
-
-  const navLinks = (
-    <nav className="mt-10 flex flex-col gap-1.5">
-      {NAV.map((item) => {
+  const renderNav = (items: NavItem[], onNavigate?: () => void) => (
+    <nav className="flex flex-col gap-0.5">
+      {items.map((item) => {
         const active = isActive(item);
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-3 rounded-[8px] px-3 py-2.5 font-body text-[13px] transition-colors ${
+            onClick={onNavigate}
+            aria-current={active ? "page" : undefined}
+            className={`flex items-center gap-3 rounded-[9px] px-3 py-2.5 font-body text-[12.5px] transition-colors ${
               active
-                ? "bg-white/10 text-[#f7f2e5]"
-                : "text-[#f4f1e6]/62 hover:bg-white/5 hover:text-[#f7f2e5]"
+                ? "bg-[#2c5a44] text-[#f7f5ea]"
+                : "text-[#e4e9e1]/65 hover:bg-white/[0.06] hover:text-[#f7f5ea]"
             }`}
           >
             <Icon name={item.icon} />
@@ -187,115 +206,82 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
       onSubmit={(event) => {
         event.preventDefault();
         const q = query.trim();
-        window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
+        window.dispatchEvent(new CustomEvent("crestion:search", { detail: q }));
+        if (!pathname.startsWith("/dashboard")) {
+          window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
+        }
       }}
-      className={`hidden h-9 items-center gap-2 rounded-full border border-[#e3ded2] bg-[#f7f4ec]/80 px-4 text-[#716b5d] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-colors focus-within:border-[#b9b09c] sm:flex ${
-        isDashboard ? "w-[188px]" : "w-[248px]"
-      }`}
+      className="hidden h-10 w-[300px] items-center gap-2.5 rounded-[10px] border border-[#e3ded2] bg-white/70 px-3.5 text-[#746f62] transition-colors focus-within:border-[#b9b09c] lg:flex xl:w-[340px]"
     >
       <SearchIcon />
       <input
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder="Search projects..."
-        aria-label="Search projects"
-        className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#171713] outline-none placeholder:text-[#8a8374]"
+        onChange={(event) => {
+          setQuery(event.target.value);
+          window.dispatchEvent(new CustomEvent("crestion:search", { detail: event.target.value }));
+        }}
+        placeholder="Search projects, files, or deliverables..."
+        aria-label="Search projects, files, or deliverables"
+        className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#17201b] outline-none placeholder:text-[#95998f]"
       />
     </form>
   );
 
+  const brand = (
+    <Link href="/dashboard" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
+      <CrestionLabsLogo size={27} />
+      <span className="font-body text-[12px] font-semibold uppercase tracking-[0.15em] text-[#f7f5ea]">
+        Crestion Labs
+      </span>
+    </Link>
+  );
+
   return (
-    <div className="flex min-h-[100svh] items-center justify-center bg-[#eef3ec] p-3 text-[#171713] sm:p-5 lg:p-10">
-      <div className={`${isDashboard ? "dashboard-preview-window" : "lg:h-[calc(100svh-5rem)]"} flex h-[calc(100svh-1.5rem)] w-full max-w-[1560px] flex-col overflow-hidden rounded-[22px] bg-[#1b4a36] p-[10px] shadow-[0_40px_100px_-55px_rgba(27,74,54,0.7)] sm:h-[calc(100svh-2.5rem)] sm:rounded-[28px] lg:rounded-[32px] lg:p-[14px]`}>
-        <div className="flex h-full w-full overflow-hidden rounded-[16px] bg-white sm:rounded-[20px]">
-          <div className="flex min-h-0 flex-1">
-            <aside className={`hidden ${isDashboard ? "w-[64px]" : "w-[80px]"} shrink-0 flex-col items-center bg-[#1b4a36] px-2 py-5 lg:flex`}>
+    <div className="flex min-h-[100svh] w-full bg-[#f7f4ec] text-[#17201b]">
+      <aside className="sticky top-0 hidden h-[100svh] w-[226px] shrink-0 flex-col bg-[#123c2b] px-3.5 py-5 lg:flex">
+        <div className="px-2">{brand}</div>
+
+        <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#e4e9e1]/35">
+          Portal
+        </p>
+        {renderNav(NAV_PRIMARY)}
+
+        <div className="mt-auto border-t border-white/10 pt-3">
+          {renderNav(NAV_BOTTOM)}
+        </div>
+      </aside>
+
+      <div className="relative flex min-w-0 flex-1 flex-col bg-[#f7f4ec]">
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#e6e2d7] bg-[#f7f4ec]/95 px-4 backdrop-blur-xl sm:px-6">
+          <span className="font-body text-[15px] font-semibold tracking-[-0.01em] text-[#17201b]">
+            {pageTitle}
+          </span>
+
+          <div className="flex items-center gap-1.5">
+            {searchForm}
             <Link
-              href="/dashboard"
-              aria-label="Crestion Labs home"
-              className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-white/10 transition-colors hover:bg-white/15"
+              href="/projects"
+              aria-label="Search projects"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[#5f6a62] transition-colors hover:bg-[#efebe0] lg:hidden"
             >
-              <CrestionLabsLogo size={25} />
+              <SearchIcon />
             </Link>
+            <NotificationsMenu />
+            <ProfileButton />
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Open portal navigation"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[#17201b] transition-colors hover:bg-[#efebe0] lg:hidden"
+            >
+              <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
+                <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.2" />
+              </svg>
+            </button>
+          </div>
+        </header>
 
-            <nav className="mt-8 flex flex-col items-center gap-2">
-              {NAV.map((item) => {
-                const active = isActive(item);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    aria-label={item.label}
-                    title={item.label}
-                    className={`flex h-11 w-11 items-center justify-center rounded-[10px] transition-colors ${
-                      active
-                        ? "bg-white/12 text-[#f7f2e5]"
-                        : "text-[#f4f1e6]/50 hover:bg-white/6 hover:text-white"
-                    }`}
-                  >
-                    <Icon name={item.icon} className="h-5 w-5" />
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="mt-auto flex flex-col items-center">
-              <div className="mb-4 h-px w-8 bg-white/10" />
-              <button
-                type="button"
-                onClick={() => void logout()}
-                aria-label="Sign out"
-                title="Sign out"
-                className="flex h-11 w-11 items-center justify-center rounded-[10px] text-[#f4f1e6]/45 transition-colors hover:bg-white/6 hover:text-white"
-              >
-                <LogoutIcon />
-              </button>
-            </div>
-          </aside>
-
-          <main className={`relative flex min-w-0 flex-1 flex-col bg-white ${isDashboard ? "overflow-y-auto lg:overflow-hidden" : "overflow-y-auto"}`}>
-            <header className={`sticky top-0 z-30 flex shrink-0 items-center justify-between gap-3 border-b border-[#e8ebe5] bg-white/85 backdrop-blur-xl ${isDashboard ? "h-12 px-4 sm:px-5" : "h-16 px-5 sm:px-8 lg:px-10"}`}>
-              <Link href="/dashboard" className={`font-body font-semibold tracking-[0.08em] text-[#1b4a36] lg:hidden ${isDashboard ? "text-[13px]" : "text-[15px]"}`}>
-                CRESTION LABS
-              </Link>
-              <span className={`hidden font-body font-semibold tracking-[-0.01em] text-[#171713] lg:block ${isDashboard ? "text-[13px]" : "text-[15px]"}`}>
-                {pageTitle}
-              </span>
-
-              <div className="flex items-center gap-1.5">
-                {searchForm}
-                <Link
-                  href="/projects"
-                  aria-label="Search projects"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#716b5d] transition-colors hover:bg-[#f1ebdf] hover:text-[#171713] sm:hidden"
-                >
-                  <SearchIcon />
-                </Link>
-                <NotificationsMenu />
-                <AccountMenu />
-                <button
-                  type="button"
-                  onClick={() => setDrawerOpen(true)}
-                  aria-label="Open portal navigation"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#1b4a36] transition-colors hover:bg-[#f1ebdf] lg:hidden"
-                >
-                  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-                    <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.2" />
-                  </svg>
-                </button>
-              </div>
-            </header>
-
-            {isDashboard ? (
-              <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-4">{children}</div>
-            ) : (
-              <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-10 lg:pt-8">
-                {children}
-              </div>
-            )}
-          </main>
-        </div>
-        </div>
+        <main className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 lg:p-6">{children}</main>
       </div>
 
       {drawerOpen && (
@@ -306,22 +292,29 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-black/35"
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[280px] flex-col bg-[#1b4a36] px-6 py-7">
+          <aside className="absolute inset-y-0 left-0 flex w-[272px] flex-col bg-[#123c2b] px-4 py-6">
             <div className="flex items-start justify-between gap-4">
               {brand}
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
                 aria-label="Close portal navigation"
-                className="text-[#f4f1e6]/60 hover:text-white"
+                className="text-[#e4e9e1]/60 hover:text-white"
               >
                 <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
                   <path d="M3 3l10 10M13 3 3 13" stroke="currentColor" strokeWidth="1.2" />
                 </svg>
               </button>
             </div>
-            {navLinks}
-            <div className="my-5 h-px bg-white/10" />
+
+            <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#e4e9e1]/35">
+              Portal
+            </p>
+            {renderNav(NAV_PRIMARY, () => setDrawerOpen(false))}
+
+            <div className="mt-auto border-t border-white/10 pt-3">
+              {renderNav(NAV_BOTTOM, () => setDrawerOpen(false))}
+            </div>
           </aside>
         </div>
       )}

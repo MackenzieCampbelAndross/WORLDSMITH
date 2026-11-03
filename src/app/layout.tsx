@@ -1,42 +1,43 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Manrope, Instrument_Serif, Anton, Cormorant_Garamond } from "next/font/google";
+import localFont from "next/font/local";
 import { AuthProvider } from "@/components/auth-provider";
 import { AuthExperience } from "@/components/AuthExperience";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const spaceGrotesk = localFont({
+  src: "./fonts/space-grotesk-latin.woff2",
   variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: "300 700",
   display: "swap",
 });
 
-const manrope = Manrope({
+const manrope = localFont({
+  src: "./fonts/manrope-latin.woff2",
   variable: "--font-manrope",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: "200 800",
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
+const instrumentSerif = localFont({
+  src: [
+    { path: "./fonts/instrument-serif-latin.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/instrument-serif-italic-latin.woff2", weight: "400", style: "italic" },
+  ],
   variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
-const anton = Anton({
+const anton = localFont({
+  src: "./fonts/anton-latin.woff2",
   variable: "--font-anton",
-  subsets: ["latin"],
   weight: "400",
   display: "swap",
 });
 
-const cormorantGaramond = Cormorant_Garamond({
+const cormorantGaramond = localFont({
+  src: "./fonts/cormorant-garamond-latin.woff2",
   variable: "--font-cormorant-garamond",
-  subsets: ["latin"],
-  weight: ["500"],
+  weight: "300 700",
   display: "swap",
 });
 

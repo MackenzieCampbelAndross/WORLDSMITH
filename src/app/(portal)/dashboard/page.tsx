@@ -1,17 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/components/auth-provider";
 import { EmptyState, LoadingBlock } from "@/components/portal/EmptyState";
+import { ProjectsTable } from "@/components/portal/ProjectsTable";
 import { formatRelative } from "@/lib/format";
-import {
-  fetchDashboard,
-  STATUS_LABELS,
-  type DashboardData,
-  type Project,
-  type ProjectStatus,
-} from "@/lib/portal";
+import { fetchDashboard, type Activity, type DashboardData } from "@/lib/portal";
 import {
   STATUS_DESCRIPTIONS,
   SUBMISSION_STAGES,
@@ -19,50 +15,68 @@ import {
   submissionStageIndex,
 } from "@/lib/productionStatus";
 
-type FilterKey = "SUBMISSIONS" | "DELIVERED";
+const PIPELINE_COLORS = ["#1f4a36", "#3a6b52", "#5c8a70", "#82a891", "#a9c6b5", "#d2e2d8"];
 
-const FILTERS: Array<{ key: FilterKey; label: string }> = [
-  { key: "SUBMISSIONS", label: "Submissions" },
-  { key: "DELIVERED", label: "Delivered" },
-];
+function computeGradient(stageCounts: Array<{ count: number }>, pipelineTotal: number): string {
+  let acc = 0;
+  const segments: string[] = [];
+  for (let i = 0; i < stageCounts.length; i++) {
+    const start = acc;
+    acc += pipelineTotal ? (stageCounts[i].count / pipelineTotal) * 100 : 0;
+    segments.push(`${PIPELINE_COLORS[i]} ${start}% ${acc}%`);
+  }
+  return segments.join(", ");
+}
 
-const statusDot: Record<ProjectStatus, string> = {
-  DRAFT: "bg-[#a08a5c]",
-  SUBMITTED: "bg-[#5a7d68]",
-  REVIEWING: "bg-[#b3914e]",
-  ASSETS_RECEIVED: "bg-[#4c8b7d]",
-  PROCESSING: "bg-[#5d7f99]",
-  INTERNAL_REVIEW: "bg-[#7c6b9e]",
-  CLIENT_REVIEW: "bg-[#a97b56]",
-  COMPLETED: "bg-[#4e8a5c]",
+const MetricIcon = ({ name }: { name: "projects" | "delivered" | "plans" | "production" }) => {
+  switch (name) {
+    case "projects":
+      return (
+        <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden="true">
+          <path d="m10 2.8 6.4 3.4L10 9.6 3.6 6.2 10 2.8ZM3.6 10l6.4 3.4 6.4-3.4M3.6 13.8 10 17.2l6.4-3.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case "delivered":
+      return (
+        <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden="true">
+          <path d="M10 2.8 16.8 6.5v7L10 17.2 3.2 13.5v-7L10 2.8ZM3.5 6.6 10 10.2l6.5-3.6M10 10.2v6.7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+        </svg>
+      );
+    case "plans":
+      return (
+        <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden="true">
+          <path d="M5.5 2.7h6l3 3v11.6h-9zM11.5 2.7v3h3M8 9h4M8 11.6h4" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden="true">
+          <path d="M4 13.8a4.2 4.2 0 0 1 1.1-8.2 5 5 0 0 1 9.7 1.2A3.4 3.4 0 0 1 15.6 14H4Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+          <path d="M10 8v3.3l2 1.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      );
+  }
 };
 
-const MetricIcon = ({ name }: { name: "projects" | "worlds" | "plans" | "processing" }) => {
-  if (name === "projects") {
+const ActivityIcon = ({ activity }: { activity: Activity }) => {
+  if (activity.eventType === "file_uploaded" || activity.eventType === "file_removed") {
     return (
-      <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
-        <path d="M3.2 6.1h13.6v9.7H3.2zM3.2 6.1l1.6-2.3h5l1.6 2.3M7.2 9.5h5.6M7.2 12.1h3.8" stroke="currentColor" strokeWidth="1.2" />
+      <svg viewBox="0 0 18 18" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+        <path d="M9 12V4.6M6.4 7 9 4.4 11.6 7M4 12.6v1.6h10v-1.6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
-  if (name === "worlds") {
+  if (activity.eventType === "project_submitted") {
     return (
-      <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
-        <path d="M10 2.8 16.8 6.5v7L10 17.2 3.2 13.5v-7L10 2.8ZM3.5 6.6 10 10.2l6.5-3.6M10 10.2v6.7" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    );
-  }
-  if (name === "plans") {
-    return (
-      <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
-        <path d="M5.5 2.7h6l3 3v11.6h-9zM11.5 2.7v3h3M8 9h4M8 11.6h4" stroke="currentColor" strokeWidth="1.2" />
+      <svg viewBox="0 0 18 18" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+        <path d="M9 2.8 14.6 6v6L9 15.2 3.4 12V6L9 2.8Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
-      <path d="M4 13.8a4.2 4.2 0 0 1 1.1-8.2 5 5 0 0 1 9.7 1.2A3.4 3.4 0 0 1 15.6 14H4Z" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M10 8v3.3l2 1.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    <svg viewBox="0 0 18 18" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+      <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M9 5.6V9l2.2 1.3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 };
@@ -73,7 +87,7 @@ export default function DashboardOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [filter, setFilter] = useState<FilterKey>("SUBMISSIONS");
+  const [search, setSearch] = useState("");
   const [greeting, setGreeting] = useState("Welcome back");
 
   useEffect(() => {
@@ -82,6 +96,14 @@ export default function DashboardOverviewPage() {
       setGreeting(hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
     });
     return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    const onSearch = (event: Event) => {
+      setSearch((event as CustomEvent<string>).detail ?? "");
+    };
+    window.addEventListener("crestion:search", onSearch);
+    return () => window.removeEventListener("crestion:search", onSearch);
   }, []);
 
   useEffect(() => {
@@ -103,25 +125,36 @@ export default function DashboardOverviewPage() {
     };
   }, [user, refreshKey]);
 
-  const projects = data?.projects ?? [];
+  const projects = useMemo(() => data?.projects ?? [], [data?.projects]);
   const delivered = useMemo(() => projects.filter((project) => isDeliveredStatus(project.status)), [projects]);
-  const rows = useMemo(
-    () => (filter === "DELIVERED" ? delivered : projects.filter((project) => !isDeliveredStatus(project.status))),
-    [projects, delivered, filter],
-  );
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const active = projects.filter((project) => !isDeliveredStatus(project.status));
+    if (!query) return active;
+    return active.filter((project) =>
+      `${project.name} ${project.developer} ${project.type} ${project.location} ${project.status}`
+        .toLowerCase()
+        .includes(query),
+    );
+  }, [projects, search]);
+
+  const firstName =
+    profile?.firstName ||
+    String((user?.user_metadata as Record<string, unknown> | undefined)?.first_name ?? "");
 
   if (loading) {
     return (
-      <div className="flex h-full min-h-0 flex-col gap-2.5">
-        <LoadingBlock className="h-7 w-64" />
-        <div className="grid shrink-0 grid-cols-4 gap-2">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
+        <LoadingBlock className="h-14 w-72" />
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           {[0, 1, 2, 3].map((item) => (
-            <LoadingBlock key={item} className="h-14 rounded-[10px]" />
+            <LoadingBlock key={item} className="h-[86px] rounded-[12px]" />
           ))}
         </div>
-        <div className="grid min-h-0 flex-1 gap-2.5 xl:grid-cols-[1.15fr_0.85fr]">
-          <LoadingBlock className="h-full rounded-[12px]" />
-          <LoadingBlock className="h-full rounded-[12px]" />
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,1fr)]">
+          <LoadingBlock className="h-[330px] rounded-[14px]" />
+          <LoadingBlock className="h-[330px] rounded-[14px]" />
         </div>
       </div>
     );
@@ -129,339 +162,274 @@ export default function DashboardOverviewPage() {
 
   if (error || !data) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="max-w-[360px] text-center">
-          <EmptyState
-            title="We couldn't load your workspace."
-            body="The account data did not come through. Check your connection and try again."
-          />
-          <button
-            type="button"
-            onClick={() => {
-              setError(false);
-              setLoading(true);
-              setRefreshKey((key) => key + 1);
-            }}
-            className="mt-3 rounded-[6px] bg-[#1b4a36] px-4 py-2 font-body text-[9px] font-semibold uppercase tracking-[0.12em] text-white"
-          >
-            Try again
-          </button>
-        </div>
+      <div className="max-w-[420px]">
+        <EmptyState
+          title="We couldn't load your workspace."
+          body="The account data did not come through. Check your connection and try again."
+        />
+        <button
+          type="button"
+          onClick={() => {
+            setError(false);
+            setLoading(true);
+            setRefreshKey((key) => key + 1);
+          }}
+          className="mt-4 rounded-[7px] bg-[#143f2d] px-4 py-2 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f7f5ea]"
+        >
+          Try again
+        </button>
       </div>
     );
   }
 
-  const firstName =
-    profile?.firstName ||
-    String((user?.user_metadata as Record<string, unknown> | undefined)?.first_name ?? "");
-  const active = data.activeProject;
-  const stageIndex = active ? submissionStageIndex(active.status) : -1;
-  const stagePercent = stageIndex >= 0 ? Math.round(((stageIndex + 1) / SUBMISSION_STAGES.length) * 100) : 0;
-  const worldReady = Boolean(
-    active && (isDeliveredStatus(active.status) || data.activeWorld?.status === "ready"),
-  );
-  const cta =
-    active?.status === "DRAFT"
-      ? { label: "Continue setup", href: `/projects/new?draft=${active.id}` }
-      : worldReady
-        ? { label: "Enter World", href: `/projects/${active?.id}/world` }
-        : { label: "Open Project", href: `/projects/${active?.id}` };
+  const metrics = [
+    { key: "projects" as const, label: "Projects", value: projects.length, caption: "In your workspace" },
+    { key: "delivered" as const, label: "Delivered", value: delivered.length, caption: "Worlds ready" },
+    { key: "plans" as const, label: "Plans", value: data.plans, caption: "Source files received" },
+    { key: "production" as const, label: "In Production", value: data.processingCount, caption: "With Creston" },
+  ];
 
   const stageCounts = SUBMISSION_STAGES.map((label, index) => ({
     label,
     count: projects.filter((project) => submissionStageIndex(project.status) === index).length,
   }));
-  const maxStageCount = Math.max(1, ...stageCounts.map((stage) => stage.count));
-  const deliveredPercent = projects.length ? Math.round((delivered.length / projects.length) * 100) : 0;
+  const pipelineTotal = stageCounts.reduce((sum, stage) => sum + stage.count, 0);
+  const gradient = computeGradient(stageCounts, pipelineTotal);
 
-  const metrics = [
-    { label: "Projects", value: projects.length, icon: "projects" as const },
-    { label: "Delivered", value: delivered.length, icon: "worlds" as const },
-    { label: "Plans", value: data.plans, icon: "plans" as const },
-    { label: "In production", value: data.processingCount, icon: "processing" as const },
-  ];
+  const active = data.activeProject;
+  const activeStage = active ? submissionStageIndex(active.status) : -1;
+  const activeHref = !active
+    ? "/projects/new"
+    : active.status === "DRAFT"
+      ? `/projects/new?draft=${active.id}`
+      : isDeliveredStatus(active.status)
+        ? `/projects/${active.id}/world`
+        : `/projects/${active.id}`;
+  const activeCta = !active
+    ? "Submit a floor plan"
+    : active.status === "DRAFT"
+      ? "Continue setup"
+      : isDeliveredStatus(active.status)
+        ? "Enter world"
+        : "Open project";
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2.5">
-      <div className="flex shrink-0 items-end justify-between gap-3">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-body text-[21px] font-semibold leading-none tracking-[-0.03em] text-[#171713]">
+          <h1 className="font-body text-[26px] font-semibold leading-none tracking-[-0.03em] text-[#17201b] sm:text-[30px]">
             {greeting}
             {firstName ? `, ${firstName}.` : "."}
           </h1>
-          <p className="mt-1.5 font-body text-[10.5px] text-[#69736b]">
+          <p className="mt-2 font-body text-[12px] text-[#6f756d]">
             Turn architectural plans into immersive, real-world property experiences.
           </p>
         </div>
         <Link
           href="/projects/new"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-[6px] bg-[#1b4a36] px-3 py-2 font-body text-[9.5px] font-medium text-[#f7f4ec] hover:bg-[#153b2b]"
+          className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#143f2d] px-4 py-2.5 font-body text-[11px] font-medium text-[#f7f5ea] transition-colors hover:bg-[#0f3626]"
         >
-          <span aria-hidden="true">+</span>
-          Submit new project
+          <span aria-hidden="true" className="text-[14px] leading-none">
+            +
+          </span>
+          New project
         </Link>
       </div>
 
-      <div className="grid shrink-0 grid-cols-4 gap-2">
+      <div className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-[10px] border border-[#e3e8e1] bg-[#fbfcf9] px-3 py-2.5">
-            <div className="flex items-start justify-between gap-2">
-              <p className="font-body text-[8.5px] uppercase tracking-[0.1em] text-[#7a847b]">{metric.label}</p>
-              <span className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-[#eaf1eb] text-[#1b4a36]">
-                <MetricIcon name={metric.icon} />
+          <div key={metric.key} className="rounded-[12px] border border-[#e6e2d7] bg-white px-4 py-3.5">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#eaf1e8] text-[#2f6b4c]">
+                <MetricIcon name={metric.key} />
               </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-body text-[8.5px] font-semibold uppercase tracking-[0.14em] text-[#93988f]">
+                  {metric.label}
+                </p>
+                <p className="mt-1 font-body text-[26px] font-semibold leading-none tracking-[-0.04em] text-[#17201b]">
+                  {metric.value}
+                </p>
+                <p className="mt-1 font-body text-[9px] text-[#9aa096]">{metric.caption}</p>
+              </div>
             </div>
-            <p className="mt-1 font-body text-[21px] font-semibold leading-none tracking-[-0.04em] text-[#14231c]">
-              {String(metric.value).padStart(2, "0")}
-            </p>
           </div>
         ))}
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-2.5 xl:grid-cols-[1.15fr_0.85fr]">
-        <section className="flex min-h-0 flex-col rounded-[12px] border border-[#e3e8e1] bg-white p-3.5">
-          <div className="flex items-center justify-between gap-2">
-            <p className="font-body text-[8px] font-semibold uppercase tracking-[0.18em] text-[#7a847b]">
-              Continue working
-            </p>
-            {active && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#eef4ef] px-2.5 py-0.5 font-body text-[9px] text-[#315b3f]">
-                <span className={`h-1 w-1 rounded-full ${statusDot[active.status]}`} />
-                {STATUS_LABELS[active.status]}
-              </span>
-            )}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,1fr)]">
+        <section className="flex min-w-0 flex-col rounded-[14px] border border-[#e6e2d7] bg-white p-4">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-body text-[13px] font-semibold text-[#17201b]">
+              Active projects ({filtered.length})
+            </h2>
+            <Link href="/projects" className="font-body text-[10.5px] text-[#2f6b4c] hover:text-[#143f2d]">
+              View all projects →
+            </Link>
           </div>
 
-          {active ? (
-            <div className="flex min-h-0 flex-1 flex-col">
-              <h2 className="mt-2.5 font-body text-[20px] font-semibold leading-none tracking-[-0.03em] text-[#14231c]">
-                {active.name}
-              </h2>
-              <p className="mt-1.5 max-w-[440px] font-body text-[10px] leading-4 text-[#69736b]">
-                {STATUS_DESCRIPTIONS[active.status]}
-              </p>
+          <div className="mt-2">
+            {filtered.length === 0 ? (
+              <div className="py-10 text-center">
+                <p className="font-body text-[12px] text-[#4f5a52]">
+                  {search.trim() ? `No projects match “${search.trim()}”.` : "No active projects yet."}
+                </p>
+                <p className="mt-1 font-body text-[10.5px] text-[#8d938b]">
+                  {search.trim() ? "Try a different name, developer or type." : "Submit a floor plan to start production."}
+                </p>
+                {!search.trim() && (
+                  <Link
+                    href="/projects/new"
+                    className="mt-3 inline-flex rounded-[7px] bg-[#143f2d] px-3.5 py-2 font-body text-[10px] font-medium text-[#f7f5ea]"
+                  >
+                    Submit a floor plan
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <ProjectsTable projects={filtered} />
+            )}
+          </div>
+        </section>
 
-              <div className="mt-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-body text-[8px] uppercase tracking-[0.14em] text-[#7a847b]">Progress</span>
-                  <span className="font-body text-[9.5px] font-semibold text-[#315b3f]">{stagePercent}%</span>
+        <section className="flex flex-col rounded-[14px] border border-[#e6e2d7] bg-white p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="font-body text-[13px] font-semibold text-[#17201b]">Production pipeline</h2>
+            <span className="font-body text-[10px] text-[#8d938b]">{projects.length} projects</span>
+          </div>
+
+          {pipelineTotal === 0 ? (
+            <div className="flex flex-1 items-center justify-center py-12">
+              <p className="max-w-[220px] text-center font-body text-[10.5px] leading-5 text-[#8d938b]">
+                Stage counts appear here as soon as Creston starts production on a project.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mt-6 flex items-center gap-5">
+                <div
+                  className="relative flex h-[150px] w-[150px] shrink-0 items-center justify-center rounded-full"
+                  style={{ background: `conic-gradient(${gradient})` }}
+                >
+                  <div className="flex h-[106px] w-[106px] flex-col items-center justify-center rounded-full bg-white">
+                    <span className="font-body text-[26px] font-semibold leading-none tracking-[-0.03em] text-[#17201b]">
+                      {pipelineTotal}
+                    </span>
+                    <span className="mt-1 text-center font-body text-[8.5px] leading-[11px] text-[#8d938b]">
+                      Projects
+                      <br />
+                      in production
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-[#edf1eb]">
-                  <div className="h-full rounded-full bg-[#1b4a36]" style={{ width: `${stagePercent}%` }} />
-                </div>
+
+                <ul className="min-w-0 flex-1 space-y-2">
+                  {stageCounts.map((stage, index) => (
+                    <li key={stage.label} className="flex items-center gap-2">
+                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: PIPELINE_COLORS[index] }} />
+                      <span className="min-w-0 flex-1 truncate font-body text-[10.5px] text-[#4f5a52]">{stage.label}</span>
+                      <span className="w-4 text-right font-body text-[10px] text-[#8d938b]">{stage.count}</span>
+                      <span className="w-9 text-right font-body text-[10px] text-[#8d938b]">
+                        {Math.round((stage.count / pipelineTotal) * 100)}%
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1">
-                {SUBMISSION_STAGES.map((label, index) => {
-                  const done = stageIndex >= index;
+              <div className="mt-6 flex gap-1">
+                {stageCounts.map((stage, index) => {
+                  const current = index === activeStage;
                   return (
-                    <div key={label} className="flex items-center gap-1.5">
-                      <span
-                        className={`flex h-3 w-3 shrink-0 items-center justify-center rounded-full border text-[7px] ${
-                          done ? "border-[#1b4a36] bg-[#1b4a36] text-white" : "border-[#d5ddd4] text-transparent"
-                        }`}
-                      >
-                        ✓
-                      </span>
-                      <span className={`font-body text-[9px] ${done ? "text-[#2f3a32]" : "text-[#8a938b]"}`}>
-                        {label}
-                      </span>
+                    <div
+                      key={stage.label}
+                      className={`flex-1 px-1.5 py-1.5 text-center ${
+                        current ? "bg-[#1f4a36] text-[#f7f5ea]" : "bg-[#eef2e9] text-[#4f5a52]"
+                      }`}
+                      style={{ clipPath: "polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%, 9px 50%)" }}
+                    >
+                      <p className={`truncate font-body text-[7px] ${current ? "text-[#f7f5ea]/70" : "text-[#7d857c]"}`}>
+                        {stage.label}
+                      </p>
+                      <p className="mt-0.5 font-body text-[11px] font-semibold">{stage.count}</p>
                     </div>
                   );
                 })}
               </div>
+            </>
+          )}
+        </section>
+      </div>
 
-              <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
-                <Link
-                  href={cta.href}
-                  className="inline-flex items-center gap-1 rounded-[5px] bg-[#1b4a36] px-2.5 py-1.5 font-body text-[9.5px] font-medium text-[#f7f4ec] hover:bg-[#153b2b]"
-                >
-                  {cta.label}
-                  <span aria-hidden="true">→</span>
-                </Link>
-                <span className="font-body text-[8.5px] text-[#8a938b]">
-                  Updated {formatRelative(active.updatedAt)}
-                </span>
-              </div>
-            </div>
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,1fr)]">
+        <section className="rounded-[14px] border border-[#e6e2d7] bg-white p-4">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-body text-[13px] font-semibold text-[#17201b]">Recent activity</h2>
+            <Link href="/projects" className="font-body text-[10.5px] text-[#2f6b4c] hover:text-[#143f2d]">
+              View projects →
+            </Link>
+          </div>
+
+          {data.activity.length === 0 ? (
+            <p className="py-8 text-center font-body text-[10.5px] text-[#8d938b]">
+              No activity yet. Updates from Creston will appear here.
+            </p>
           ) : (
-            <div className="flex min-h-0 flex-1 flex-col justify-center">
-              <h2 className="font-body text-[20px] font-semibold leading-none tracking-[-0.03em] text-[#14231c]">
-                No active project yet.
-              </h2>
-              <p className="mt-1.5 max-w-[380px] font-body text-[10px] leading-4 text-[#69736b]">
-                Send a floor plan. Creston handles the architectural interpretation and builds the world.
-              </p>
-              <Link
-                href="/projects/new"
-                className="mt-3 inline-flex w-fit rounded-[5px] bg-[#1b4a36] px-2.5 py-1.5 font-body text-[9.5px] font-medium text-[#f7f4ec] hover:bg-[#153b2b]"
-              >
-                Submit a floor plan
-              </Link>
-            </div>
+            <ol className="relative mt-4">
+              <span className="absolute bottom-4 left-[13px] top-4 w-px bg-[#ebe7dc]" aria-hidden="true" />
+              {data.activity.map((item) => (
+                <li key={item.id} className="relative flex gap-3 pb-4 last:pb-0">
+                  <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#eaf1e8] text-[#3f6a4d]">
+                    <ActivityIcon activity={item} />
+                  </span>
+                  <div className="min-w-0 flex-1 pt-0.5">
+                    <p className="font-body text-[11px] font-medium text-[#263129]">
+                      {item.projectName || "Workspace"}
+                    </p>
+                    <p className="mt-0.5 font-body text-[10px] leading-4 text-[#8d938b]">{item.message}</p>
+                  </div>
+                  <span className="shrink-0 pt-0.5 font-body text-[9px] text-[#9aa096]">
+                    {item.createdAt ? formatRelative(item.createdAt) : ""}
+                  </span>
+                </li>
+              ))}
+            </ol>
           )}
         </section>
 
-        <div className="grid min-h-0 grid-rows-[1fr_auto] gap-2.5">
-          <section className="flex min-h-0 flex-col rounded-[12px] border border-[#e3e8e1] bg-white p-3.5">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="font-body text-[10.5px] font-semibold text-[#14231c]">Production stages</h2>
-              <span className="font-body text-[8.5px] text-[#8a938b]">{projects.length} projects</span>
-            </div>
-            {projects.length === 0 ? (
-              <p className="flex flex-1 items-center font-body text-[9.5px] text-[#8a938b]">
-                No submissions to chart yet.
-              </p>
-            ) : (
-              <div className="mt-2 grid min-h-0 flex-1 grid-cols-[1.15fr_0.85fr] gap-2">
-                <div className="flex min-h-0 flex-col justify-between gap-1">
-                  {stageCounts.map((stage) => (
-                    <div key={stage.label}>
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="truncate font-body text-[8.5px] text-[#4d5a50]">{stage.label}</span>
-                        <span className="font-body text-[8px] text-[#8a938b]">{stage.count}</span>
-                      </div>
-                      <div className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-[#edf1eb]">
-                        <div
-                          className="h-full rounded-full bg-[#1b4a36]"
-                          style={{ width: `${(stage.count / maxStageCount) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-col items-center justify-center gap-1">
-                  <div
-                    className="relative flex h-14 w-14 items-center justify-center rounded-full"
-                    style={{ background: `conic-gradient(#1b4a36 ${deliveredPercent}%, #edf1eb 0)` }}
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-                      <span className="font-body text-[10px] font-semibold text-[#14231c]">{deliveredPercent}%</span>
-                    </div>
-                  </div>
-                  <p className="text-center font-body text-[8px] leading-3 text-[#8a938b]">
-                    {delivered.length} of {projects.length} delivered
-                  </p>
-                </div>
-              </div>
-            )}
-          </section>
-
-          <section className="relative overflow-hidden rounded-[12px] bg-[#1b4a36] px-4 py-3.5 text-[#f7f4ec]">
-            <svg viewBox="0 0 180 100" className="pointer-events-none absolute -bottom-5 -right-3 h-[90px] w-[160px] opacity-20" fill="none" aria-hidden="true">
-              <path d="M8 92 70 32l34 28 62-52M70 32v60M104 60v32" stroke="#f7f4ec" strokeWidth="1" />
-            </svg>
-            <div className="relative">
-              <p className="font-body text-[7.5px] uppercase tracking-[0.16em] text-[#f7f4ec]/55">New world</p>
-              <h2 className="mt-1.5 font-body text-[16px] font-semibold leading-tight tracking-[-0.02em]">
-                Start your next world.
-              </h2>
-              <p className="mt-1 max-w-[210px] font-body text-[9px] leading-4 text-[#f7f4ec]/65">
-                Send a floor plan. Creston handles the rest.
-              </p>
-              <Link
-                href="/projects/new"
-                className="mt-2.5 inline-flex rounded-[5px] bg-[#f7f4ec] px-2.5 py-1.5 font-body text-[9px] font-semibold text-[#1b4a36] hover:bg-white"
-              >
-                Submit a floor plan
-              </Link>
-            </div>
-          </section>
-        </div>
-      </div>
-
-      <section className="hidden min-h-0 shrink-0 flex-col overflow-hidden rounded-[12px] border border-[#e3e8e1] bg-white p-3 xl:flex">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="font-body text-[10.5px] font-semibold text-[#14231c]">Your projects</h2>
-          <div className="flex gap-3">
-            {FILTERS.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setFilter(item.key)}
-                className={`border-b pb-0.5 font-body text-[8.5px] transition-colors ${
-                  filter === item.key
-                    ? "border-[#1b4a36] text-[#171713]"
-                    : "border-transparent text-[#8a938b] hover:text-[#1b4a36]"
-                }`}
-              >
-                {item.label}
-                <span className="ml-1 text-[7.5px] text-[#a3aca4]">
-                  {item.key === "DELIVERED" ? delivered.length : projects.length - delivered.length}
-                </span>
-              </button>
-            ))}
+        <section className="relative min-h-[228px] overflow-hidden rounded-[14px] bg-[#123c2b]">
+          <Image
+            src="/showcase/contact-cantilever.png"
+            alt=""
+            fill
+            sizes="(min-width: 1280px) 480px, 100vw"
+            className="object-cover object-right"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,#123c2b_0%,#123c2b_48%,rgba(18,60,43,0.35)_78%,rgba(18,60,43,0.05)_100%)]" />
+          <div className="relative z-10 flex h-full flex-col justify-center p-5">
+            <p className="font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#f7f5ea]/50">
+              {active ? "Next action" : "New world"}
+            </p>
+            <h2 className="mt-2 max-w-[260px] font-body text-[21px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#f7f5ea]">
+              {active ? active.name : "Start your next world."}
+            </h2>
+            <p className="mt-2 max-w-[260px] font-body text-[10.5px] leading-4 text-[#f7f5ea]/65">
+              {active
+                ? activeStage >= 0
+                  ? STATUS_DESCRIPTIONS[active.status]
+                  : STATUS_DESCRIPTIONS.DRAFT
+                : "Send a floor plan. Creston handles the architectural interpretation and builds the world."}
+            </p>
+            <Link
+              href={activeHref}
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-[7px] bg-[#f7f5ea] px-3.5 py-2 font-body text-[10.5px] font-semibold text-[#143f2d] transition-colors hover:bg-white"
+            >
+              {activeCta}
+              <span aria-hidden="true">→</span>
+            </Link>
           </div>
-          <Link href="/projects" className="font-body text-[8.5px] text-[#1b4a36] hover:opacity-70">
-            View all →
-          </Link>
-        </div>
-
-        {rows.length === 0 ? (
-          <p className="py-2 font-body text-[9px] text-[#8a938b]">
-            {filter === "DELIVERED" ? "No delivered worlds yet." : "Submit a floor plan to start a project."}
-          </p>
-        ) : (
-          <table className="mt-1 w-full min-w-[560px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-[#eef1ea]">
-                {["Project", "Type", "Status", "Updated", ""].map((heading) => (
-                  <th key={heading} className="py-1 pr-3 font-body text-[7.5px] uppercase tracking-[0.12em] text-[#8a938b] last:pr-0">
-                    {heading}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.slice(0, 2).map((project: Project) => {
-                const deliveredRow = isDeliveredStatus(project.status);
-                return (
-                  <tr key={project.id} className="border-b border-[#f0f3ee] last:border-b-0">
-                    <td className="py-1.5 pr-3">
-                      <Link href={`/projects/${project.id}`} className="font-body text-[9px] font-medium text-[#14231c] hover:text-[#1b4a36]">
-                        {project.name}
-                      </Link>
-                    </td>
-                    <td className="py-1.5 pr-3 font-body text-[8.5px] text-[#69736b]">
-                      {[project.type, project.location].filter(Boolean).join(" · ")}
-                    </td>
-                    <td className="py-1.5 pr-3">
-                      <span className="inline-flex items-center gap-1.5 font-body text-[8.5px] text-[#4d5a50]">
-                        <span className={`h-1 w-1 rounded-full ${statusDot[project.status]}`} />
-                        {STATUS_LABELS[project.status]}
-                      </span>
-                    </td>
-                    <td className="py-1.5 pr-3 font-body text-[8px] text-[#8a938b]">
-                      {formatRelative(project.updatedAt)}
-                    </td>
-                    <td className="py-1.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {deliveredRow ? (
-                          <>
-                            <Link href={`/projects/${project.id}/world`} className="rounded-[4px] bg-[#1b4a36] px-2 py-1 font-body text-[8px] text-white hover:bg-[#153b2b]">
-                              Enter
-                            </Link>
-                            <Link href={`/projects/${project.id}/presentation`} className="rounded-[4px] border border-[#d5ddd4] px-2 py-1 font-body text-[8px] text-[#4d5a50] hover:border-[#1b4a36]">
-                              Share
-                            </Link>
-                          </>
-                        ) : (
-                          <Link
-                            href={project.status === "DRAFT" ? `/projects/new?draft=${project.id}` : `/projects/${project.id}`}
-                            className="rounded-[4px] border border-[#d5ddd4] px-2 py-1 font-body text-[8px] text-[#4d5a50] hover:border-[#1b4a36]"
-                          >
-                            {project.status === "DRAFT" ? "Continue" : "Open"}
-                          </Link>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
