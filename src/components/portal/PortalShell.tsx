@@ -146,13 +146,13 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="min-h-[100svh] bg-[#f7f4ec] text-[#171713]">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[272px] flex-col bg-[#1b4a36] px-6 py-7 lg:flex">
+      <aside className="fixed bottom-3 left-3 top-3 z-40 hidden w-[248px] flex-col overflow-hidden rounded-[16px] bg-[#1b4a36] px-5 py-6 lg:flex">
         {brand}
         {navLinks}
         {profileMenu}
       </aside>
 
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#e2ddd1] bg-[#f7f4ec]/95 px-5 py-4 backdrop-blur lg:hidden">
+      <header className="sticky top-3 z-30 mx-3 flex items-center justify-between rounded-[14px] border border-[#e2ddd1] bg-[#f7f4ec]/95 px-4 py-3 shadow-[0_12px_32px_-24px_rgba(0,0,0,0.35)] backdrop-blur lg:hidden">
         <Link href="/dashboard" className="font-cormorant text-[19px] uppercase tracking-[0.16em] text-[#1b4a36]">
           Crestion Labs
         </Link>
