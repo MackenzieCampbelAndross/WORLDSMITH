@@ -1,7 +1,11 @@
 export interface PlanCheckResult {
   ok: boolean
   errors: string[]
+  measured: boolean
 }
+
+export const PLAN_EXTENSIONS = [".png", ".jpg", ".jpeg", ".pdf"]
+export const MAX_PLAN_BYTES = 15 * 1024 * 1024
 
 // Mirrors the reconstruction engine's own pre-flight gates so an unusable plan
 // is rejected before it burns a production slot.
@@ -13,14 +17,36 @@ const MAX_WALL_RATIO = 0.65
 const isPdf = (file: File): boolean =>
   file.type === "application/pdf" || /\.pdf$/i.test(file.name)
 
+export function planFormatError(file: File): string | null {
+  const name = file.name.toLowerCase()
+  if (!PLAN_EXTENSIONS.some((extension) => name.endsWith(extension))) {
+    return "The plan must be a PNG, JPG or PDF. CAD and Revit exports can't be read."
+  }
+  if (file.size === 0) return "That file is empty."
+  if (file.size > MAX_PLAN_BYTES) return "The plan must stay under 15 MB."
+  return null
+}
+
 export async function inspectPlanFile(file: File): Promise<PlanCheckResult> {
-  if (isPdf(file)) return { ok: true, errors: [] }
+  const format = planFormatError(file)
+  if (format) return { ok: false, errors: [format], measured: false }
+  if (isPdf(file)) {
+    return {
+      ok: true,
+      errors: [],
+      measured: false,
+    }
+  }
 
   let bitmap: ImageBitmap
   try {
     bitmap = await createImageBitmap(file)
   } catch {
-    return { ok: false, errors: ["We couldn't read that image. Try exporting the plan again."] }
+    return {
+      ok: false,
+      errors: ["We couldn't read that image. Try exporting the plan again."],
+      measured: false,
+    }
   }
 
   const width = bitmap.width
@@ -32,7 +58,7 @@ export async function inspectPlanFile(file: File): Promise<PlanCheckResult> {
   const context = canvas.getContext("2d", { willReadFrequently: true })
   if (!context) {
     bitmap.close()
-    return { ok: true, errors: [] }
+    return { ok: true, errors: [], measured: false }
   }
 
   context.fillStyle = "#ffffff"
@@ -74,5 +100,5 @@ export async function inspectPlanFile(file: File): Promise<PlanCheckResult> {
     errors.push("That image is too dark for the engine to read walls from. Use black lines on white.")
   }
 
-  return { ok: errors.length === 0, errors }
+  return { ok: errors.length === 0, errors, measured: true }
 }

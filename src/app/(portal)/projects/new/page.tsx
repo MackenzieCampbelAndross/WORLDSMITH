@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { formatBytes } from "@/lib/format";
-import { inspectPlanFile } from "@/lib/planCheck";
+import { inspectPlanFile, PLAN_EXTENSIONS, planFormatError } from "@/lib/planCheck";
 import { submitProductionRequest } from "@/lib/production";
 import {
   createDraftProject,
@@ -20,10 +20,15 @@ import {
   type Project,
 } from "@/lib/portal";
 
-const ACCEPTED = ".png,.jpg,.jpeg,.pdf";
-const MAX_PLAN_BYTES = 15 * 1024 * 1024;
+const ACCEPTED = PLAN_EXTENSIONS.join(",");
 
 const isSpan = (value: number): boolean => Number.isFinite(value) && value >= 2 && value <= 100;
+
+interface Requirement {
+  label: string;
+  hint: string;
+  passed: boolean;
+}
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -38,6 +43,7 @@ export default function NewProjectPage() {
   const [draftProject, setDraftProject] = useState<Project | null>(null);
   const [uploaded, setUploaded] = useState(false);
   const [existingPlan, setExistingPlan] = useState<string | null>(null);
+  const [planProblems, setPlanProblems] = useState<string[]>([]);
   const [busy, setBusy] = useState<"saving" | "uploading" | "submitting" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,29 +97,64 @@ export default function NewProjectPage() {
     };
   }, [user, router]);
 
+  const requirements: Requirement[] = useMemo(() => {
+    const widthMeters = Number(width);
+    const lengthMeters = Number(length);
+    const stored = uploaded || Boolean(existingPlan);
+    const formatProblem = file ? planFormatError(file) : null;
+    const readable = file ? planProblems.length === 0 : stored;
+
+    return [
+      {
+        label: "Project name",
+        hint: "Name the project.",
+        passed: name.trim().length > 0,
+      },
+      {
+        label: "Floor plan",
+        hint: formatProblem ?? "PNG, JPG or PDF, 15 MB or smaller.",
+        passed: file ? formatProblem === null : stored,
+      },
+      {
+        label: "Plan quality",
+        hint:
+          planProblems[0] ??
+          (stored && !file
+            ? "Checked when the plan was uploaded."
+            : "250px on both axes, with wall lines the reader can follow."),
+        passed: readable,
+      },
+      {
+        label: "Plan width",
+        hint: "Outer width in metres, between 2 and 100.",
+        passed: isSpan(widthMeters),
+      },
+      {
+        label: "Plan length",
+        hint: "Outer length in metres, between 2 and 100.",
+        passed: isSpan(lengthMeters),
+      },
+      {
+        label: "Furnishing style",
+        hint: "Pick one of the four styles Creston can build.",
+        passed: (FURNISHING_STYLES as readonly string[]).includes(style),
+      },
+    ];
+  }, [name, width, length, style, file, uploaded, existingPlan, planProblems]);
+
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (busy || !user) return;
     setError(null);
 
-    if (!name.trim()) {
-      setError("Add a project name.");
+    const unmet = requirements.filter((item) => !item.passed);
+    if (unmet.length > 0) {
+      setError(`${unmet[0].label}: ${unmet[0].hint}`);
       return;
     }
+
     const widthMeters = Number(width);
     const lengthMeters = Number(length);
-    if (!isSpan(widthMeters) || !isSpan(lengthMeters)) {
-      setError("Enter the plan's overall width and length in metres, between 2 and 100.");
-      return;
-    }
-    if (file && file.size > MAX_PLAN_BYTES) {
-      setError("The floor plan must stay under 15 MB.");
-      return;
-    }
-    if (!file && !uploaded) {
-      setError("Upload the floor plan to continue.");
-      return;
-    }
 
     let id = draftId;
     let project = draftProject;
@@ -304,26 +345,16 @@ export default function NewProjectPage() {
                 className="sr-only"
                 onChange={(event) => {
                   const next = event.target.files?.[0] ?? null;
-                  if (!next) {
-                    setFile(null);
-                    return;
-                  }
-                  if (next.size > MAX_PLAN_BYTES) {
-                    event.target.value = "";
-                    setFile(null);
-                    setError("The floor plan must stay under 15 MB.");
-                    return;
-                  }
+                  setFile(next);
+                  setPlanProblems([]);
                   setError(null);
-                  void inspectPlanFile(next).then(({ ok, errors }) => {
-                    if (ok) {
-                      setFile(next);
-                      return;
-                    }
-                    event.target.value = "";
-                    setFile(null);
-                    setError(errors[0] ?? "That plan can't be read. Try a different export.");
-                  });
+                  if (!next) return;
+                  const format = planFormatError(next);
+                  if (format) {
+                    setPlanProblems([format]);
+                    return;
+                  }
+                  void inspectPlanFile(next).then((result) => setPlanProblems(result.errors));
                 }}
               />
             </label>
@@ -333,6 +364,32 @@ export default function NewProjectPage() {
               {file.name} · {formatBytes(file.size)}
             </p>
           )}
+        </div>
+
+        <div className="mt-6 rounded-[10px] border border-[#e2ddd1] bg-[#fbf8f1] px-4 py-3.5">
+          <p className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+            What Creston needs
+          </p>
+          <ul className="mt-2.5 space-y-1.5">
+            {requirements.map((item) => (
+              <li key={item.label} className="flex items-start gap-2.5">
+                <span
+                  aria-hidden="true"
+                  className={`mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full ${
+                    item.passed ? "bg-[#1f5e44]" : "bg-[#a13328]"
+                  }`}
+                />
+                <span
+                  className={`font-body text-[11px] leading-5 ${
+                    item.passed ? "text-[#4d5a50]" : "text-[#a13328]"
+                  }`}
+                >
+                  <span className="font-medium">{item.label}</span>
+                  {item.passed ? "" : ` — ${item.hint}`}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {error && (
