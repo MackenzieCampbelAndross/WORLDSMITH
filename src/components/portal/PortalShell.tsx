@@ -201,10 +201,10 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <div className="min-h-[100svh] bg-[#e9eef6] text-[#171713]">
-      <div className="flex min-h-[100svh] flex-col lg:m-3 lg:h-[calc(100svh-1.5rem)] lg:min-h-0 lg:overflow-hidden lg:rounded-[22px] lg:bg-[#fbfaf6] lg:shadow-[0_30px_80px_-55px_rgba(23,23,19,0.6)]">
+    <div className="flex min-h-[100svh] items-center justify-center bg-[#eef2ec] p-3 text-[#171713] sm:p-5 lg:p-10">
+      <div className="flex h-[calc(100svh-1.5rem)] w-full max-w-[1560px] flex-col overflow-hidden rounded-[18px] border border-[#1b4a36]/55 bg-white shadow-[0_35px_90px_-50px_rgba(27,74,54,0.55)] sm:h-[calc(100svh-2.5rem)] sm:rounded-[22px] lg:h-[calc(100svh-5rem)] lg:rounded-[26px]">
         <div className="flex min-h-0 flex-1">
-          <aside className="hidden w-[80px] shrink-0 flex-col items-center bg-[#1a1d1b] px-2 py-5 lg:flex">
+          <aside className="hidden w-[80px] shrink-0 flex-col items-center rounded-l-[26px] bg-[#1b4a36] px-2 py-5 lg:flex">
             <Link
               href="/dashboard"
               aria-label="Crestion Labs home"
@@ -248,8 +248,8 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             </div>
           </aside>
 
-          <main className="relative flex min-w-0 flex-1 flex-col bg-[#fbfaf6] lg:min-h-0 lg:overflow-y-auto">
-            <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[#eee9df] bg-[#fbfaf6]/80 px-5 backdrop-blur-xl sm:px-8 lg:px-10">
+          <main className="relative flex min-w-0 flex-1 flex-col overflow-y-auto bg-white">
+            <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[#e8ebe5] bg-white/85 px-5 backdrop-blur-xl sm:px-8 lg:px-10">
               <Link href="/dashboard" className="font-body text-[15px] font-semibold tracking-[0.08em] text-[#1b4a36] lg:hidden">
                 CRESTION LABS
               </Link>
