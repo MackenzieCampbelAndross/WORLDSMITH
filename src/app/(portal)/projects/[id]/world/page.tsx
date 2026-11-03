@@ -2,20 +2,23 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import DeliveredWorld from "@/components/portal/DeliveredWorld";
 import { LoadingBlock } from "@/components/portal/EmptyState";
 import { StatusPill } from "@/components/portal/StatusPill";
 import { useProjectWorkspace } from "@/components/portal/ProjectWorkspaceContext";
 import { fetchWorld, type World } from "@/lib/portal";
+import { syncProductionStatus } from "@/lib/production";
 import { STATUS_DESCRIPTIONS } from "@/lib/productionStatus";
 import { useSignedUrls } from "@/lib/use-signed-urls";
 
 export default function ProjectWorldPage() {
-  const { project } = useProjectWorkspace();
+  const { project, refresh } = useProjectWorkspace();
   const [world, setWorld] = useState<World | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState<"share" | "embed" | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
+  const [stage, setStage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -35,7 +38,31 @@ export default function ProjectWorldPage() {
     };
   }, [project.id]);
 
-  const previews = useSignedUrls([world?.previewPath]);
+
+  useEffect(() => {
+    let active = true;
+    const poll = async () => {
+      try {
+        const result = await syncProductionStatus(project.id);
+        if (!active) return;
+        if (result.synced) {
+          setStage(result.stage ?? null);
+          setWorld(await fetchWorld(project.id));
+          if (result.delivered) await refresh();
+        }
+      } catch {
+        // Keep the last known state and try again on the next tick.
+      }
+    };
+    void poll();
+    const timer = window.setInterval(poll, 6000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [project.id, refresh]);
+
+  const previews = useSignedUrls([world?.previewPath, world?.glbPath]);
 
   const copy = async (value: string, kind: "share" | "embed") => {
     try {
@@ -106,6 +133,11 @@ export default function ProjectWorldPage() {
           <div className="relative mt-6 flex justify-center">
             <StatusPill status={project.status} />
           </div>
+          {stage && project.status !== "DRAFT" && (
+            <p className="relative mt-4 font-body text-[11px] text-[#f4f1e6]/45">
+              Live from production: {stage}.
+            </p>
+          )}
           {project.status === "DRAFT" && (
             <Link
               href={`/projects/new?draft=${project.id}`}
@@ -144,8 +176,16 @@ export default function ProjectWorldPage() {
         )}
       </div>
 
-      <div className="relative mt-6 aspect-[16/9] overflow-hidden border border-[#e2ddd1] bg-[#1b4a36]">
-        {readyWorld.previewPath && previews[readyWorld.previewPath] ? (
+      <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-[12px] border border-[#e2ddd1] bg-[#1b4a36]">
+        {readyWorld.glbPath && previews[readyWorld.glbPath] ? (
+          <DeliveredWorld
+            glbUrl={previews[readyWorld.glbPath]}
+            collisionUrl={
+              previews[`${readyWorld.glbPath.replace("scene.glb", "collision.json")}`] ?? null
+            }
+            className="h-full w-full rounded-[12px]"
+          />
+        ) : readyWorld.previewPath && previews[readyWorld.previewPath] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={previews[readyWorld.previewPath]}
