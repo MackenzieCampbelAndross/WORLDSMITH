@@ -3,15 +3,16 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LoadingBlock } from "@/components/portal/EmptyState";
+import { StatusPill } from "@/components/portal/StatusPill";
 import { useProjectWorkspace } from "@/components/portal/ProjectWorkspaceContext";
-import { fetchProcessing, fetchWorld, type ProcessingJob, type World } from "@/lib/portal";
+import { fetchWorld, type World } from "@/lib/portal";
+import { STATUS_DESCRIPTIONS } from "@/lib/productionStatus";
 import { createFileSignedUrl } from "@/lib/storage";
 import { useSignedUrls } from "@/lib/use-signed-urls";
 
 export default function ProjectWorldPage() {
   const { project } = useProjectWorkspace();
   const [world, setWorld] = useState<World | null>(null);
-  const [job, setJob] = useState<ProcessingJob | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState<"share" | "embed" | null>(null);
@@ -19,11 +20,10 @@ export default function ProjectWorldPage() {
 
   useEffect(() => {
     let active = true;
-    void Promise.all([fetchWorld(project.id), fetchProcessing(project.id)])
-      .then(([nextWorld, processing]) => {
+    void fetchWorld(project.id)
+      .then((nextWorld) => {
         if (!active) return;
         setWorld(nextWorld);
-        setJob(processing.job);
         setLoading(false);
       })
       .catch(() => {
@@ -76,8 +76,6 @@ export default function ProjectWorldPage() {
   }
 
   if (!world || world.status !== "ready") {
-    const progress = job?.progress ?? 0;
-    const currentStage = job?.currentStageKey?.replaceAll("_", " ") ?? null;
     return (
       <div>
         <div className="relative overflow-hidden border border-[#e2ddd1] bg-[#1b4a36] px-6 py-12 text-center sm:px-12">
@@ -90,24 +88,18 @@ export default function ProjectWorldPage() {
             {project.status === "DRAFT" ? "Awaiting submission" : "World in production"}
           </p>
           <h2 className="relative mt-4 font-display text-[28px] leading-tight text-[#fbf8ee] sm:text-[34px]">
-            {project.status === "DRAFT" ? "Your world hasn't started yet." : "Your world is being created."}
+            {project.status === "DRAFT"
+              ? "Your world hasn't started yet."
+              : project.status === "COMPLETED"
+                ? "Delivery details are being prepared."
+                : "Your world is being created."}
           </h2>
           <p className="relative mx-auto mt-3 max-w-[480px] font-body text-[12.5px] leading-6 text-[#f4f1e6]/60">
-            {project.status === "DRAFT"
-              ? "Submit the project brief and architectural plans to send this development to Crestion Labs production."
-              : "Our production team is transforming your architectural plans into an interactive environment. This page updates as the world moves through the pipeline."}
+            {STATUS_DESCRIPTIONS[project.status]}
           </p>
-          {job && (
-            <div className="relative mx-auto mt-8 max-w-[380px] text-left">
-              <div className="flex items-center justify-between font-body text-[10px] text-[#f4f1e6]/55">
-                <span>{currentStage ?? "Production"}</span>
-                <span>{progress}%</span>
-              </div>
-              <div className="mt-2 h-[3px] w-full overflow-hidden bg-white/20">
-                <div className="h-full bg-[#e9e3d2]" style={{ width: `${progress}%` }} />
-              </div>
-            </div>
-          )}
+          <div className="relative mt-6 flex justify-center">
+            <StatusPill status={project.status} />
+          </div>
           {project.status === "DRAFT" && (
             <Link
               href={`/projects/new?draft=${project.id}`}

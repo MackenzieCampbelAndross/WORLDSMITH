@@ -25,12 +25,10 @@ interface QueueItem {
 
 export const FileLibrary = ({
   categories,
-  showProcessing = false,
   emptyTitle = "No files uploaded yet.",
   emptyBody = "Upload your plans, drawings or references to begin.",
 }: {
   categories: FileCategory[];
-  showProcessing?: boolean;
   emptyTitle?: string;
   emptyBody?: string;
 }) => {
@@ -277,7 +275,6 @@ export const FileLibrary = ({
                     "Size",
                     "Uploaded by",
                     "Uploaded",
-                    ...(showProcessing ? ["Processing"] : []),
                     "",
                   ].map((heading) => (
                     <th key={heading} className="py-2.5 pr-5 font-body text-[9px] uppercase tracking-[0.14em] text-[#8a8374] last:pr-0">
@@ -302,13 +299,6 @@ export const FileLibrary = ({
                       {file.uploadedBy === user?.id ? profile?.firstName || "You" : "Crestion Labs"}
                     </td>
                     <td className="py-3 pr-5 font-body text-[10.5px] text-[#8a8374]">{formatRelative(file.createdAt)}</td>
-                    {showProcessing && (
-                      <td className="py-3 pr-5">
-                        <span className={`font-body text-[10px] ${file.processingStatus === "complete" ? "text-[#2d5c3a]" : file.processingStatus === "failed" ? "text-[#8a5a2f]" : "text-[#8a8374]"}`}>
-                          {file.processingStatus === "complete" ? "Processed" : file.processingStatus === "processing" ? "Processing" : file.processingStatus === "failed" ? "Needs attention" : "Pending"}
-                        </span>
-                      </td>
-                    )}
                     <td className="py-3 text-right">
                       <div className="flex items-center justify-end gap-3">
                         <button type="button" onClick={() => void openFile(file)} className="font-body text-[9px] uppercase tracking-[0.1em] text-[#1f5e44] hover:opacity-70">

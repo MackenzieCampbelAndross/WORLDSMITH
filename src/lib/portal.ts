@@ -160,29 +160,6 @@ export interface Activity {
   createdAt: Date | null;
 }
 
-export interface ProcessingStage {
-  id: string;
-  jobId: string;
-  stageKey: string;
-  label: string;
-  sortOrder: number;
-  state: "pending" | "active" | "completed" | "failed";
-  startedAt: Date | null;
-  completedAt: Date | null;
-  message: string;
-}
-
-export interface ProcessingJob {
-  id: string;
-  projectId: string;
-  status: "queued" | "processing" | "review" | "completed" | "failed";
-  currentStageKey: string | null;
-  progress: number;
-  startedAt: Date | null;
-  completedAt: Date | null;
-  errorMessage: string;
-}
-
 export interface World {
   id: string;
   projectId: string;
@@ -316,38 +293,6 @@ const mapActivity = (row: Row): Activity => ({
   message: String(row.message ?? ""),
   eventType: String(row.event_type ?? "general"),
   createdAt: toDate(row.created_at),
-});
-
-const mapStage = (row: Row): ProcessingStage => ({
-  id: String(row.id ?? ""),
-  jobId: String(row.job_id ?? ""),
-  stageKey: String(row.stage_key ?? ""),
-  label: String(row.label ?? ""),
-  sortOrder: toNumber(row.sort_order),
-  state:
-    row.state === "active" || row.state === "completed" || row.state === "failed"
-      ? row.state
-      : "pending",
-  startedAt: toDate(row.started_at),
-  completedAt: toDate(row.completed_at),
-  message: String(row.message ?? ""),
-});
-
-const mapJob = (row: Row): ProcessingJob => ({
-  id: String(row.id ?? ""),
-  projectId: String(row.project_id ?? ""),
-  status:
-    row.status === "processing" ||
-    row.status === "review" ||
-    row.status === "completed" ||
-    row.status === "failed"
-      ? row.status
-      : "queued",
-  currentStageKey: typeof row.current_stage_key === "string" ? row.current_stage_key : null,
-  progress: Math.min(100, Math.max(0, toNumber(row.progress))),
-  startedAt: toDate(row.started_at),
-  completedAt: toDate(row.completed_at),
-  errorMessage: String(row.error_message ?? ""),
 });
 
 const mapWorld = (row: Row): World => ({
@@ -543,31 +488,6 @@ export async function fetchProjectActivity(
   return (data ?? []).map(mapActivity);
 }
 
-export async function fetchProcessing(
-  projectId: string,
-): Promise<{ job: ProcessingJob | null; stages: ProcessingStage[] }> {
-  const supabase = getSupabaseClient();
-  const { data: jobRow, error: jobError } = await supabase
-    .from("processing_jobs")
-    .select("*")
-    .eq("project_id", projectId)
-    .maybeSingle();
-  if (jobError) fail(jobError);
-  if (!jobRow) return { job: null, stages: [] };
-
-  const { data: stageRows, error: stageError } = await supabase
-    .from("processing_stages")
-    .select("*")
-    .eq("job_id", jobRow.id)
-    .order("sort_order", { ascending: true });
-  if (stageError) fail(stageError);
-
-  return {
-    job: mapJob(jobRow),
-    stages: (stageRows ?? []).map(mapStage),
-  };
-}
-
 export async function fetchWorld(projectId: string): Promise<World | null> {
   const { data, error } = await getSupabaseClient()
     .from("worlds")
@@ -657,14 +577,6 @@ export async function updateDraftProject(
   if (Object.keys(payload).length === 0) return;
 
   const { error } = await getSupabaseClient().from("projects").update(payload).eq("id", id);
-  if (error) fail(error);
-}
-
-export async function submitProject(id: string): Promise<void> {
-  const { error } = await getSupabaseClient()
-    .from("projects")
-    .update({ status: "SUBMITTED" })
-    .eq("id", id);
   if (error) fail(error);
 }
 
@@ -767,8 +679,6 @@ export interface DashboardData {
   newProjectsThisMonth: number;
   processingCount: number;
   activeProject: Project | null;
-  activeJob: ProcessingJob | null;
-  activeStages: ProcessingStage[];
 }
 
 export async function fetchDashboard(uid: string): Promise<DashboardData> {
@@ -797,19 +707,6 @@ export async function fetchDashboard(uid: string): Promise<DashboardData> {
     projects[0] ??
     null;
 
-  let activeJob: ProcessingJob | null = null;
-  let activeStages: ProcessingStage[] = [];
-  if (activeProject) {
-    try {
-      const processing = await fetchProcessing(activeProject.id);
-      activeJob = processing.job;
-      activeStages = processing.stages;
-    } catch {
-      activeJob = null;
-      activeStages = [];
-    }
-  }
-
   return {
     projects,
     activity,
@@ -818,11 +715,7 @@ export async function fetchDashboard(uid: string): Promise<DashboardData> {
     newProjectsThisMonth: projects.filter(
       (project) => project.createdAt && project.createdAt >= monthStart,
     ).length,
-    processingCount: projects.filter((project) =>
-      ["PROCESSING", "INTERNAL_REVIEW", "CLIENT_REVIEW"].includes(project.status),
-    ).length,
+    processingCount: projects.filter((project) => activeStatuses.includes(project.status)).length,
     activeProject,
-    activeJob,
-    activeStages,
   };
 }

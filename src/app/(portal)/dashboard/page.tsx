@@ -109,7 +109,6 @@ export default function DashboardOverviewPage() {
     String((user?.user_metadata as Record<string, unknown> | undefined)?.first_name ?? "");
   const active = data.activeProject;
   const activeCover = active?.coverPath ? covers[active.coverPath] : null;
-  const progress = data.activeJob?.progress ?? 0;
   const activity = allActivity ?? data.activity;
 
   const metrics = [
@@ -129,9 +128,9 @@ export default function DashboardOverviewPage() {
       caption: "Architectural files received",
     },
     {
-      label: "Currently Processing",
+      label: "Active Requests",
       value: String(data.processingCount),
-      caption: data.processingCount > 0 ? "In production" : "All clear",
+      caption: data.processingCount > 0 ? "With Crestion Labs" : "All clear",
     },
   ];
 
@@ -285,25 +284,9 @@ export default function DashboardOverviewPage() {
                     <div className="mt-4 flex items-center gap-3">
                       <StatusPill status={active.status} />
                       <span className="font-body text-[10.5px] text-[#f4f1e6]/55">
-                        {data.activeJob?.currentStageKey
-                          ? data.activeJob.currentStageKey.replaceAll("_", " ").toLowerCase()
-                          : "Awaiting production"}
+                        Updated {formatRelative(active.updatedAt)}
                       </span>
                     </div>
-                    {data.activeJob && (
-                      <div className="mt-4">
-                        <div className="h-[3px] w-full overflow-hidden bg-white/20">
-                          <div
-                            className="h-full bg-[#e9e3d2]"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                        <div className="mt-1.5 flex items-center justify-between font-body text-[10px] text-[#f4f1e6]/55">
-                          <span>Production progress</span>
-                          <span>{progress}%</span>
-                        </div>
-                      </div>
-                    )}
                     <Link
                       href={active.status === "DRAFT" ? `/projects/new?draft=${active.id}` : `/projects/${active.id}`}
                       className="mt-5 inline-flex items-center gap-2 border border-[#f4f1e6]/35 px-4 py-2 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#f4f1e6] transition-colors hover:bg-[#f4f1e6] hover:text-[#1b4a36]"
@@ -317,7 +300,7 @@ export default function DashboardOverviewPage() {
                 <div className="p-6">
                   <p className="font-accent text-[24px] text-[#fbf8ee]">No active project yet.</p>
                   <p className="mt-2 max-w-[320px] font-body text-[12px] leading-5 text-[#f4f1e6]/60">
-                    Start a project to see production progress here.
+                    Start a project to see its production status here.
                   </p>
                   <Link
                     href="/projects/new"

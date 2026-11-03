@@ -18,7 +18,6 @@ export default function ProjectPlansPage() {
       </div>
       <FileLibrary
         categories={PLAN_LIBRARY_CATEGORIES}
-        showProcessing
         emptyTitle="No plans uploaded yet."
         emptyBody="Upload your floor plans, elevations, site plans or CAD drawings to begin."
       />

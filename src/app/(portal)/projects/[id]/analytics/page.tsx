@@ -5,10 +5,7 @@ import { EmptyState, LoadingBlock } from "@/components/portal/EmptyState";
 import { useProjectWorkspace } from "@/components/portal/ProjectWorkspaceContext";
 import {
   fetchAnalytics,
-  fetchProcessing,
-  STATUS_LABELS,
   type AnalyticsRow,
-  type ProcessingJob,
 } from "@/lib/portal";
 
 const formatDuration = (seconds: number) => {
@@ -31,17 +28,15 @@ const mergeCounts = (rows: AnalyticsRow[], key: "areas" | "engagement") => {
 export default function ProjectAnalyticsPage() {
   const { project } = useProjectWorkspace();
   const [rows, setRows] = useState<AnalyticsRow[]>([]);
-  const [job, setJob] = useState<ProcessingJob | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     let active = true;
-    void Promise.all([fetchAnalytics(project.id), fetchProcessing(project.id)])
-      .then(([analytics, processing]) => {
+    void fetchAnalytics(project.id)
+      .then((analytics) => {
         if (!active) return;
         setRows(analytics);
-        setJob(processing.job);
         setLoading(false);
       })
       .catch(() => {
@@ -160,48 +155,6 @@ export default function ProjectAnalyticsPage() {
         </div>
       )}
 
-      <section className="mt-6 border border-[#e2ddd1] bg-[#fdfbf6]">
-        <div className="border-b border-[#e2ddd1] px-5 py-4">
-          <h3 className="font-accent text-[21px] leading-none text-[#171713]">Production</h3>
-        </div>
-        <div className="md:grid md:grid-cols-2 md:divide-x md:divide-[#eee9df]">
-          <div className="px-5 py-2">
-            {[
-              { label: "Current stage", value: job?.currentStageKey?.replaceAll("_", " ") ?? "Awaiting production" },
-              { label: "Progress", value: `${job?.progress ?? 0}%` },
-              { label: "Production status", value: job?.status ?? "Not started" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-baseline justify-between border-b border-[#eee9df] py-3 last:border-b-0">
-                <span className="font-body text-[9px] uppercase tracking-[0.12em] text-[#8a8374]">{item.label}</span>
-                <span className="text-right font-body text-[11.5px] text-[#3f3b33]">{item.value}</span>
-              </div>
-            ))}
-          </div>
-          <div className="px-5 py-2">
-            {[
-              { label: "Project status", value: STATUS_LABELS[project.status] },
-              {
-                label: "Review",
-                value:
-                  project.status === "CLIENT_REVIEW"
-                    ? "Awaiting your review"
-                    : project.status === "INTERNAL_REVIEW"
-                      ? "With Crestion Labs"
-                      : "—",
-              },
-              {
-                label: "World",
-                value: project.status === "COMPLETED" ? "Delivered" : "Not delivered",
-              },
-            ].map((item) => (
-              <div key={item.label} className="flex items-baseline justify-between border-b border-[#eee9df] py-3 last:border-b-0 md:border-b-0">
-                <span className="font-body text-[9px] uppercase tracking-[0.12em] text-[#8a8374]">{item.label}</span>
-                <span className="text-right font-body text-[11.5px] text-[#3f3b33]">{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

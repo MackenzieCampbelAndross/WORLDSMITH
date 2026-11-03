@@ -13,7 +13,7 @@ import { fetchProject, type Project } from "@/lib/portal";
 const TABS = [
   { href: "", label: "Overview", exact: true },
   { href: "/plans", label: "2D Plans" },
-  { href: "/processing", label: "Processing" },
+  { href: "/status", label: "Status" },
   { href: "/world", label: "3D World" },
   { href: "/files", label: "Files" },
   { href: "/analytics", label: "Project Analytics" },

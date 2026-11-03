@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { WizardFileUpload } from "@/components/portal/WizardFileUpload";
 import { formatBytes } from "@/lib/format";
+import { submitProductionRequest } from "@/lib/production";
 import {
   createDraftProject,
   DEVELOPMENT_STAGES,
@@ -15,7 +16,6 @@ import {
   PLAN_CATEGORIES,
   PROJECT_TYPES,
   setProjectCover,
-  submitProject,
   UNIT_TYPES,
   updateDraftProject,
   type FileCategory,
@@ -347,10 +347,14 @@ export default function NewProjectPage() {
       if (!projectId) return;
       setSaving(true);
       try {
-        await submitProject(projectId);
+        await submitProductionRequest(projectId);
         router.push(`/projects/${projectId}?submitted=1`);
-      } catch {
-        setError("This project could not be submitted. Please try again.");
+      } catch (caught) {
+        setError(
+          caught instanceof Error
+            ? caught.message
+            : "This project could not be submitted. Please try again.",
+        );
         setSaving(false);
       }
     }
@@ -800,7 +804,7 @@ export default function NewProjectPage() {
                 </ReviewSection>
                 <p className="border-t border-[#e2ddd1] pt-5 font-body text-[10.5px] leading-5 text-[#8a8374]">
                   Submitting sends this brief to the Crestion Labs production team. Once submitted,
-                  the project enters the production pipeline and its details can no longer be edited.
+                  the project is sent to the Crestion Labs production team and its details can no longer be edited.
                 </p>
               </div>
             )}
