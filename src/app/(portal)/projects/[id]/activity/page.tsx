@@ -7,7 +7,11 @@ import { useProjectWorkspace } from "@/components/portal/ProjectWorkspaceContext
 import { StatusPill } from "@/components/portal/StatusPill";
 import { formatDate, formatRelative } from "@/lib/format";
 import { fetchProjectActivity, type Activity } from "@/lib/portal";
-import { STATUS_DESCRIPTIONS } from "@/lib/productionStatus";
+import {
+  STATUS_DESCRIPTIONS,
+  SUBMISSION_STAGES,
+  submissionStageIndex,
+} from "@/lib/productionStatus";
 
 export default function ProjectActivityPage() {
   const { project } = useProjectWorkspace();
@@ -44,6 +48,8 @@ export default function ProjectActivityPage() {
       active = false;
     };
   }, [project.id, refreshKey]);
+
+  const stageIndex = submissionStageIndex(project.status);
 
   return (
     <div>
@@ -101,6 +107,34 @@ export default function ProjectActivityPage() {
             Open World →
           </Link>
         )}
+      </div>
+
+      <div className="mt-5 rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-5">
+        <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">Progress</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {SUBMISSION_STAGES.map((label, index) => {
+            const done = stageIndex >= index;
+            const current = stageIndex === index;
+            return (
+              <div key={label} className="flex items-center gap-3">
+                <span
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] ${
+                    done
+                      ? "border-[#1f5e44] bg-[#1f5e44] text-[#f7f4ec]"
+                      : current
+                        ? "border-[#1f5e44] text-[#1f5e44]"
+                        : "border-[#cfc8b8] text-transparent"
+                  }`}
+                >
+                  {done ? "✓" : "·"}
+                </span>
+                <span className={`font-body text-[11.5px] ${done || current ? "text-[#3f3b33]" : "text-[#8a8374]"}`}>
+                  {label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="mt-8">

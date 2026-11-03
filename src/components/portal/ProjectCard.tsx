@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { STATUS_LABELS, type Project, type ProjectStatus } from "@/lib/portal";
+import { isDeliveredStatus } from "@/lib/productionStatus";
 
 const statusDot: Record<ProjectStatus, string> = {
   DRAFT: "bg-[#a08a5c]",
@@ -23,6 +24,7 @@ export const ProjectCard = ({
   coverUrl?: string | null;
 }) => {
   const openHref = project.status === "DRAFT" ? `/projects/new?draft=${project.id}` : `/projects/${project.id}`;
+  const delivered = isDeliveredStatus(project.status);
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] transition-colors duration-300 hover:border-[#c8c0ae]">
@@ -80,6 +82,23 @@ export const ProjectCard = ({
             </div>
           </details>
         </div>
+
+        {delivered && (
+          <div className="mt-4 flex gap-2">
+            <Link
+              href={`/projects/${project.id}/world`}
+              className="inline-flex flex-1 items-center justify-center rounded-[6px] bg-[#1f5e44] px-3 py-2 font-body text-[10.5px] font-medium text-[#f7f4ec] transition-colors hover:bg-[#174d37]"
+            >
+              Enter World
+            </Link>
+            <Link
+              href={`/projects/${project.id}/presentation`}
+              className="inline-flex items-center justify-center rounded-[6px] border border-[#d8d2c4] px-3 py-2 font-body text-[10.5px] text-[#3f3b33] transition-colors hover:border-[#1f5e44]"
+            >
+              Share
+            </Link>
+          </div>
+        )}
       </div>
     </article>
   );

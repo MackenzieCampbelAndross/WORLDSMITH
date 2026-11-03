@@ -34,14 +34,13 @@ export default function ProjectOverviewPage() {
   }, [project.id]);
 
   const summary = [
-    { label: "Location", value: project.location },
-    { label: "Type", value: project.type },
+    { label: "Location", value: project.location || "—" },
+    { label: "Property type", value: project.type },
     { label: "Developer", value: project.developer || "—" },
-    { label: "Stage", value: project.developmentStage || "—" },
-    { label: "Buildings", value: String(project.buildings || "—") },
-    { label: "Floors", value: String(project.floors || "—") },
-    { label: "Units", value: String(project.units || "—") },
-    { label: "Unit types", value: project.unitTypes.join(", ") || "—" },
+    {
+      label: "Submitted",
+      value: project.submittedAt ? formatDate(project.submittedAt) : "Not yet",
+    },
   ];
 
   return (

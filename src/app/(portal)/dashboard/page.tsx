@@ -11,54 +11,21 @@ import {
   fetchDashboard,
   type Activity,
   type DashboardData,
-  type Project,
-  type ProjectStatus,
 } from "@/lib/portal";
+import {
+  STATUS_DESCRIPTIONS,
+  SUBMISSION_STAGES,
+  isDeliveredStatus,
+  submissionStageIndex,
+} from "@/lib/productionStatus";
 import { useSignedUrls } from "@/lib/use-signed-urls";
 
-type FilterKey = "ALL" | "ACTIVE" | "PROCESSING" | "READY" | "ARCHIVED";
+type FilterKey = "SUBMISSIONS" | "DELIVERED";
 
 const FILTERS: Array<{ key: FilterKey; label: string }> = [
-  { key: "ALL", label: "All" },
-  { key: "ACTIVE", label: "Active" },
-  { key: "PROCESSING", label: "Processing" },
-  { key: "READY", label: "Ready" },
-  { key: "ARCHIVED", label: "Archived" },
+  { key: "SUBMISSIONS", label: "Submissions" },
+  { key: "DELIVERED", label: "Delivered" },
 ];
-
-const PROCESSING: ProjectStatus[] = ["REVIEWING", "ASSETS_RECEIVED", "PROCESSING", "INTERNAL_REVIEW"];
-const READY: ProjectStatus[] = ["CLIENT_REVIEW", "COMPLETED"];
-
-const matchesFilter = (project: Project, filter: FilterKey) => {
-  if (filter === "ACTIVE") return project.status !== "DRAFT" && project.status !== "COMPLETED";
-  if (filter === "PROCESSING") return PROCESSING.includes(project.status);
-  if (filter === "READY") return READY.includes(project.status);
-  if (filter === "ARCHIVED") return false;
-  return true;
-};
-
-const statusCopy = (project: Project) => {
-  switch (project.status) {
-    case "DRAFT":
-      return "Finish the project brief to send it to production.";
-    case "SUBMITTED":
-      return "Your request is with the Crestion Labs team.";
-    case "REVIEWING":
-      return "The team is reviewing your brief and files.";
-    case "ASSETS_RECEIVED":
-      return "Your files are being prepared for production.";
-    case "PROCESSING":
-      return "Your world is in production.";
-    case "INTERNAL_REVIEW":
-      return "The world is in internal review.";
-    case "CLIENT_REVIEW":
-      return "World ready for review.";
-    case "COMPLETED":
-      return "World delivered.";
-    default:
-      return "Production update available.";
-  }
-};
 
 const Check = ({ done, optional = false }: { done: boolean; optional?: boolean }) => (
   <span
@@ -106,7 +73,7 @@ export default function DashboardOverviewPage() {
   const [error, setError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [allActivity, setAllActivity] = useState<Activity[] | null>(null);
-  const [filter, setFilter] = useState<FilterKey>("ALL");
+  const [filter, setFilter] = useState<FilterKey>("SUBMISSIONS");
   const [greeting, setGreeting] = useState("Welcome back");
 
   useEffect(() => {
@@ -141,7 +108,12 @@ export default function DashboardOverviewPage() {
   );
 
   const filtered = useMemo(
-    () => (data ? data.projects.filter((project) => matchesFilter(project, filter)) : []),
+    () =>
+      data
+        ? data.projects.filter((project) =>
+            filter === "DELIVERED" ? isDeliveredStatus(project.status) : !isDeliveredStatus(project.status),
+          )
+        : [],
     [data, filter],
   );
 
@@ -190,10 +162,10 @@ export default function DashboardOverviewPage() {
     String((user?.user_metadata as Record<string, unknown> | undefined)?.first_name ?? "");
   const active = data.activeProject;
   const activeCover = active?.coverPath ? covers[active.coverPath] : null;
-  const hasPlans = data.activeFiles.some((file) => file.kind === "plan");
-  const hasWorld = Boolean(data.activeWorld);
-  const worldReady = data.activeWorld?.status === "ready" || (active ? READY.includes(active.status) : false);
-  const hasPresentation = Boolean(data.activeWorld?.embedUrl || data.activeWorld?.shareSlug);
+  const stageIndex = active ? submissionStageIndex(active.status) : -1;
+  const worldReady = Boolean(
+    active && (isDeliveredStatus(active.status) || data.activeWorld?.status === "ready"),
+  );
 
   const cta =
     active?.status === "DRAFT"
@@ -225,7 +197,9 @@ export default function DashboardOverviewPage() {
                 <h2 className="font-accent text-[34px] leading-none tracking-[-0.02em] text-[#171713] sm:text-[40px]">
                   {active.name}
                 </h2>
-                <p className="mt-3 font-body text-[12.5px] text-[#716b5d]">{statusCopy(active)}</p>
+                <p className="mt-3 font-body text-[12.5px] text-[#716b5d]">
+                  {STATUS_DESCRIPTIONS[active.status]}
+                </p>
                 {activeCover ? (
                   <div className="mt-5 h-24 w-full max-w-[300px] overflow-hidden rounded-[8px] border border-[#e2ddd1]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -245,21 +219,18 @@ export default function DashboardOverviewPage() {
                 <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">
                   Project progress
                 </p>
-                <div className="mt-4 space-y-4">
-                  {[
-                    { label: "Plans uploaded", done: hasPlans },
-                    { label: "Spatial model generated", done: hasWorld },
-                    { label: "3D world created", done: worldReady },
-                    { label: "Presentation", done: hasPresentation, optional: true },
-                  ].map((stage) => (
-                    <div key={stage.label} className="flex items-center gap-3">
-                      <Check done={stage.done} optional={stage.optional} />
-                      <span className={`font-body text-[12px] ${stage.done ? "text-[#171713]" : "text-[#716b5d]"}`}>
-                        {stage.label}
-                        {stage.optional && <span className="ml-1 text-[#a0988a]">(optional)</span>}
-                      </span>
-                    </div>
-                  ))}
+                <div className="mt-4 space-y-3.5">
+                  {SUBMISSION_STAGES.map((label, index) => {
+                    const done = stageIndex >= index;
+                    return (
+                      <div key={label} className="flex items-center gap-3">
+                        <Check done={done} />
+                        <span className={`font-body text-[12px] ${done ? "text-[#171713]" : "text-[#716b5d]"}`}>
+                          {label}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -267,13 +238,13 @@ export default function DashboardOverviewPage() {
             <div className="mt-5">
               <h2 className="font-accent text-[32px] leading-none text-[#171713]">No active project yet.</h2>
               <p className="mt-3 max-w-[420px] font-body text-[12.5px] leading-6 text-[#716b5d]">
-                Start with the plans you have. We&apos;ll turn them into a world your buyers can explore.
+                Send us a floor plan. Creston handles the architectural interpretation and builds the world.
               </p>
               <Link
                 href="/projects/new"
                 className="mt-6 inline-flex rounded-[7px] bg-[#1f5e44] px-5 py-3 font-body text-[11.5px] font-medium text-[#f7f4ec] transition-colors hover:bg-[#174d37]"
               >
-                New project
+                Submit a floor plan
               </Link>
             </div>
           )}
@@ -358,7 +329,7 @@ export default function DashboardOverviewPage() {
             className="inline-flex items-center gap-2 rounded-[7px] bg-[#1f5e44] px-4 py-2.5 font-body text-[11px] font-medium text-[#f7f4ec] transition-colors hover:bg-[#174d37]"
           >
             <span aria-hidden="true">+</span>
-            New project
+            Submit new project
           </Link>
         </div>
 
@@ -383,8 +354,8 @@ export default function DashboardOverviewPage() {
           <div className="mt-6">
             <EmptyState
               title="Your first world starts here."
-              body="Create a project and give us your architectural plans. We'll turn them into an interactive environment your buyers can explore."
-              actionLabel="New Project"
+              body="Send us a floor plan. Creston handles the architectural interpretation and builds the interactive world."
+              actionLabel="Submit New Project"
               actionHref="/projects/new"
             />
           </div>
@@ -392,9 +363,9 @@ export default function DashboardOverviewPage() {
           <div className="mt-6 rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-6 py-10 text-center">
             <p className="font-accent text-[24px] text-[#171713]">Nothing here yet.</p>
             <p className="mx-auto mt-2 max-w-[360px] font-body text-[11.5px] leading-5 text-[#716b5d]">
-              {filter === "ARCHIVED"
-                ? "Archived projects will appear here when the team closes them."
-                : "No projects match this view yet."}
+              {filter === "DELIVERED"
+                ? "Delivered worlds will appear here once Creston finishes processing."
+                : "Submit a floor plan to start a new project."}
             </p>
           </div>
         ) : (

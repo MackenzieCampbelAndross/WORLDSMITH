@@ -36,13 +36,13 @@ export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
 export const STATUS_LABELS: Record<ProjectStatus, string> = {
   DRAFT: "Draft",
-  SUBMITTED: "Submitted",
-  REVIEWING: "Reviewing",
-  ASSETS_RECEIVED: "Assets Received",
-  PROCESSING: "Processing",
-  INTERNAL_REVIEW: "Internal Review",
-  CLIENT_REVIEW: "Client Review",
-  COMPLETED: "Completed",
+  SUBMITTED: "Plan Received",
+  REVIEWING: "Understanding Plan",
+  ASSETS_RECEIVED: "Reconstructing",
+  PROCESSING: "Generating World",
+  INTERNAL_REVIEW: "Quality Review",
+  CLIENT_REVIEW: "Ready",
+  COMPLETED: "Ready",
 };
 
 export const FILE_CATEGORIES = [

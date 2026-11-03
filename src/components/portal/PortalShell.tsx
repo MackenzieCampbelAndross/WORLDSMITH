@@ -8,7 +8,6 @@ import { useAuth } from "@/components/auth-provider";
 const NAV = [
   { href: "/dashboard", label: "Home", exact: true, icon: "home" as const },
   { href: "/projects", label: "Projects", exact: false, icon: "projects" as const },
-  { href: "/insights", label: "Insights", exact: false, icon: "insights" as const },
 ];
 
 const Icon = ({ name, className = "h-4 w-4" }: { name: "home" | "projects" | "insights"; className?: string }) => {

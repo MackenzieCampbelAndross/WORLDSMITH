@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Manrope, Instrument_Serif, Anton, Cormorant_Garamond, Alef } from "next/font/google";
+import { Space_Grotesk, Manrope, Instrument_Serif, Anton, Cormorant_Garamond } from "next/font/google";
 import { AuthProvider } from "@/components/auth-provider";
 import { AuthExperience } from "@/components/AuthExperience";
 import "./globals.css";
@@ -8,13 +8,6 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  display: "swap",
-});
-
-const alef = Alef({
-  variable: "--font-alef",
-  subsets: ["latin"],
-  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -83,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${manrope.variable} ${instrumentSerif.variable} ${anton.variable} ${cormorantGaramond.variable} ${alef.variable} h-full`}
+      className={`${spaceGrotesk.variable} ${manrope.variable} ${instrumentSerif.variable} ${anton.variable} ${cormorantGaramond.variable} h-full`}
     >
       <body className="min-h-full bg-[#1f5e44] text-[#f0f1e6] antialiased selection:bg-[#a8cebc] selection:text-[#171713] overflow-x-clip font-manrope">
         <AuthProvider>

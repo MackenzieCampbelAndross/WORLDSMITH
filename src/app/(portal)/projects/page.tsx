@@ -8,30 +8,16 @@ import { ProjectCard } from "@/components/portal/ProjectCard";
 import {
   fetchProjects,
   type Project,
-  type ProjectStatus,
 } from "@/lib/portal";
+import { isDeliveredStatus } from "@/lib/productionStatus";
 import { useSignedUrls } from "@/lib/use-signed-urls";
 
-type FilterKey = "ALL" | "ACTIVE" | "PROCESSING" | "READY" | "ARCHIVED";
+type FilterKey = "SUBMISSIONS" | "DELIVERED";
 
 const FILTERS: Array<{ key: FilterKey; label: string }> = [
-  { key: "ALL", label: "All" },
-  { key: "ACTIVE", label: "Active" },
-  { key: "PROCESSING", label: "Processing" },
-  { key: "READY", label: "Ready" },
-  { key: "ARCHIVED", label: "Archived" },
+  { key: "SUBMISSIONS", label: "Submissions" },
+  { key: "DELIVERED", label: "Delivered" },
 ];
-
-const PROCESSING: ProjectStatus[] = ["REVIEWING", "ASSETS_RECEIVED", "PROCESSING", "INTERNAL_REVIEW"];
-const READY: ProjectStatus[] = ["CLIENT_REVIEW", "COMPLETED"];
-
-const matchesFilter = (project: Project, filter: FilterKey) => {
-  if (filter === "ACTIVE") return project.status !== "DRAFT" && project.status !== "COMPLETED";
-  if (filter === "PROCESSING") return PROCESSING.includes(project.status);
-  if (filter === "READY") return READY.includes(project.status);
-  if (filter === "ARCHIVED") return false;
-  return true;
-};
 
 export default function ProjectsPage() {
   const { user } = useAuth();
@@ -39,7 +25,7 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<FilterKey>("ALL");
+  const [filter, setFilter] = useState<FilterKey>("SUBMISSIONS");
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -73,7 +59,7 @@ export default function ProjectsPage() {
     return projects
       .filter((project) => {
         if (q && !`${project.name} ${project.location} ${project.type}`.toLowerCase().includes(q)) return false;
-        return matchesFilter(project, filter);
+        return filter === "DELIVERED" ? isDeliveredStatus(project.status) : !isDeliveredStatus(project.status);
       })
       .sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
   }, [projects, search, filter]);
@@ -108,7 +94,7 @@ export default function ProjectsPage() {
           className="inline-flex items-center gap-2 rounded-[7px] bg-[#1f5e44] px-4 py-2.5 font-body text-[11px] font-medium text-[#f7f4ec] transition-colors hover:bg-[#174d37]"
         >
           <span aria-hidden="true">+</span>
-          New project
+          Submit new project
         </Link>
       </div>
 
@@ -134,8 +120,8 @@ export default function ProjectsPage() {
         <div className="mt-8">
           <EmptyState
             title="Your first world starts here."
-            body="Create a project and give us your architectural plans. We'll transform them into an interactive environment your buyers can explore."
-            actionLabel="New Project"
+            body="Send us a floor plan. Creston handles the architectural interpretation and builds the interactive world."
+            actionLabel="Submit New Project"
             actionHref="/projects/new"
           />
         </div>
@@ -178,9 +164,9 @@ export default function ProjectsPage() {
             <div className="mt-6 rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-6 py-10 text-center">
               <p className="font-accent text-[24px] text-[#171713]">Nothing here yet.</p>
               <p className="mx-auto mt-2 max-w-[360px] font-body text-[11.5px] leading-5 text-[#716b5d]">
-                {filter === "ARCHIVED"
-                  ? "Archived projects will appear here when the team closes them."
-                  : "No projects match this view yet."}
+                {filter === "DELIVERED"
+                  ? "Delivered worlds will appear here once Creston finishes processing."
+                  : "Submit a floor plan to start a new project."}
               </p>
             </div>
           ) : (

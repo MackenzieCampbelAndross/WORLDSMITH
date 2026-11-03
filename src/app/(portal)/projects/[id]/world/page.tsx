@@ -7,7 +7,6 @@ import { StatusPill } from "@/components/portal/StatusPill";
 import { useProjectWorkspace } from "@/components/portal/ProjectWorkspaceContext";
 import { fetchWorld, type World } from "@/lib/portal";
 import { STATUS_DESCRIPTIONS } from "@/lib/productionStatus";
-import { createFileSignedUrl } from "@/lib/storage";
 import { useSignedUrls } from "@/lib/use-signed-urls";
 
 export default function ProjectWorldPage() {
@@ -16,7 +15,7 @@ export default function ProjectWorldPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState<"share" | "embed" | null>(null);
-  const [exportError, setExportError] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -41,20 +40,11 @@ export default function ProjectWorldPage() {
   const copy = async (value: string, kind: "share" | "embed") => {
     try {
       await navigator.clipboard.writeText(value);
+      setCopyError(null);
       setCopied(kind);
       window.setTimeout(() => setCopied(null), 1800);
     } catch {
-      setExportError("Your browser blocked copying. Select the link manually.");
-    }
-  };
-
-  const openExport = async (path: string) => {
-    setExportError(null);
-    try {
-      const url = await createFileSignedUrl(path);
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch {
-      setExportError("We couldn't create a secure export link. Please try again.");
+      setCopyError("Your browser blocked copying. Select the link manually.");
     }
   };
 
@@ -208,41 +198,13 @@ export default function ProjectWorldPage() {
                 </button>
               </div>
             )}
-            {[
-              { path: readyWorld.glbPath, label: "GLB" },
-              { path: readyWorld.fbxPath, label: "FBX" },
-              { path: readyWorld.objPath, label: "OBJ" },
-            ]
-              .filter((entry) => Boolean(entry.path))
-              .map((entry) => (
-                <div key={entry.label} className="flex items-center justify-between gap-4 px-5 py-3.5">
-                  <div>
-                    <p className="font-body text-[11.5px] text-[#3f3b33]">{entry.label} asset export</p>
-                    <p className="mt-0.5 font-body text-[10px] text-[#8a8374]">Textures and materials included where available.</p>
-                  </div>
-                  <button type="button" onClick={() => void openExport(entry.path as string)} className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#1f5e44]">
-                    Download
-                  </button>
-                </div>
-              ))}
-            {readyWorld.sourceAvailable && (
-              <div className="flex items-center justify-between gap-4 px-5 py-3.5">
-                <div>
-                  <p className="font-body text-[11.5px] text-[#3f3b33]">Source project</p>
-                  <p className="mt-0.5 font-body text-[10px] text-[#8a8374]">Enterprise delivery available on request.</p>
-                </div>
-                <a href="mailto:crestionlabs@gmail.com?subject=Source%20project%20delivery" className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#1f5e44]">
-                  Contact
-                </a>
-              </div>
-            )}
-            {!readyWorld.worldUrl && !readyWorld.embedUrl && !readyWorld.glbPath && !readyWorld.fbxPath && !readyWorld.objPath && !readyWorld.sourceAvailable && (
+            {!readyWorld.worldUrl && !readyWorld.embedUrl && (
               <p className="px-5 py-5 font-body text-[11.5px] text-[#8a8374]">
                 Delivery options will appear here when your world is published.
               </p>
             )}
           </div>
-          {exportError && <p className="px-5 pb-4 font-body text-[11px] text-[#8a5a2f]">{exportError}</p>}
+          {copyError && <p className="px-5 pb-4 font-body text-[11px] text-[#8a5a2f]">{copyError}</p>}
         </section>
 
         <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
