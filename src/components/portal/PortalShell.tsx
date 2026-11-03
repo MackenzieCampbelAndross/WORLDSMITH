@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CrestionLabsLogo } from "@/components/CrestionLabsLogo";
 import { useAuth } from "@/components/auth-provider";
 
 const NAV = [
@@ -145,6 +146,45 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   const isActive = (item: (typeof NAV)[number]) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
+  const pageTitle = pathname.startsWith("/dashboard")
+    ? "Overview"
+    : pathname.startsWith("/settings")
+      ? "Settings"
+      : "Projects";
+
+  const railBrand = (
+    <Link
+      href="/dashboard"
+      aria-label="Crestion Labs home"
+      className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-white/10 transition-colors hover:bg-white/15"
+    >
+      <CrestionLabsLogo size={25} />
+    </Link>
+  );
+
+  const railNav = (
+    <nav className="mt-8 flex flex-col items-center gap-2">
+      {NAV.map((item) => {
+        const active = isActive(item);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            aria-label={item.label}
+            title={item.label}
+            className={`flex h-11 w-11 items-center justify-center rounded-[10px] transition-colors ${
+              active
+                ? "bg-white/12 text-[#f7f2e5]"
+                : "text-[#f4f1e6]/55 hover:bg-white/6 hover:text-white"
+            }`}
+          >
+            <Icon name={item.icon} className="h-5 w-5" />
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
   const brand = (
     <Link href="/dashboard" className="inline-flex flex-col font-cormorant text-[19px] uppercase leading-[1.05] tracking-[0.16em] text-[#f4f1e6] transition-opacity hover:opacity-75">
       <span>Crestion</span>
@@ -175,8 +215,12 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   );
 
   const desktopControls = (
-    <div className="fixed left-0 right-0 top-0 z-30 hidden h-16 border-b border-white/60 bg-[#f7f4ec]/70 shadow-[0_14px_40px_-30px_rgba(23,23,19,0.45)] backdrop-blur-xl lg:flex lg:left-[248px]">
-      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-end gap-3 px-12">
+    <div className="fixed left-0 right-0 top-0 z-30 hidden h-16 border-b border-white/60 bg-[#f7f4ec]/70 shadow-[0_14px_40px_-30px_rgba(23,23,19,0.45)] backdrop-blur-xl lg:flex lg:left-[80px]">
+      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-4 px-8 lg:px-12">
+        <span className="font-body text-[14px] font-semibold tracking-[-0.01em] text-[#171713]">
+          {pageTitle}
+        </span>
+        <div className="flex items-center gap-3">
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -196,16 +240,17 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
         </form>
         <NotificationsMenu />
         <AccountMenu />
+        </div>
       </div>
     </div>
   );
 
   return (
     <div className="min-h-[100svh] bg-[#f7f4ec] text-[#171713]">
-      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-[248px] flex-col overflow-hidden rounded-r-[16px] bg-[#1b4a36] px-5 py-6 lg:flex">
-        <div>{brand}</div>
-        {navLinks}
-        <div className="my-5 h-px bg-white/10" />
+      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-[80px] flex-col items-center overflow-hidden rounded-r-[16px] bg-[#1b4a36] px-2 py-6 lg:flex">
+        {railBrand}
+        {railNav}
+        <div className="mt-5 h-px w-8 bg-white/10" />
       </aside>
 
       <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-white/60 bg-[#f7f4ec]/70 px-4 py-2.5 shadow-[0_14px_40px_-30px_rgba(23,23,19,0.35)] backdrop-blur-xl lg:hidden">
@@ -237,7 +282,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
 
       {desktopControls}
 
-      <main className="min-h-[100svh] lg:pl-[248px]">
+      <main className="min-h-[100svh] lg:pl-[80px]">
         <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 lg:px-12 lg:pt-[88px]">
           {children}
         </div>
