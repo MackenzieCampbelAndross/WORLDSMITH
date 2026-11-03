@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/components/auth-provider";
 import { EmptyState, LoadingBlock } from "@/components/portal/EmptyState";
 import { ProjectCard } from "@/components/portal/ProjectCard";
@@ -150,6 +151,17 @@ export default function ProjectsPage() {
                 : `${deliveredCount} delivered ${deliveredCount === 1 ? "world" : "worlds"} ready to explore.`}
             </p>
           </div>
+          {section === "CREATE" && projects.length > 0 && (
+            <Link
+              href="/projects/new"
+              className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#143f2d] px-4 py-2.5 font-body text-[11px] font-medium text-[#f7f5ea] transition-colors hover:bg-[#0f3626]"
+            >
+              <span aria-hidden="true" className="text-[14px] leading-none">
+                +
+              </span>
+              New project
+            </Link>
+          )}
         </div>
 
         <div className="mt-3 md:hidden">{sectionNav("inline")}</div>
