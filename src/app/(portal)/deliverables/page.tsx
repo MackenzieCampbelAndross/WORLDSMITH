@@ -50,7 +50,7 @@ export default function DeliverablesPage() {
               : `${delivered.length} delivered ${delivered.length === 1 ? "world" : "worlds"} ready to enter and share.`}
           </p>
         </div>
-        <Link href="/projects" className="font-body text-[10.5px] text-[#2f6b4c] hover:text-[#143f2d]">
+        <Link href="/projects" className="font-body text-[10.5px] text-[#3c4430] hover:text-[#202415]">
           View projects →
         </Link>
       </div>

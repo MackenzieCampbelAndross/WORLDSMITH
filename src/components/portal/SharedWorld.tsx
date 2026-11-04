@@ -38,8 +38,8 @@ export function SharedWorld({ slug, chrome }: { slug: string; chrome: boolean })
 
   if (error) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#1f5e44] px-6">
-        <div className="max-w-[420px] rounded-[12px] border border-[#e2ddd1]/25 bg-[#171713]/70 px-6 py-7 text-center">
+      <div className="flex min-h-dvh items-center justify-center bg-[#2f3423] px-6">
+        <div className="max-w-[420px] rounded-[12px] border border-[#dbd4c5]/25 bg-[#171713]/70 px-6 py-7 text-center">
           <p className="font-body text-[10px] uppercase tracking-[0.22em] text-[#a8cebc]">Crestion Labs</p>
           <p className="mt-3 font-accent text-[22px] text-[#f0f1e6]">This walkthrough isn&apos;t available</p>
           <p className="mt-2 font-body text-[12px] leading-6 text-[#f0f1e6]/60">{error}</p>
@@ -50,7 +50,7 @@ export function SharedWorld({ slug, chrome }: { slug: string; chrome: boolean })
 
   if (!data) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#1f5e44]">
+      <div className="flex min-h-dvh items-center justify-center bg-[#2f3423]">
         <p className="font-body text-[11px] uppercase tracking-[0.2em] text-[#f0f1e6]/60">Opening walkthrough…</p>
       </div>
     );
@@ -65,7 +65,7 @@ export function SharedWorld({ slug, chrome }: { slug: string; chrome: boolean })
   }
 
   return (
-    <div className="min-h-dvh bg-[#1f5e44] px-4 py-6 sm:px-8 sm:py-10">
+    <div className="min-h-dvh bg-[#2f3423] px-4 py-6 sm:px-8 sm:py-10">
       <div className="mx-auto w-full max-w-[1180px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">

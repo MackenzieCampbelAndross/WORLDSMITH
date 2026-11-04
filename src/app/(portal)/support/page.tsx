@@ -31,7 +31,7 @@ export default function SupportPage() {
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
-        <section className="rounded-[14px] border border-[#e6e2d7] bg-white p-5">
+        <section className="rounded-[14px] border border-[#ded7c9] bg-white p-5">
           <h2 className="font-body text-[13px] font-semibold text-[#17201b]">Talk to the team</h2>
           <p className="mt-2 max-w-[440px] font-body text-[11px] leading-5 text-[#6f756d]">
             Send us a note and a producer will reply within one business day. Include the project name so we can pull
@@ -40,7 +40,7 @@ export default function SupportPage() {
           <div className="mt-4 flex flex-wrap gap-2.5">
             <a
               href="mailto:crestionlabs@gmail.com"
-              className="inline-flex items-center gap-2 rounded-[7px] bg-[#143f2d] px-3.5 py-2 font-body text-[10.5px] font-medium text-[#f7f5ea] hover:bg-[#0f3626]"
+              className="inline-flex items-center gap-2 rounded-[7px] bg-[#202415] px-3.5 py-2 font-body text-[10.5px] font-medium text-[#efe9dd] hover:bg-[#0f3626]"
             >
               crestionlabs@gmail.com
             </a>
@@ -60,7 +60,7 @@ export default function SupportPage() {
           </div>
         </section>
 
-        <section className="rounded-[14px] border border-[#e6e2d7] bg-white p-5">
+        <section className="rounded-[14px] border border-[#ded7c9] bg-white p-5">
           <h2 className="font-body text-[13px] font-semibold text-[#17201b]">Common questions</h2>
           <div className="mt-3 space-y-2">
             {FAQ.map((item) => (

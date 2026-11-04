@@ -216,7 +216,7 @@ export default function NewProjectPage() {
 
   return (
     <div className="mx-auto max-w-[760px]">
-      <Link href="/projects" className="font-body text-[10px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#1f5e44]">
+      <Link href="/projects" className="font-body text-[10px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#2f3423]">
         ← Projects
       </Link>
 
@@ -228,7 +228,7 @@ export default function NewProjectPage() {
         world generation. No room dimensions or material schedules required.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 rounded-[14px] border border-[#e2ddd1] bg-[#fdfbf6] px-6 py-7 sm:px-8">
+      <form onSubmit={onSubmit} className="mt-8 rounded-[14px] border border-[#dbd4c5] bg-[#f3efe4] px-6 py-7 sm:px-8">
         <div>
           <label htmlFor="submission-name" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
             Project name
@@ -238,7 +238,7 @@ export default function NewProjectPage() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="The Grove"
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#2f3423]"
           />
         </div>
 
@@ -250,7 +250,7 @@ export default function NewProjectPage() {
             id="submission-type"
             value={type}
             onChange={(event) => setType(event.target.value as (typeof PROJECT_TYPES)[number])}
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#2f3423]"
           >
             {PROJECT_TYPES.map((option) => (
               <option key={option} value={option}>
@@ -275,7 +275,7 @@ export default function NewProjectPage() {
               value={width}
               onChange={(event) => setWidth(event.target.value)}
               placeholder="12.0"
-              className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#2f3423]"
             />
           </div>
           <div>
@@ -292,7 +292,7 @@ export default function NewProjectPage() {
               value={length}
               onChange={(event) => setLength(event.target.value)}
               placeholder="9.0"
-              className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#2f3423]"
             />
           </div>
         </div>
@@ -309,7 +309,7 @@ export default function NewProjectPage() {
             id="submission-style"
             value={style}
             onChange={(event) => setStyle(event.target.value as FurnishingStyle)}
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d8d2c4] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#2f3423]"
           >
             {FURNISHING_STYLES.map((option) => (
               <option key={option} value={option}>
@@ -322,21 +322,21 @@ export default function NewProjectPage() {
         <div className="mt-5">
           <p className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">Floor plan</p>
           {uploaded ? (
-            <div className="mt-2 flex items-center justify-between gap-4 rounded-[7px] border border-[#d8d2c4] bg-[#f7f2e7] px-3 py-3">
+            <div className="mt-2 flex items-center justify-between gap-4 rounded-[7px] border border-[#d2cab8] bg-[#f7f2e7] px-3 py-3">
               <div className="min-w-0">
                 <p className="truncate font-body text-[12px] text-[#3f3b33]">{existingPlan ?? "Floor plan uploaded"}</p>
                 <p className="mt-0.5 font-body text-[10px] text-[#8a8374]">Source plan ready for Creston.</p>
               </div>
-              <span className="font-body text-[10px] text-[#2d5c3a]">Uploaded</span>
+              <span className="font-body text-[10px] text-[#333a29]">Uploaded</span>
             </div>
           ) : (
-            <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-[7px] border border-dashed border-[#cfc8b8] bg-[#faf6ec] px-5 py-8 text-center transition-colors hover:border-[#1f5e44]">
+            <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-[7px] border border-dashed border-[#cfc8b8] bg-[#faf6ec] px-5 py-8 text-center transition-colors hover:border-[#2f3423]">
               <span className="font-body text-[12px] text-[#3f3b33]">Choose the floor plan</span>
               <span className="mt-1 font-body text-[10px] text-[#8a8374]">PNG, JPG or PDF · up to 15 MB</span>
               <span className="mt-1 font-body text-[10px] text-[#8a8374]">
                 Use the line drawing of the plan, not a 3D view or a furnished render.
               </span>
-              <span className="mt-3 rounded-[6px] border border-[#d8d2c4] bg-[#fdfbf6] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#3f3b33]">
+              <span className="mt-3 rounded-[6px] border border-[#d2cab8] bg-[#f3efe4] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#3f3b33]">
                 Browse
               </span>
               <input
@@ -366,7 +366,7 @@ export default function NewProjectPage() {
           )}
         </div>
 
-        <div className="mt-6 rounded-[10px] border border-[#e2ddd1] bg-[#fbf8f1] px-4 py-3.5">
+        <div className="mt-6 rounded-[10px] border border-[#dbd4c5] bg-[#f3efe4] px-4 py-3.5">
           <p className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
             What Creston needs
           </p>
@@ -376,7 +376,7 @@ export default function NewProjectPage() {
                 <span
                   aria-hidden="true"
                   className={`mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full ${
-                    item.passed ? "bg-[#1f5e44]" : "bg-[#a13328]"
+                    item.passed ? "bg-[#2f3423]" : "bg-[#a13328]"
                   }`}
                 />
                 <span
@@ -401,7 +401,7 @@ export default function NewProjectPage() {
         <button
           type="submit"
           disabled={busy !== null}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-[7px] bg-[#1f5e44] px-5 py-3 font-body text-[12px] font-medium text-[#f7f4ec] transition-colors hover:bg-[#174d37] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-[7px] bg-[#2f3423] px-5 py-3 font-body text-[12px] font-medium text-[#e8e2d5] transition-colors hover:bg-[#252a1b] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {busyLabel}
         </button>

@@ -98,12 +98,12 @@ export default function ProjectsPage() {
             className={
               variant === "sidebar"
                 ? `flex items-center justify-between gap-2 rounded-[9px] px-2.5 py-2 font-body text-[11.5px] transition-colors ${
-                    active ? "bg-[#1b4a36] text-[#f7f4ec]" : "text-[#4d5a50] hover:bg-[#f2ece0]"
+                    active ? "bg-[#2b3021] text-[#e8e2d5]" : "text-[#4d5a50] hover:bg-[#f2ece0]"
                   }`
                 : `inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-body text-[11px] transition-colors ${
                     active
-                      ? "border-[#1b4a36] bg-[#1b4a36] text-[#f7f4ec]"
-                      : "border-[#e2ddd1] bg-[#fbf8f1] text-[#716b5d]"
+                      ? "border-[#2b3021] bg-[#2b3021] text-[#e8e2d5]"
+                      : "border-[#dbd4c5] bg-[#f3efe4] text-[#716b5d]"
                   }`
             }
           >
@@ -114,7 +114,7 @@ export default function ProjectsPage() {
             <span
               className={`font-body text-[10px] ${
                 active
-                  ? "text-[#f7f4ec]/60"
+                  ? "text-[#e8e2d5]/60"
                   : variant === "sidebar"
                     ? "text-[#8a8374]"
                     : "text-[#8a8374]"
@@ -131,7 +131,7 @@ export default function ProjectsPage() {
   return (
     <div className="flex min-h-0 flex-1 gap-4">
       <aside className="hidden w-[200px] shrink-0 md:block">
-        <div className="sticky top-0 rounded-[14px] border border-[#e2ddd1] bg-[#fbf8f1] p-2">
+        <div className="sticky top-0 rounded-[14px] border border-[#dbd4c5] bg-[#f3efe4] p-2">
           <p className="px-2.5 pb-2 pt-1.5 font-body text-[9px] font-semibold uppercase tracking-[0.18em] text-[#8a8374]">
             Projects
           </p>
@@ -154,7 +154,7 @@ export default function ProjectsPage() {
           {section === "CREATE" && projects.length > 0 && (
             <Link
               href="/projects/new"
-              className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#143f2d] px-4 py-2.5 font-body text-[11px] font-medium text-[#f7f5ea] transition-colors hover:bg-[#0f3626]"
+              className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#202415] px-4 py-2.5 font-body text-[11px] font-medium text-[#efe9dd] transition-colors hover:bg-[#0f3626]"
             >
               <span aria-hidden="true" className="text-[14px] leading-none">
                 +
@@ -185,7 +185,7 @@ export default function ProjectsPage() {
                 setLoading(true);
                 setRefreshKey((key) => key + 1);
               }}
-              className="mt-4 inline-flex rounded-[7px] bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#f7f4ec]"
+              className="mt-4 inline-flex rounded-[7px] bg-[#2f3423] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8e2d5]"
             >
               Try again
             </button>
@@ -201,7 +201,7 @@ export default function ProjectsPage() {
           </div>
         ) : (
           <>
-            <label className="mt-5 flex h-9 w-full max-w-[320px] items-center gap-2 rounded-full border border-[#e2ddd1] bg-[#fbf8f1] px-4 text-[#8a8374] transition-colors focus-within:border-[#b9b09c]">
+            <label className="mt-5 flex h-9 w-full max-w-[320px] items-center gap-2 rounded-full border border-[#dbd4c5] bg-[#f3efe4] px-4 text-[#8a8374] transition-colors focus-within:border-[#b9b09c]">
               <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" aria-hidden="true">
                 <circle cx="8" cy="8" r="4.6" stroke="currentColor" strokeWidth="1.2" />
                 <path d="m11.4 11.4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -216,7 +216,7 @@ export default function ProjectsPage() {
             </label>
 
             {filtered.length === 0 ? (
-              <div className="mt-5 rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-6 py-10 text-center">
+              <div className="mt-5 rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-6 py-10 text-center">
                 <p className="font-body text-[15px] font-semibold text-[#171713]">
                   {search.trim() ? "No matching projects." : "Nothing here yet."}
                 </p>

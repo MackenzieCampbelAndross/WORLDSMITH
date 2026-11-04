@@ -32,9 +32,9 @@ export default function ProfilePage() {
         Your name and contact number appear on projects and correspondence.
       </p>
 
-      <section className="mt-5 overflow-hidden rounded-[12px] border border-[#e2ddd1] bg-white">
-        <div className="flex items-center gap-4 border-b border-[#e2ddd1] px-5 py-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#eaf1e8] font-body text-[12px] font-semibold text-[#1b4a36]">
+      <section className="mt-5 overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-white">
+        <div className="flex items-center gap-4 border-b border-[#dbd4c5] px-5 py-4">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#e6e3d7] font-body text-[12px] font-semibold text-[#2b3021]">
             {initialsFor(profile?.firstName ?? "", profile?.lastName ?? "", user.email ?? "")}
           </span>
           <div className="min-w-0">
@@ -55,7 +55,7 @@ export default function ProfilePage() {
 
       <Link
         href="/settings"
-        className="mt-4 inline-flex font-body text-[10.5px] text-[#2f6b4c] transition-colors hover:text-[#143f2d]"
+        className="mt-4 inline-flex font-body text-[10.5px] text-[#3c4430] transition-colors hover:text-[#202415]"
       >
         Account settings →
       </Link>

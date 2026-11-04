@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { saveProfile } from "@/lib/portal";
 
 const inputClass =
-  "mt-1.5 h-10 w-full border border-[#d8d2c4] bg-transparent px-3 font-body text-[12.5px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]";
+  "mt-1.5 h-10 w-full border border-[#d2cab8] bg-transparent px-3 font-body text-[12.5px] text-[#171713] outline-none transition-colors focus:border-[#2f3423]";
 const labelClass = "font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]";
 
 export const ProfileForm = ({
@@ -57,14 +57,14 @@ export const ProfileForm = ({
           <p className="mt-1 font-body text-[9.5px] text-[#a0988a]">Managed by Supabase Auth.</p>
         </div>
       </div>
-      {status === "saved" && <p className="mt-4 font-body text-[11px] text-[#1f5e44]">Profile saved.</p>}
+      {status === "saved" && <p className="mt-4 font-body text-[11px] text-[#2f3423]">Profile saved.</p>}
       {status === "error" && (
         <p className="mt-4 font-body text-[11px] text-[#8a5a2f]">We couldn&apos;t save your profile. Please try again.</p>
       )}
       <button
         type="submit"
         disabled={status === "saving"}
-        className="mt-5 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f7f4ec] disabled:opacity-60"
+        className="mt-5 bg-[#2f3423] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5] disabled:opacity-60"
       >
         {status === "saving" ? "Saving…" : "Save profile"}
       </button>

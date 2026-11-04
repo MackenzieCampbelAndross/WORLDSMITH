@@ -112,13 +112,13 @@ const ProfileButton = () => {
       aria-label="Profile"
       title={`Profile (${displayName})`}
       className={`group flex items-center gap-2 rounded-full p-0.5 transition-all focus:outline-none ${
-        isProfileActive ? "ring-2 ring-[#123c2b] ring-offset-2 ring-offset-[#f7f4ec]" : "hover:opacity-85"
+        isProfileActive ? "ring-2 ring-[#232818] ring-offset-2 ring-offset-[#e8e2d5]" : "hover:opacity-85"
       }`}
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#123c2b] font-body text-[10.5px] font-semibold text-[#f7f5ea] shadow-sm transition-transform group-hover:scale-105">
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#232818] font-body text-[10.5px] font-semibold text-[#efe9dd] shadow-sm transition-transform group-hover:scale-105">
         {initials}
       </span>
-      <span className="hidden pr-1 font-body text-[11.5px] font-medium text-[#17201b] transition-colors group-hover:text-[#123c2b] sm:inline-block">
+      <span className="hidden pr-1 font-body text-[11.5px] font-medium text-[#17201b] transition-colors group-hover:text-[#232818] sm:inline-block">
         {displayName.split(" ")[0]}
       </span>
     </Link>
@@ -133,7 +133,7 @@ const NotificationsMenu = () => (
     >
       <BellIcon />
     </summary>
-    <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-[10px] border border-[#e2ddd1] bg-white px-4 py-4 shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
+    <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-[10px] border border-[#dbd4c5] bg-white px-4 py-4 shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
       <p className="font-body text-[12px] text-[#17201b]">No new notifications</p>
       <p className="mt-1 font-body text-[10.5px] leading-4 text-[#8d938b]">
         Project updates appear in each project&apos;s Activity.
@@ -159,7 +159,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   }, [pathname]);
 
   if (!user) {
-    return <div className="min-h-[100svh] bg-[#f7f4ec]" />;
+    return <div className="min-h-[100svh] bg-[#e8e2d5]" />;
   }
 
   const isActive = (item: NavItem) =>
@@ -189,8 +189,8 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             aria-current={active ? "page" : undefined}
             className={`flex items-center gap-3 rounded-[9px] px-3 py-2.5 font-body text-[12.5px] transition-colors ${
               active
-                ? "bg-[#2c5a44] text-[#f7f5ea]"
-                : "text-[#e4e9e1]/65 hover:bg-white/[0.06] hover:text-[#f7f5ea]"
+                ? "bg-[#3a4230] text-[#efe9dd]"
+                : "text-[#e4e9e1]/65 hover:bg-white/[0.06] hover:text-[#efe9dd]"
             }`}
           >
             <Icon name={item.icon} />
@@ -230,15 +230,15 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   const brand = (
     <Link href="/dashboard" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
       <CrestionLabsLogo size={27} />
-      <span className="font-body text-[12px] font-semibold uppercase tracking-[0.15em] text-[#f7f5ea]">
+      <span className="font-body text-[12px] font-semibold uppercase tracking-[0.15em] text-[#efe9dd]">
         Crestion Labs
       </span>
     </Link>
   );
 
   return (
-    <div className="flex min-h-[100svh] w-full bg-[#f7f4ec] text-[#17201b]">
-      <aside className="sticky top-0 hidden h-[100svh] w-[226px] shrink-0 flex-col bg-[#123c2b] px-3.5 py-5 lg:flex">
+    <div className="flex min-h-[100svh] w-full text-[#17201b]">
+      <aside className="sticky top-0 hidden h-[100svh] w-[226px] shrink-0 flex-col bg-[#232818] px-3.5 py-5 lg:flex">
         <div className="px-2">{brand}</div>
 
         <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#e4e9e1]/35">
@@ -251,8 +251,8 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
 
-      <div className="relative flex min-w-0 flex-1 flex-col bg-[#f7f4ec]">
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#e6e2d7] bg-[#f7f4ec]/95 px-4 backdrop-blur-xl sm:px-6">
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#ded7c9] bg-[#e8e2d5]/95 px-4 backdrop-blur-xl sm:px-6">
           <span className="font-body text-[15px] font-semibold tracking-[-0.01em] text-[#17201b]">
             {pageTitle}
           </span>
@@ -292,7 +292,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-black/35"
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[272px] flex-col bg-[#123c2b] px-4 py-6">
+          <aside className="absolute inset-y-0 left-0 flex w-[272px] flex-col bg-[#232818] px-4 py-6">
             <div className="flex items-start justify-between gap-4">
               {brand}
               <button

@@ -71,14 +71,14 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
 
   if (project === null) {
     return (
-      <div className="border border-[#e2ddd1] bg-[#fdfbf6] px-6 py-10">
+      <div className="border border-[#dbd4c5] bg-[#f3efe4] px-6 py-10">
         <p className="font-accent text-[24px] text-[#171713]">You don&apos;t have access to this project.</p>
         <p className="mt-2 max-w-[440px] font-body text-[12.5px] leading-6 text-[#716b5d]">
           It may have been removed, or it belongs to another account.
         </p>
         <Link
           href="/projects"
-          className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] uppercase tracking-[0.13em] text-[#f7f4ec]"
+          className="mt-5 inline-flex bg-[#2f3423] px-4 py-2.5 font-body text-[10px] uppercase tracking-[0.13em] text-[#e8e2d5]"
         >
           Back to projects
         </Link>
@@ -93,7 +93,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
     <ProjectWorkspaceProvider project={project} refresh={load}>
       <Link
         href="/projects"
-        className="font-body text-[9.5px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#1f5e44]"
+        className="font-body text-[9.5px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#2f3423]"
       >
         ← All projects
       </Link>
@@ -116,7 +116,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
           <button
             type="button"
             onClick={() => void load()}
-            className="border border-[#d8d2c4] px-2.5 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
+            className="border border-[#d2cab8] px-2.5 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#2f3423] hover:text-[#2f3423]"
           >
             Refresh
           </button>
@@ -138,8 +138,8 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
       )}
 
       {showSubmitted && (
-        <div className="mt-5 flex items-start justify-between gap-4 border-l-2 border-[#1f5e44] bg-[#e9f0e9] px-4 py-3">
-          <p className="font-body text-[11.5px] leading-5 text-[#2d5c3a]">
+        <div className="mt-5 flex items-start justify-between gap-4 border-l-2 border-[#2f3423] bg-[#e6e3d7] px-4 py-3">
+          <p className="font-body text-[11.5px] leading-5 text-[#333a29]">
             Project submitted. Our production team is reviewing your brief and will update the
             status here.
           </p>
@@ -147,14 +147,14 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
             type="button"
             onClick={() => setShowSubmitted(false)}
             aria-label="Dismiss submission notice"
-            className="shrink-0 font-body text-[11px] text-[#2d5c3a]/60 hover:text-[#2d5c3a]"
+            className="shrink-0 font-body text-[11px] text-[#333a29]/60 hover:text-[#333a29]"
           >
             ×
           </button>
         </div>
       )}
 
-      <div className="mt-7 flex gap-6 overflow-x-auto border-b border-[#e2ddd1]">
+      <div className="mt-7 flex gap-6 overflow-x-auto border-b border-[#dbd4c5]">
         {TABS.map((tab) => {
           const active = current(tab.href);
           return (
@@ -163,8 +163,8 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
               href={`${base}${tab.href}`}
               className={`shrink-0 border-b py-3 font-body text-[10.5px] uppercase tracking-[0.12em] transition-colors ${
                 active
-                  ? "border-[#1f5e44] text-[#171713]"
-                  : "border-transparent text-[#8a8374] hover:text-[#1f5e44]"
+                  ? "border-[#2f3423] text-[#171713]"
+                  : "border-transparent text-[#8a8374] hover:text-[#2f3423]"
               }`}
             >
               {tab.label}

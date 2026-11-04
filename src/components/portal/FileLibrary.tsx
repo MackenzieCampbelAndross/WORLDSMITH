@@ -185,7 +185,7 @@ export const FileLibrary = ({
             <select
               value={uploadCategory}
               onChange={(event) => setUploadCategory(event.target.value as FileCategory)}
-              className="h-8 border border-[#d8d2c4] bg-[#f7f4ec] px-2 font-body text-[10.5px] text-[#514c42] outline-none"
+              className="h-8 border border-[#d2cab8] bg-[#e8e2d5] px-2 font-body text-[10.5px] text-[#514c42] outline-none"
             >
               {categories.map((option) => (
                 <option key={option} value={option}>
@@ -195,7 +195,7 @@ export const FileLibrary = ({
             </select>
             <label
               htmlFor={inputId}
-              className="cursor-pointer border border-[#1f5e44] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.14em] text-[#1f5e44] transition-colors hover:bg-[#1f5e44] hover:text-[#f7f4ec]"
+              className="cursor-pointer border border-[#2f3423] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.14em] text-[#2f3423] transition-colors hover:bg-[#2f3423] hover:text-[#e8e2d5]"
             >
               Browse
             </label>
@@ -219,9 +219,9 @@ export const FileLibrary = ({
       {queue.length > 0 && (
         <div className="mt-3 space-y-2">
           {queue.map((item) => (
-            <div key={item.key} className="flex items-center justify-between border border-[#e2ddd1] px-4 py-2.5">
+            <div key={item.key} className="flex items-center justify-between border border-[#dbd4c5] px-4 py-2.5">
               <span className="truncate font-body text-[11.5px] text-[#514c42]">{item.name}</span>
-              <span className={`font-body text-[10px] ${item.status === "error" ? "text-[#8a5a2f]" : item.status === "done" ? "text-[#1f5e44]" : "text-[#8a8374]"}`}>
+              <span className={`font-body text-[10px] ${item.status === "error" ? "text-[#8a5a2f]" : item.status === "done" ? "text-[#2f3423]" : "text-[#8a8374]"}`}>
                 {item.message ?? "Uploading…"}
               </span>
             </div>
@@ -230,30 +230,30 @@ export const FileLibrary = ({
       )}
 
       {error ? (
-        <div className="mt-6 border border-[#e2ddd1] px-5 py-6">
+        <div className="mt-6 border border-[#dbd4c5] px-5 py-6">
           <p className="font-body text-[12px] text-[#8a5a2f]">We couldn&apos;t load these files.</p>
-          <button type="button" onClick={() => void load()} className="mt-3 font-body text-[10px] uppercase tracking-[0.12em] text-[#1f5e44]">
+          <button type="button" onClick={() => void load()} className="mt-3 font-body text-[10px] uppercase tracking-[0.12em] text-[#2f3423]">
             Try again
           </button>
         </div>
       ) : files.length === 0 ? (
-        <div className="mt-6 border border-[#e2ddd1] px-5 py-8">
+        <div className="mt-6 border border-[#dbd4c5] px-5 py-8">
           <p className="font-accent text-[22px] text-[#171713]">{emptyTitle}</p>
           <p className="mt-2 font-body text-[12px] text-[#716b5d]">{emptyBody}</p>
         </div>
       ) : (
         <>
-          <div className="mt-6 flex flex-wrap items-center gap-3 border-y border-[#e2ddd1] py-2.5">
+          <div className="mt-6 flex flex-wrap items-center gap-3 border-y border-[#dbd4c5] py-2.5">
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search files…"
-              className="h-8 min-w-[180px] flex-1 border border-[#ddd7c9] bg-transparent px-3 font-body text-[11px] outline-none placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+              className="h-8 min-w-[180px] flex-1 border border-[#ddd7c9] bg-transparent px-3 font-body text-[11px] outline-none placeholder:text-[#a0988a] focus:border-[#2f3423]"
             />
             <select
               value={categoryFilter}
               onChange={(event) => setCategoryFilter(event.target.value as "ALL" | FileCategory)}
-              className="h-8 border border-[#ddd7c9] bg-[#f7f4ec] px-2 font-body text-[10.5px] text-[#514c42] outline-none"
+              className="h-8 border border-[#ddd7c9] bg-[#e8e2d5] px-2 font-body text-[10.5px] text-[#514c42] outline-none"
             >
               <option value="ALL">All categories</option>
               {categories.map((option) => (
@@ -268,7 +268,7 @@ export const FileLibrary = ({
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] border-collapse text-left">
               <thead>
-                <tr className="border-b border-[#e2ddd1]">
+                <tr className="border-b border-[#dbd4c5]">
                   {[
                     "File",
                     "Category",
@@ -285,7 +285,7 @@ export const FileLibrary = ({
               </thead>
               <tbody>
                 {visible.map((file) => (
-                  <tr key={file.id} className="border-b border-[#eee9df]">
+                  <tr key={file.id} className="border-b border-[#e3ddce]">
                     <td className="py-3 pr-5">
                       <span className="block max-w-[260px] truncate font-body text-[11.5px] text-[#3f3b33]">
                         {file.name}
@@ -301,7 +301,7 @@ export const FileLibrary = ({
                     <td className="py-3 pr-5 font-body text-[10.5px] text-[#8a8374]">{formatRelative(file.createdAt)}</td>
                     <td className="py-3 text-right">
                       <div className="flex items-center justify-end gap-3">
-                        <button type="button" onClick={() => void openFile(file)} className="font-body text-[9px] uppercase tracking-[0.1em] text-[#1f5e44] hover:opacity-70">
+                        <button type="button" onClick={() => void openFile(file)} className="font-body text-[9px] uppercase tracking-[0.1em] text-[#2f3423] hover:opacity-70">
                           Open
                         </button>
                         <button

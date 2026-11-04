@@ -46,13 +46,13 @@ export default function ProjectOverviewPage() {
   return (
     <div>
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
-          <div className="border-b border-[#e2ddd1] px-5 py-4">
+        <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4]">
+          <div className="border-b border-[#dbd4c5] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Project summary</h2>
           </div>
           <dl className="grid grid-cols-2 px-5 py-2">
             {summary.map((item) => (
-              <div key={item.label} className="border-b border-[#eee9df] py-3 last:border-b-0">
+              <div key={item.label} className="border-b border-[#e3ddce] py-3 last:border-b-0">
                 <dt className="font-body text-[9px] uppercase tracking-[0.14em] text-[#8a8374]">
                   {item.label}
                 </dt>
@@ -60,7 +60,7 @@ export default function ProjectOverviewPage() {
               </div>
             ))}
           </dl>
-          <div className="flex items-center justify-between border-t border-[#e2ddd1] px-5 py-3.5">
+          <div className="flex items-center justify-between border-t border-[#dbd4c5] px-5 py-3.5">
             <span className="font-body text-[10px] text-[#8a8374]">
               Created {formatDate(project.createdAt)}
             </span>
@@ -70,12 +70,12 @@ export default function ProjectOverviewPage() {
           </div>
         </section>
 
-        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
-          <div className="flex items-center justify-between border-b border-[#e2ddd1] px-5 py-4">
+        <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4]">
+          <div className="flex items-center justify-between border-b border-[#dbd4c5] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Production status</h2>
             <Link
               href={`/projects/${project.id}/activity`}
-              className="font-body text-[10px] text-[#1f5e44] transition-opacity hover:opacity-70"
+              className="font-body text-[10px] text-[#2f3423] transition-opacity hover:opacity-70"
             >
               View activity →
             </Link>
@@ -103,7 +103,7 @@ export default function ProjectOverviewPage() {
                 {project.status === "DRAFT" && (
                   <Link
                     href={`/projects/new?draft=${project.id}`}
-                    className="mt-4 inline-flex bg-[#1f5e44] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#f7f4ec]"
+                    className="mt-4 inline-flex bg-[#2f3423] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#e8e2d5]"
                   >
                     Continue setup
                   </Link>
@@ -115,8 +115,8 @@ export default function ProjectOverviewPage() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
-          <div className="flex items-center justify-between border-b border-[#e2ddd1] px-5 py-4">
+        <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4]">
+          <div className="flex items-center justify-between border-b border-[#dbd4c5] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Project activity</h2>
           </div>
           <div>
@@ -131,7 +131,7 @@ export default function ProjectOverviewPage() {
               </p>
             ) : (
               activity.map((entry) => (
-                <div key={entry.id} className="flex items-start justify-between gap-4 border-t border-[#eee9df] px-5 py-3.5 first:border-t-0">
+                <div key={entry.id} className="flex items-start justify-between gap-4 border-t border-[#e3ddce] px-5 py-3.5 first:border-t-0">
                   <div>
                     <p className="font-body text-[11.5px] leading-5 text-[#3f3b33]">{entry.message}</p>
                     <p className="mt-0.5 font-body text-[10px] uppercase tracking-[0.08em] text-[#8a8374]">
@@ -147,8 +147,8 @@ export default function ProjectOverviewPage() {
           </div>
         </section>
 
-        <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6]">
-          <div className="border-b border-[#e2ddd1] px-5 py-4">
+        <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4]">
+          <div className="border-b border-[#dbd4c5] px-5 py-4">
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Quick actions</h2>
           </div>
           <div className="grid grid-cols-1">
@@ -161,13 +161,13 @@ export default function ProjectOverviewPage() {
               <Link
                 key={action.href}
                 href={action.href}
-                className="flex items-center justify-between border-b border-[#eee9df] px-5 py-3.5 transition-colors last:border-b-0 hover:bg-[#f8f4ea]"
+                className="flex items-center justify-between border-b border-[#e3ddce] px-5 py-3.5 transition-colors last:border-b-0 hover:bg-[#f8f4ea]"
               >
                 <span>
                   <span className="block font-body text-[12px] text-[#3f3b33]">{action.label}</span>
                   <span className="mt-0.5 block font-body text-[10px] text-[#8a8374]">{action.hint}</span>
                 </span>
-                <span className="font-body text-[13px] text-[#1f5e44]" aria-hidden="true">→</span>
+                <span className="font-body text-[13px] text-[#2f3423]" aria-hidden="true">→</span>
               </Link>
             ))}
           </div>

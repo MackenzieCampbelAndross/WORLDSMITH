@@ -72,7 +72,7 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
               >
                 <td className="py-2.5 pr-4">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[7px] bg-[#eaf1e8] font-body text-[12px] font-semibold text-[#2f6b4c]">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[7px] bg-[#e6e3d7] font-body text-[12px] font-semibold text-[#3c4430]">
                       {project.name.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="min-w-0">
@@ -117,7 +117,7 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
                     >
                       <MoreIcon />
                     </summary>
-                    <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-[10px] border border-[#e6e2d7] bg-white py-1 shadow-[0_18px_40px_-24px_rgba(20,35,28,0.4)]">
+                    <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-[10px] border border-[#ded7c9] bg-white py-1 shadow-[0_18px_40px_-24px_rgba(20,35,28,0.4)]">
                       <Link
                         href={href}
                         className="block px-3 py-2 font-body text-[11px] text-[#3f4a42] hover:bg-[#f6f3ea]"

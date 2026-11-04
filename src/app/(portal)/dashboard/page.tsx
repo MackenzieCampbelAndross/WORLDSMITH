@@ -174,7 +174,7 @@ export default function DashboardOverviewPage() {
             setLoading(true);
             setRefreshKey((key) => key + 1);
           }}
-          className="mt-4 rounded-[7px] bg-[#143f2d] px-4 py-2 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f7f5ea]"
+          className="mt-4 rounded-[7px] bg-[#202415] px-4 py-2 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#efe9dd]"
         >
           Try again
         </button>
@@ -227,7 +227,7 @@ export default function DashboardOverviewPage() {
         </div>
         <Link
           href="/projects/new"
-          className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#143f2d] px-4 py-2.5 font-body text-[11px] font-medium text-[#f7f5ea] transition-colors hover:bg-[#0f3626]"
+          className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#202415] px-4 py-2.5 font-body text-[11px] font-medium text-[#efe9dd] transition-colors hover:bg-[#0f3626]"
         >
           <span aria-hidden="true" className="text-[14px] leading-none">
             +
@@ -238,9 +238,9 @@ export default function DashboardOverviewPage() {
 
       <div className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
         {metrics.map((metric) => (
-          <div key={metric.key} className="rounded-[12px] border border-[#e6e2d7] bg-white px-4 py-3.5">
+          <div key={metric.key} className="rounded-[12px] border border-[#ded7c9] bg-white px-4 py-3.5">
             <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#eaf1e8] text-[#2f6b4c]">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#e6e3d7] text-[#3c4430]">
                 <MetricIcon name={metric.key} />
               </span>
               <div className="min-w-0 flex-1">
@@ -258,12 +258,12 @@ export default function DashboardOverviewPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,1fr)]">
-        <section className="flex min-w-0 flex-col rounded-[14px] border border-[#e6e2d7] bg-white p-4">
+        <section className="flex min-w-0 flex-col rounded-[14px] border border-[#ded7c9] bg-white p-4">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-body text-[13px] font-semibold text-[#17201b]">
               Active projects ({filtered.length})
             </h2>
-            <Link href="/projects" className="font-body text-[10.5px] text-[#2f6b4c] hover:text-[#143f2d]">
+            <Link href="/projects" className="font-body text-[10.5px] text-[#3c4430] hover:text-[#202415]">
               View all projects →
             </Link>
           </div>
@@ -280,7 +280,7 @@ export default function DashboardOverviewPage() {
                 {!search.trim() && (
                   <Link
                     href="/projects/new"
-                    className="mt-3 inline-flex rounded-[7px] bg-[#143f2d] px-3.5 py-2 font-body text-[10px] font-medium text-[#f7f5ea]"
+                    className="mt-3 inline-flex rounded-[7px] bg-[#202415] px-3.5 py-2 font-body text-[10px] font-medium text-[#efe9dd]"
                   >
                     Submit a floor plan
                   </Link>
@@ -292,7 +292,7 @@ export default function DashboardOverviewPage() {
           </div>
         </section>
 
-        <section className="flex flex-col rounded-[14px] border border-[#e6e2d7] bg-white p-4">
+        <section className="flex flex-col rounded-[14px] border border-[#ded7c9] bg-white p-4">
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-body text-[13px] font-semibold text-[#17201b]">Production pipeline</h2>
             <span className="font-body text-[10px] text-[#8d938b]">{projects.length} projects</span>
@@ -344,11 +344,11 @@ export default function DashboardOverviewPage() {
                     <div
                       key={stage.label}
                       className={`flex-1 px-1.5 py-1.5 text-center ${
-                        current ? "bg-[#1f4a36] text-[#f7f5ea]" : "bg-[#eef2e9] text-[#4f5a52]"
+                        current ? "bg-[#1f4a36] text-[#efe9dd]" : "bg-[#eef2e9] text-[#4f5a52]"
                       }`}
                       style={{ clipPath: "polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%, 9px 50%)" }}
                     >
-                      <p className={`truncate font-body text-[7px] ${current ? "text-[#f7f5ea]/70" : "text-[#7d857c]"}`}>
+                      <p className={`truncate font-body text-[7px] ${current ? "text-[#efe9dd]/70" : "text-[#7d857c]"}`}>
                         {stage.label}
                       </p>
                       <p className="mt-0.5 font-body text-[11px] font-semibold">{stage.count}</p>
@@ -362,10 +362,10 @@ export default function DashboardOverviewPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,1fr)]">
-        <section className="rounded-[14px] border border-[#e6e2d7] bg-white p-4">
+        <section className="rounded-[14px] border border-[#ded7c9] bg-white p-4">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-body text-[13px] font-semibold text-[#17201b]">Recent activity</h2>
-            <Link href="/projects" className="font-body text-[10.5px] text-[#2f6b4c] hover:text-[#143f2d]">
+            <Link href="/projects" className="font-body text-[10.5px] text-[#3c4430] hover:text-[#202415]">
               View projects →
             </Link>
           </div>
@@ -379,7 +379,7 @@ export default function DashboardOverviewPage() {
               <span className="absolute bottom-4 left-[13px] top-4 w-px bg-[#ebe7dc]" aria-hidden="true" />
               {data.activity.map((item) => (
                 <li key={item.id} className="relative flex gap-3 pb-4 last:pb-0">
-                  <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#eaf1e8] text-[#3f6a4d]">
+                  <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#e6e3d7] text-[#3f6a4d]">
                     <ActivityIcon activity={item} />
                   </span>
                   <div className="min-w-0 flex-1 pt-0.5">
@@ -397,7 +397,7 @@ export default function DashboardOverviewPage() {
           )}
         </section>
 
-        <section className="relative min-h-[228px] overflow-hidden rounded-[14px] bg-[#123c2b]">
+        <section className="relative min-h-[228px] overflow-hidden rounded-[14px] bg-[#232818]">
           <Image
             src="/showcase/contact-cantilever.png"
             alt=""
@@ -405,15 +405,15 @@ export default function DashboardOverviewPage() {
             sizes="(min-width: 1280px) 480px, 100vw"
             className="object-cover object-right"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#123c2b_0%,#123c2b_48%,rgba(18,60,43,0.35)_78%,rgba(18,60,43,0.05)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,#232818_0%,#232818_48%,rgba(18,60,43,0.35)_78%,rgba(18,60,43,0.05)_100%)]" />
           <div className="relative z-10 flex h-full flex-col justify-center p-5">
-            <p className="font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#f7f5ea]/50">
+            <p className="font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#efe9dd]/50">
               {active ? "Next action" : "New world"}
             </p>
-            <h2 className="mt-2 max-w-[260px] font-body text-[21px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#f7f5ea]">
+            <h2 className="mt-2 max-w-[260px] font-body text-[21px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#efe9dd]">
               {active ? active.name : "Start your next world."}
             </h2>
-            <p className="mt-2 max-w-[260px] font-body text-[10.5px] leading-4 text-[#f7f5ea]/65">
+            <p className="mt-2 max-w-[260px] font-body text-[10.5px] leading-4 text-[#efe9dd]/65">
               {active
                 ? activeStage >= 0
                   ? STATUS_DESCRIPTIONS[active.status]
@@ -422,7 +422,7 @@ export default function DashboardOverviewPage() {
             </p>
             <Link
               href={activeHref}
-              className="mt-4 inline-flex w-fit items-center gap-2 rounded-[7px] bg-[#f7f5ea] px-3.5 py-2 font-body text-[10.5px] font-semibold text-[#143f2d] transition-colors hover:bg-white"
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-[7px] bg-[#efe9dd] px-3.5 py-2 font-body text-[10.5px] font-semibold text-[#202415] transition-colors hover:bg-white"
             >
               {activeCta}
               <span aria-hidden="true">→</span>

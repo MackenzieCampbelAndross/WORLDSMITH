@@ -182,7 +182,7 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "", onStill }
   const [locked, setLocked] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [lighting, setLighting] = useState<LightingPreset>("daylight");
+  const [lighting, setLighting] = useState<LightingPreset>("evening");
   const [furnitureVisible, setFurnitureVisible] = useState(true);
   const [ceilingVisible, setCeilingVisible] = useState(true);
   const [quality, setQuality] = useState<Quality>("medium");
@@ -588,20 +588,27 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "", onStill }
   return (
     <div
       ref={panelRef}
-      className={`relative overflow-hidden bg-[#0e1310] ${className}`}
+      className={`relative overflow-hidden bg-[#2f3423] ${className}`}
       data-testid="delivered-world"
     >
       <div ref={mountRef} className="absolute inset-0" />
 
+      {/* The hero's datum lines and paper grain, laid over the scene. */}
+      <div className="grid-lines pointer-events-none absolute inset-0 z-[5]" aria-hidden="true" />
+      <div
+        className="paper-grain pointer-events-none absolute inset-0 z-[5] opacity-80 mix-blend-soft-light"
+        aria-hidden="true"
+      />
+
       {status === "loading" && (
-        <div className="absolute inset-0 flex items-center justify-center gap-2 font-body text-[11px] text-[#f0f1e6]/70">
+        <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 font-body text-[11px] text-[#f0f1e6]/70">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#a8cebc]" aria-hidden="true" />
           Opening your world…
         </div>
       )}
 
       {status === "failed" && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 px-6 text-center">
           <p className="font-body text-[12px] text-[#f0f1e6]">This world could not be opened.</p>
           <p className="max-w-[420px] font-body text-[10.5px] leading-5 text-[#f0f1e6]/55">{message}</p>
         </div>

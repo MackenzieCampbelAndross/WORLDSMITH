@@ -56,7 +56,7 @@ export default function ProjectPresentationPage() {
         </p>
       </div>
 
-      <div className="mt-6 rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-5">
+      <div className="mt-6 rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-5 py-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">
@@ -66,7 +66,7 @@ export default function ProjectPresentationPage() {
               <StatusPill status={project.status} />
             </div>
           </div>
-          <Link href={`/projects/${project.id}/activity`} className="font-body text-[10.5px] text-[#1f5e44] hover:opacity-70">
+          <Link href={`/projects/${project.id}/activity`} className="font-body text-[10.5px] text-[#2f3423] hover:opacity-70">
             View activity →
           </Link>
         </div>
@@ -97,7 +97,7 @@ export default function ProjectPresentationPage() {
       ) : (
         <div className="mt-5 space-y-4">
           {shareUrl && (
-            <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-5">
+            <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-5 py-5">
               <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">Shareable link</p>
               <p className="mt-2 break-all font-body text-[11.5px] text-[#3f3b33]">{shareUrl}</p>
               <div className="mt-4 flex flex-wrap gap-3">
@@ -105,14 +105,14 @@ export default function ProjectPresentationPage() {
                   href={shareUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-[7px] bg-[#1f5e44] px-4 py-2 font-body text-[10.5px] font-medium text-[#f7f4ec] hover:bg-[#174d37]"
+                  className="rounded-[7px] bg-[#2f3423] px-4 py-2 font-body text-[10.5px] font-medium text-[#e8e2d5] hover:bg-[#252a1b]"
                 >
                   Open world ↗
                 </a>
                 <button
                   type="button"
                   onClick={() => void copy(shareUrl, "link")}
-                  className="rounded-[7px] border border-[#d8d2c4] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#1f5e44]"
+                  className="rounded-[7px] border border-[#d2cab8] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#2f3423]"
                 >
                   {copied === "link" ? "Copied" : "Copy link"}
                 </button>
@@ -121,7 +121,7 @@ export default function ProjectPresentationPage() {
           )}
 
           {embedUrl && (
-            <section className="rounded-[12px] border border-[#e2ddd1] bg-[#fdfbf6] px-5 py-5">
+            <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-5 py-5">
               <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">Website embed</p>
               <p className="mt-2 break-all font-body text-[11.5px] text-[#3f3b33]">{embedUrl}</p>
               <button
@@ -132,7 +132,7 @@ export default function ProjectPresentationPage() {
                     "embed",
                   )
                 }
-                className="mt-4 rounded-[7px] border border-[#d8d2c4] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#1f5e44]"
+                className="mt-4 rounded-[7px] border border-[#d2cab8] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#2f3423]"
               >
                 {copied === "embed" ? "Copied" : "Copy embed"}
               </button>

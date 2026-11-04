@@ -336,8 +336,16 @@ html.auth-open body {
   background-color: #ecece2;
 }
 
+/* Signed-in workspace canvas: almond neutral carrying the hero's datum lines
+   turned on their side plus the same paper grain. Fixed, so the rules stay
+   still while the content above them scrolls. */
 body.portal-shell {
-  background-color: #f7f4ec;
+  background-color: #e8e2d5;
+  background-image:
+    var(--paper-noise),
+    linear-gradient(to bottom, rgba(47, 52, 35, 0.055) 1px, transparent 1px);
+  background-size: 200px 200px, 100% calc(100vh / 7);
+  background-attachment: fixed;
 }
 
 /* Keep the black auth inputs black through browser autofill. */
