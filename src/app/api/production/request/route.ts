@@ -1,33 +1,11 @@
 import { createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabaseConfig";
+import { buildProductionPayload } from "@/lib/productionPayload";
 
 type Row = Record<string, unknown>;
 
 const TIMEOUT_MS = 15_000;
-
-const numericOrNull = (value: unknown): number | null => {
-  const parsed = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
-// Without both spans the engine has to estimate real-world size from room areas.
-const isMeasured = (value: number | null): value is number =>
-  value !== null && value >= 2 && value <= 100;
-
-const PLAN_EXTENSIONS = [".png", ".jpg", ".jpeg", ".pdf"];
-const MAX_PLAN_BYTES = 15 * 1024 * 1024;
-
-const isReadablePlan = (file: Row): boolean => {
-  const name = String(file.name ?? "").toLowerCase();
-  const size = Number(file.size_bytes ?? 0);
-  return (
-    file.kind === "plan" &&
-    PLAN_EXTENSIONS.some((extension) => name.endsWith(extension)) &&
-    size > 0 &&
-    size <= MAX_PLAN_BYTES
-  );
-};
 
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status });
 
@@ -83,148 +61,27 @@ export async function POST(request: Request) {
     return json({ message: "This project has already been submitted." }, 409);
   }
 
-  const planWidthMeters = numericOrNull(project.plan_width_meters);
-  const planLengthMeters = numericOrNull(project.plan_length_meters);
-  if (!isMeasured(planWidthMeters) || !isMeasured(planLengthMeters)) {
-    return json(
-      {
-        message:
-          "Enter the floor plan's overall width and length in metres (2 to 100) so the world is built at true scale.",
-      },
-      422,
-    );
-  }
-
-  const [profileResponse, filesResponse] = await Promise.all([
-    fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=*`,
-      { headers: authHeaders },
-    ),
-    fetch(
-      `${supabaseUrl}/rest/v1/project_files?project_id=eq.${encodeURIComponent(projectId)}&select=*`,
-      { headers: authHeaders },
-    ),
-  ]);
-  const profile = ((await profileResponse.json()) as Row[])[0] ?? {};
-  const files = (await filesResponse.json()) as Row[];
-  if (!Array.isArray(files) || files.length === 0) {
-    return json({ message: "Upload at least one project file before submitting." }, 422);
-  }
-  if (!files.some((file) => file.kind === "plan")) {
-    return json({ message: "Upload at least one architectural plan before submitting." }, 422);
-  }
-  if (!files.some(isReadablePlan)) {
-    return json(
-      {
-        message:
-          "Plans are read from PNG, JPG or PDF files up to 15 MB. CAD and Revit exports are not readable yet, so re-upload the floor plan as an image or PDF.",
-      },
-      422,
-    );
-  }
-
-  const companyId = typeof project.company_id === "string" ? project.company_id : null;
-  let company: Row | null = null;
-  if (companyId) {
-    const companyResponse = await fetch(
-      `${supabaseUrl}/rest/v1/companies?id=eq.${encodeURIComponent(companyId)}&select=*`,
-      { headers: authHeaders },
-    );
-    company = ((await companyResponse.json()) as Row[])[0] ?? null;
-  }
-
-  const packagedFiles: Array<Record<string, unknown>> = [];
-  for (const file of files) {
-    const path = typeof file.storage_path === "string" ? file.storage_path : "";
-    if (!path) continue;
-    const encodedPath = path.split("/").map(encodeURIComponent).join("/");
-    const signResponse = await fetch(
-      `${supabaseUrl}/storage/v1/object/sign/project-files/${encodedPath}`,
-      {
-        method: "POST",
-        headers: jsonHeaders,
-        body: JSON.stringify({ expiresIn: 3600 }),
-      },
-    );
-    if (!signResponse.ok) {
-      return json(
-        { message: "Project files could not be packaged. Check the storage policy and try again." },
-        502,
-      );
-    }
-    const signed = (await signResponse.json()) as { signedURL?: string };
-    if (!signed.signedURL) {
-      return json({ message: "Project files could not be packaged." }, 502);
-    }
-    packagedFiles.push({
-      name: file.name,
-      category: file.category,
-      kind: file.kind,
-      mimeType: file.mime_type,
-      sizeBytes: file.size_bytes,
-      signedUrl: `${supabaseUrl}/storage/v1${signed.signedURL}`,
-      expiresIn: 3600,
-    });
-  }
-
   const backendUrl = process.env.PRODUCTION_BACKEND_URL;
   const backendSecret = process.env.PRODUCTION_BACKEND_SECRET;
   if (!backendUrl || !backendSecret) {
     return json({ message: "Production intake isn't connected yet." }, 503);
   }
 
-  const payload = {
-    version: 1,
-    requestId: project.id,
-    submittedAt: new Date().toISOString(),
-    portal: "crestionlabs",
-    client: {
-      id: user.id,
-      email: user.email ?? profile.email ?? "",
-      firstName: profile.first_name ?? "",
-      lastName: profile.last_name ?? "",
-      phone: profile.phone ?? "",
-    },
-    company: company
-      ? {
-          id: company.id,
-          name: company.name,
-          website: company.website,
-          details: company.details,
-        }
-      : null,
-    project: {
-      id: project.id,
-      name: project.name,
-      developer: project.developer,
-      location: project.location,
-      type: project.type,
-      developmentStage: project.development_stage,
-      buildings: project.buildings,
-      floors: project.floors,
-      units: project.units,
-      unitTypes: project.unit_types,
-      interiorStyle: project.interior_style,
-      exteriorStyle: project.exterior_style,
-      planWidthMeters,
-      planLengthMeters,
-      furnishingStyle: String(project.furnishing_style ?? "modern"),
-      materials: project.materials,
-      landscape: project.landscape,
-      lighting: project.lighting,
-      referenceProjects: project.reference_projects,
-      visualizationScope: project.visualization_scope,
-      createdAt: project.created_at,
-    },
-    files: packagedFiles,
-  };
+  const built = await buildProductionPayload(project, authHeaders);
+  if (!built.ok) {
+    return json({ message: built.message }, built.status);
+  }
 
-  const body = JSON.stringify(payload);
+  const body = JSON.stringify(built.payload);
   const signature = createHmac("sha256", backendSecret).update(body).digest("hex");
 
-  let backendResponse: Response;
+  // A studio machine sitting behind NAT or switched off cannot be reached from
+  // a deployed portal. The submission is still accepted and left in the queue
+  // for the studio to pull, so the client is never blocked by production being
+  // offline.
+  let pushed = false;
   try {
-    backendResponse = await fetch(backendUrl, {
+    const backendResponse = await fetch(backendUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -234,11 +91,9 @@ export async function POST(request: Request) {
       body,
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
+    pushed = backendResponse.ok;
   } catch {
-    return json({ message: "The production backend is unavailable. Try again shortly." }, 502);
-  }
-  if (!backendResponse.ok) {
-    return json({ message: "The production backend rejected this request. Try again." }, 502);
+    pushed = false;
   }
 
   const updateResponse = await fetch(
@@ -260,11 +115,13 @@ export async function POST(request: Request) {
       owner_id: user.id,
       project_id: projectId,
       project_name: project.name ?? "",
-      message: "Project submitted for production",
+      message: pushed
+        ? "Project submitted for production"
+        : "Project submitted. It is queued and will reach production when the studio pulls it.",
       event_type: "project_submitted",
       actor_id: user.id,
     }),
   }).catch(() => undefined);
 
-  return json({ ok: true });
+  return json({ ok: true, pushed });
 }
