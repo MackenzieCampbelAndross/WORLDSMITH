@@ -38,19 +38,18 @@ export function siteBase(request: Request): string {
 // The slug is the only thing guarding a shared walkthrough, so it has to be
 // unguessable and stable: re-delivering a project keeps the link the client
 // already handed to their buyers.
-async function shareSlug(
+async function existingWorld(
   projectId: string,
   authHeaders: Headers,
-): Promise<string> {
-  const existing = await fetch(
-    `${SUPABASE_URL}/rest/v1/worlds?project_id=eq.${encodeURIComponent(projectId)}&select=share_slug&limit=1`,
+): Promise<{ id: string | null; share_slug: string | null }> {
+  const rows = await fetch(
+    `${SUPABASE_URL}/rest/v1/worlds?project_id=eq.${encodeURIComponent(projectId)}&select=id,share_slug&limit=1`,
     { headers: { ...authHeaders, "Content-Type": "application/json" } },
   )
     .then((response) => response.json())
     .catch(() => []);
-  const held = (Array.isArray(existing) ? existing[0] : undefined)?.share_slug;
-  if (typeof held === "string" && held.length >= 8) return held;
-  return crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+  const row = Array.isArray(rows) ? rows[0] : undefined;
+  return { id: row?.id ?? null, share_slug: row?.share_slug ?? null };
 }
 
 async function storeObject(
@@ -111,27 +110,38 @@ export async function deliverWorld(
     await storeObject(authHeaders, `${projectId}/world/collision.json`, collision, "application/json");
   }
 
-  const slug = await shareSlug(projectId, authHeaders);
+  const held = await existingWorld(projectId, authHeaders);
+  const slug =
+    held.share_slug && held.share_slug.length >= 8
+      ? held.share_slug
+      : crypto.randomUUID().replace(/-/g, "").slice(0, 16);
   const shareUrl = `${siteBase}/share/${slug}`;
   const embedUrl = `${siteBase}/embed/${slug}`;
 
-  const worldResponse = await fetch(`${SUPABASE_URL}/rest/v1/worlds`, {
-    method: "POST",
-    headers: { ...jsonHeaders, Prefer: "return=minimal,resolution=merge-duplicates" },
-    body: JSON.stringify([
-      {
-        project_id: projectId,
-        status: "ready",
-        glb_path: glbPath,
-        preview_path: null,
-        share_slug: slug,
-        world_url: shareUrl,
-        embed_url: embedUrl,
-        source_available: true,
-        updated_at: new Date().toISOString(),
-      },
-    ]),
-  });
+  const worldValues = {
+    project_id: projectId,
+    status: "ready",
+    glb_path: glbPath,
+    preview_path: null,
+    share_slug: slug,
+    world_url: shareUrl,
+    embed_url: embedUrl,
+    source_available: true,
+    updated_at: new Date().toISOString(),
+  };
+  // worlds.project_id is unique, so a second delivery of the same project has to
+  // update the existing row rather than insert a duplicate.
+  const worldResponse = held.id
+    ? await fetch(`${SUPABASE_URL}/rest/v1/worlds?id=eq.${encodeURIComponent(held.id)}`, {
+        method: "PATCH",
+        headers: { ...jsonHeaders, Prefer: "return=minimal" },
+        body: JSON.stringify(worldValues),
+      })
+    : await fetch(`${SUPABASE_URL}/rest/v1/worlds`, {
+        method: "POST",
+        headers: { ...jsonHeaders, Prefer: "return=minimal" },
+        body: JSON.stringify([worldValues]),
+      });
   if (!worldResponse.ok) {
     return {
       ...none,
