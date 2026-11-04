@@ -336,16 +336,23 @@ html.auth-open body {
   background-color: #ecece2;
 }
 
-/* Faint horizontal datum lines with the hero's paper grain, for surfaces that
+/* Faint vertical datum lines with the hero's paper grain, for surfaces that
    sit behind content rather than being content themselves. */
 body.portal-shell,
 .rule-lines {
   --rule-line-color: rgba(47, 52, 35, 0.055);
   background-image:
     var(--paper-noise),
-    linear-gradient(to bottom, var(--rule-line-color) 1px, transparent 1px);
-  background-size: 200px 200px, 100% calc(100vh / 7);
+    linear-gradient(to right, var(--rule-line-color) 1px, transparent 1px);
+  background-size: 200px 200px, calc(100% / 8) 100%;
   background-attachment: fixed;
+}
+
+@media (min-width: 1024px) {
+  body.portal-shell,
+  .rule-lines {
+    background-size: 200px 200px, calc(100% / 10) 100%;
+  }
 }
 
 .rule-lines--on-dark {
