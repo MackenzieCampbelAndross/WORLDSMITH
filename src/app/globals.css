@@ -338,7 +338,6 @@ html.auth-open body {
 
 /* Faint vertical datum lines with the hero's paper grain, for surfaces that
    sit behind content rather than being content themselves. */
-body.portal-shell,
 .rule-lines {
   --rule-line-color: rgba(31, 94, 68, 0.06);
   background-image:
@@ -349,7 +348,6 @@ body.portal-shell,
 }
 
 @media (min-width: 1024px) {
-  body.portal-shell,
   .rule-lines {
     background-size: 200px 200px, calc(100% / 10) 100%;
   }
@@ -360,7 +358,13 @@ body.portal-shell,
 }
 
 body.portal-shell {
-  background-color: #e8e2d5;
+  background-color: #f7f7f7 !important;
+  background-image: none !important;
+}
+
+html:has(body.portal-shell) {
+  background-color: #f7f7f7 !important;
+  background-image: none !important;
 }
 
 /* Keep the black auth inputs black through browser autofill. */

@@ -173,7 +173,7 @@ export const FileLibrary = ({
 
   return (
     <div>
-      <div className="border border-dashed border-[#cfc8b8] bg-[#fbf9f3] px-5 py-5">
+      <div className="rounded-[12px] border border-dashed border-black/15 bg-[#f7f7f7] px-5 py-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-body text-[12.5px] text-[#3f3b33]">Upload project files</p>
@@ -185,7 +185,7 @@ export const FileLibrary = ({
             <select
               value={uploadCategory}
               onChange={(event) => setUploadCategory(event.target.value as FileCategory)}
-              className="h-8 border border-[#d2cab8] bg-[#e8e2d5] px-2 font-body text-[10.5px] text-[#514c42] outline-none"
+              className="h-8 rounded-[6px] border border-black/[0.1] bg-white px-2 font-body text-[10.5px] text-[#171713] outline-none"
             >
               {categories.map((option) => (
                 <option key={option} value={option}>
@@ -195,7 +195,7 @@ export const FileLibrary = ({
             </select>
             <label
               htmlFor={inputId}
-              className="cursor-pointer border border-[#1f5e44] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.14em] text-[#1f5e44] transition-colors hover:bg-[#1f5e44] hover:text-[#e8e2d5]"
+              className="cursor-pointer rounded-[6px] border border-[#1f5e44] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.14em] text-[#1f5e44] transition-colors hover:bg-[#1f5e44] hover:text-white"
             >
               Browse
             </label>
@@ -213,15 +213,15 @@ export const FileLibrary = ({
       </div>
 
       {uploadError && (
-        <p role="alert" className="mt-3 font-body text-[11.5px] text-[#8a5a2f]">{uploadError}</p>
+        <p role="alert" className="mt-3 font-body text-[11.5px] text-red-600">{uploadError}</p>
       )}
 
       {queue.length > 0 && (
         <div className="mt-3 space-y-2">
           {queue.map((item) => (
-            <div key={item.key} className="flex items-center justify-between border border-[#dbd4c5] px-4 py-2.5">
-              <span className="truncate font-body text-[11.5px] text-[#514c42]">{item.name}</span>
-              <span className={`font-body text-[10px] ${item.status === "error" ? "text-[#8a5a2f]" : item.status === "done" ? "text-[#1f5e44]" : "text-[#8a8374]"}`}>
+            <div key={item.key} className="flex items-center justify-between rounded-[8px] border border-black/[0.08] bg-white px-4 py-2.5">
+              <span className="truncate font-body text-[11.5px] text-[#171713]">{item.name}</span>
+              <span className={`font-body text-[10px] ${item.status === "error" ? "text-red-600" : item.status === "done" ? "text-[#1f5e44]" : "text-neutral-500"}`}>
                 {item.message ?? "Uploading…"}
               </span>
             </div>
@@ -230,30 +230,30 @@ export const FileLibrary = ({
       )}
 
       {error ? (
-        <div className="mt-6 border border-[#dbd4c5] px-5 py-6">
-          <p className="font-body text-[12px] text-[#8a5a2f]">We couldn&apos;t load these files.</p>
+        <div className="mt-6 rounded-[16px] border border-black/[0.08] bg-white px-5 py-6 shadow-sm">
+          <p className="font-body text-[12px] text-red-600">We couldn&apos;t load these files.</p>
           <button type="button" onClick={() => void load()} className="mt-3 font-body text-[10px] uppercase tracking-[0.12em] text-[#1f5e44]">
             Try again
           </button>
         </div>
       ) : files.length === 0 ? (
-        <div className="mt-6 border border-[#dbd4c5] px-5 py-8">
+        <div className="mt-6 rounded-[16px] border border-black/[0.08] bg-white px-5 py-8 shadow-sm">
           <p className="font-accent text-[22px] text-[#171713]">{emptyTitle}</p>
-          <p className="mt-2 font-body text-[12px] text-[#716b5d]">{emptyBody}</p>
+          <p className="mt-2 font-body text-[12px] text-neutral-600">{emptyBody}</p>
         </div>
       ) : (
         <>
-          <div className="mt-6 flex flex-wrap items-center gap-3 border-y border-[#dbd4c5] py-2.5">
+          <div className="mt-6 flex flex-wrap items-center gap-3 border-y border-black/[0.06] py-2.5">
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search files…"
-              className="h-8 min-w-[180px] flex-1 border border-[#ddd7c9] bg-transparent px-3 font-body text-[11px] outline-none placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+              className="h-8 min-w-[180px] flex-1 rounded-[6px] border border-black/[0.1] bg-white px-3 font-body text-[11px] outline-none placeholder:text-neutral-400 focus:border-[#1f5e44]"
             />
             <select
               value={categoryFilter}
               onChange={(event) => setCategoryFilter(event.target.value as "ALL" | FileCategory)}
-              className="h-8 border border-[#ddd7c9] bg-[#e8e2d5] px-2 font-body text-[10.5px] text-[#514c42] outline-none"
+              className="h-8 rounded-[6px] border border-black/[0.1] bg-white px-2 font-body text-[10.5px] text-[#171713] outline-none"
             >
               <option value="ALL">All categories</option>
               {categories.map((option) => (
@@ -262,13 +262,13 @@ export const FileLibrary = ({
                 </option>
               ))}
             </select>
-            <span className="font-body text-[10px] text-[#8a8374]">{visible.length} files</span>
+            <span className="font-body text-[10px] text-neutral-500">{visible.length} files</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] border-collapse text-left">
               <thead>
-                <tr className="border-b border-[#dbd4c5]">
+                <tr className="border-b border-black/[0.06]">
                   {[
                     "File",
                     "Category",
@@ -277,7 +277,7 @@ export const FileLibrary = ({
                     "Uploaded",
                     "",
                   ].map((heading) => (
-                    <th key={heading} className="py-2.5 pr-5 font-body text-[9px] uppercase tracking-[0.14em] text-[#8a8374] last:pr-0">
+                    <th key={heading} className="py-2.5 pr-5 font-body text-[9px] uppercase tracking-[0.14em] text-neutral-500 last:pr-0">
                       {heading}
                     </th>
                   ))}
@@ -285,7 +285,7 @@ export const FileLibrary = ({
               </thead>
               <tbody>
                 {visible.map((file) => (
-                  <tr key={file.id} className="border-b border-[#e3ddce]">
+                  <tr key={file.id} className="border-b border-black/[0.04]">
                     <td className="py-3 pr-5">
                       <span className="block max-w-[260px] truncate font-body text-[11.5px] text-[#3f3b33]">
                         {file.name}

@@ -8,14 +8,14 @@ import { STATUS_LABELS, type Project, type ProjectStatus } from "@/lib/portal";
 import { SUBMISSION_STAGES, submissionStageIndex } from "@/lib/productionStatus";
 
 const STATUS_STYLES: Record<ProjectStatus, string> = {
-  DRAFT: "bg-[#efede4] text-[#6d7168]",
-  SUBMITTED: "bg-[#e9efe6] text-[#4b6a52]",
-  REVIEWING: "bg-[#f4ecd0] text-[#8a6a2b]",
-  ASSETS_RECEIVED: "bg-[#e4efe8] text-[#3d6b4b]",
-  PROCESSING: "bg-[#e4ecf1] text-[#456179]",
-  INTERNAL_REVIEW: "bg-[#ece8f2] text-[#655780]",
-  CLIENT_REVIEW: "bg-[#dfedd9] text-[#3b6a49]",
-  COMPLETED: "bg-[#dfedd9] text-[#3b6a49]",
+  DRAFT: "bg-black/[0.05] text-[#555d56]",
+  SUBMITTED: "bg-[#eef5f1] text-[#1f5e44]",
+  REVIEWING: "bg-[#fef9eb] text-[#8a681b]",
+  ASSETS_RECEIVED: "bg-[#e8f4ed] text-[#1b5e43]",
+  PROCESSING: "bg-[#ebf3f7] text-[#2c5f78]",
+  INTERNAL_REVIEW: "bg-[#f3eff8] text-[#5c4a75]",
+  CLIENT_REVIEW: "bg-[#e3f4ea] text-[#1b6b41]",
+  COMPLETED: "bg-[#e3f4ea] text-[#1b6b41]",
 };
 
 const MoreIcon = () => (
@@ -45,11 +45,11 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
     <div className="min-h-0 overflow-x-auto">
       <table className="w-full min-w-[720px] border-collapse text-left">
         <thead>
-          <tr className="border-b border-[#ebe7dc]">
+          <tr className="border-b border-black/[0.06]">
             {["Project", "Type", "Stage", "Progress", "Updated", ""].map((heading) => (
               <th
                 key={heading}
-                className="whitespace-nowrap py-2.5 pr-4 font-body text-[8.5px] font-semibold uppercase tracking-[0.13em] text-[#93988f] last:pr-1"
+                className="whitespace-nowrap py-2.5 pr-4 font-body text-[8.5px] font-semibold uppercase tracking-[0.14em] text-[#868d83] last:pr-1"
               >
                 {heading}
               </th>
@@ -68,28 +68,28 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
                   if (event.key === "Enter") router.push(href);
                 }}
                 tabIndex={0}
-                className="cursor-pointer border-b border-[#f0ede4] transition-colors last:border-b-0 hover:bg-[#faf7ef] focus-visible:bg-[#faf7ef] focus-visible:outline-none"
+                className="cursor-pointer border-b border-black/[0.04] transition-colors last:border-b-0 hover:bg-[#f9faf9] focus-visible:bg-[#f9faf9] focus-visible:outline-none"
               >
                 <td className="py-2.5 pr-4">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[7px] bg-[#e6e3d7] font-body text-[12px] font-semibold text-[#2f6b4c]">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#eef5f1] font-body text-[12px] font-bold text-[#1f5e44]">
                       {project.name.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="min-w-0">
                       <Link
                         href={href}
                         onClick={(event) => event.stopPropagation()}
-                        className="block truncate font-body text-[11.5px] font-semibold text-[#1c2620] hover:text-[#2c5b45]"
+                        className="block truncate font-body text-[12px] font-semibold text-[#17201b] hover:text-[#1f5e44]"
                       >
                         {project.name}
                       </Link>
-                      <p className="mt-0.5 truncate font-body text-[9.5px] text-[#8d938b]">
+                      <p className="mt-0.5 truncate font-body text-[10px] text-[#868d83]">
                         {project.developer || project.location || "—"}
                       </p>
                     </div>
                   </div>
                 </td>
-                <td className="whitespace-nowrap py-2.5 pr-4 font-body text-[10.5px] text-[#4f5a52]">
+                <td className="whitespace-nowrap py-2.5 pr-4 font-body text-[11px] text-[#48524a]">
                   {[project.type, project.location].filter(Boolean).join(" · ") || "—"}
                 </td>
                 <td className="whitespace-nowrap py-2.5 pr-4">
@@ -97,30 +97,30 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
                 </td>
                 <td className="py-2.5 pr-4">
                   <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-[#e9ece4]">
+                    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-black/[0.06]">
                       <div
-                        className="h-full rounded-full bg-[#204936]"
+                        className="h-full rounded-full bg-[#1f5e44]"
                         style={{ width: `${Math.max(progress, 2)}%` }}
                       />
                     </div>
-                    <span className="font-body text-[10px] text-[#5d675f]">{progress}%</span>
+                    <span className="font-body text-[10.5px] font-medium text-[#5d675f]">{progress}%</span>
                   </div>
                 </td>
-                <td className="whitespace-nowrap py-2.5 pr-4 font-body text-[10.5px] text-[#5d675f]">
+                <td className="whitespace-nowrap py-2.5 pr-4 font-body text-[10.5px] text-[#868d83]">
                   {project.updatedAt ? formatRelative(project.updatedAt) : "—"}
                 </td>
                 <td className="py-2.5 pr-1 text-right">
                   <details className="relative" onClick={(event) => event.stopPropagation()}>
                     <summary
                       aria-label={`Open menu for ${project.name}`}
-                      className="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-full text-[#8d938b] transition-colors hover:bg-[#efede4] hover:text-[#3f4a42] [&::-webkit-details-marker]:hidden"
+                      className="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-full text-[#868d83] transition-colors hover:bg-black/[0.05] hover:text-[#17201b] [&::-webkit-details-marker]:hidden"
                     >
                       <MoreIcon />
                     </summary>
-                    <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-[10px] border border-[#ded7c9] bg-white py-1 shadow-[0_18px_40px_-24px_rgba(20,35,28,0.4)]">
+                    <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-[12px] border border-black/[0.08] bg-white py-1 shadow-[0_16px_36px_-16px_rgba(0,0,0,0.15)]">
                       <Link
                         href={href}
-                        className="block px-3 py-2 font-body text-[11px] text-[#3f4a42] hover:bg-[#f6f3ea]"
+                        className="block px-3 py-2 font-body text-[11px] text-[#333d36] hover:bg-[#f7f9f7]"
                       >
                         Open project
                       </Link>
@@ -129,13 +129,13 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
                         onClick={() => {
                           void navigator.clipboard?.writeText(`${window.location.origin}${href}`);
                         }}
-                        className="block w-full px-3 py-2 text-left font-body text-[11px] text-[#3f4a42] hover:bg-[#f6f3ea]"
+                        className="block w-full px-3 py-2 text-left font-body text-[11px] text-[#333d36] hover:bg-[#f7f9f7]"
                       >
                         Copy link
                       </button>
                       <Link
                         href={`${href}/source`}
-                        className="block px-3 py-2 font-body text-[11px] text-[#3f4a42] hover:bg-[#f6f3ea]"
+                        className="block px-3 py-2 font-body text-[11px] text-[#333d36] hover:bg-[#f7f9f7]"
                       >
                         Source files
                       </Link>

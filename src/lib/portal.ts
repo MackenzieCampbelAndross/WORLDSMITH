@@ -115,9 +115,105 @@ export interface UserProfile {
   phone: string;
   email: string;
   companyId: string | null;
+  avatarUrl?: string;
+  title?: string;
   notificationPrefs: NotificationPrefs;
   createdAt: Date | null;
 }
+
+export interface PersonalInfo {
+  avatarUrl: string;
+  firstName: string;
+  lastName: string;
+  title: string;
+  email: string;
+  phone: string;
+  linkedinUrl: string;
+}
+
+export interface CompanyInfo {
+  name: string;
+  logoUrl: string;
+  website: string;
+  businessType: string;
+  yearEstablished: string;
+  companySize: string;
+  description: string;
+}
+
+export interface BusinessAddress {
+  country: string;
+  state: string;
+  city: string;
+  officeAddress: string;
+  postalCode: string;
+}
+
+export interface BusinessContacts {
+  primaryContactName: string;
+  primaryContactEmail: string;
+  primaryContactPhone: string;
+  billingEmail: string;
+  alternateContact: string;
+}
+
+export interface BrandIdentity {
+  brandLogoUrl: string;
+  primaryColor: string;
+  secondaryColor: string;
+  brandGuidelinesUrl: string;
+  brandGuidelinesName: string;
+  preferredBrandingOption: string;
+}
+
+export interface AdditionalInfo {
+  discoverySource: string;
+  primaryReason: string;
+  notes: string;
+}
+
+export interface FullClientProfile {
+  personal: PersonalInfo;
+  company: CompanyInfo;
+  address: BusinessAddress;
+  contacts: BusinessContacts;
+  brand: BrandIdentity;
+  additional: AdditionalInfo;
+}
+
+export const BUSINESS_TYPES = [
+  "Real Estate Developer",
+  "Real Estate Agency",
+  "Architecture Firm",
+  "Construction Company",
+  "Property Consultant",
+  "Other",
+] as const;
+
+export const COMPANY_SIZES = [
+  "1 to 10 employees",
+  "11 to 50 employees",
+  "51 to 200 employees",
+  "201 to 500 employees",
+  "500+ employees",
+] as const;
+
+export const BRANDING_OPTIONS = [
+  "Standard CreSTION",
+  "Co-branded",
+  "Custom Client Identity",
+  "White-label",
+] as const;
+
+export const DISCOVERY_SOURCES = [
+  "Architectural Press",
+  "Industry Referral",
+  "Search Engine / Web",
+  "LinkedIn / Social Media",
+  "Exhibition / Summit",
+  "Direct Outreach",
+  "Other",
+] as const;
 
 export interface Company {
   id: string;
@@ -355,13 +451,22 @@ const fail = (error: { message?: string } | null): never => {
 };
 
 export async function fetchProfile(uid: string): Promise<UserProfile | null> {
-  const { data, error } = await getSupabaseClient()
-    .from("profiles")
-    .select("*")
-    .eq("id", uid)
-    .maybeSingle();
+  const supabase = getSupabaseClient();
+  const [{ data: profileData, error }, { data: companyData }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+    supabase.from("companies").select("details").eq("owner_id", uid).maybeSingle(),
+  ]);
   if (error) fail(error);
-  return data ? mapProfile(data) : null;
+  if (!profileData) return null;
+  const mapped = mapProfile(profileData);
+  if (companyData?.details && typeof companyData.details === "string") {
+    try {
+      const details = JSON.parse(companyData.details);
+      if (details.personal?.avatarUrl) mapped.avatarUrl = String(details.personal.avatarUrl);
+      if (details.personal?.title) mapped.title = String(details.personal.title);
+    } catch {}
+  }
+  return mapped;
 }
 
 export async function ensureProfile(
@@ -458,6 +563,205 @@ export async function saveCompany(
     details: String(data.details ?? ""),
     createdAt: toDate(data.created_at),
   };
+}
+
+export const DEFAULT_CLIENT_PROFILE: FullClientProfile = {
+  personal: {
+    avatarUrl: "",
+    firstName: "",
+    lastName: "",
+    title: "",
+    email: "",
+    phone: "",
+    linkedinUrl: "",
+  },
+  company: {
+    name: "",
+    logoUrl: "",
+    website: "",
+    businessType: "Real Estate Developer",
+    yearEstablished: "",
+    companySize: "11 to 50 employees",
+    description: "",
+  },
+  address: {
+    country: "",
+    state: "",
+    city: "",
+    officeAddress: "",
+    postalCode: "",
+  },
+  contacts: {
+    primaryContactName: "",
+    primaryContactEmail: "",
+    primaryContactPhone: "",
+    billingEmail: "",
+    alternateContact: "",
+  },
+  brand: {
+    brandLogoUrl: "",
+    primaryColor: "#1f5e44",
+    secondaryColor: "#17201b",
+    brandGuidelinesUrl: "",
+    brandGuidelinesName: "",
+    preferredBrandingOption: "Standard CreSTION",
+  },
+  additional: {
+    discoverySource: "",
+    primaryReason: "",
+    notes: "",
+  },
+};
+
+export async function fetchFullClientProfile(uid: string): Promise<FullClientProfile> {
+  const supabase = getSupabaseClient();
+  const [{ data: profileRow }, { data: companyRow }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+    supabase.from("companies").select("*").eq("owner_id", uid).maybeSingle(),
+  ]);
+
+  let parsedDetails: Record<string, unknown> = {};
+  if (companyRow?.details && typeof companyRow.details === "string") {
+    try {
+      parsedDetails = JSON.parse(companyRow.details);
+    } catch {
+      parsedDetails = { rawDetails: companyRow.details };
+    }
+  }
+
+  const p = (parsedDetails.personal as Record<string, unknown>) || {};
+  const c = (parsedDetails.company as Record<string, unknown>) || {};
+  const a = (parsedDetails.address as Record<string, unknown>) || {};
+  const ct = (parsedDetails.contacts as Record<string, unknown>) || {};
+  const b = (parsedDetails.brand as Record<string, unknown>) || {};
+  const ad = (parsedDetails.additional as Record<string, unknown>) || {};
+
+  const firstName = String(profileRow?.first_name ?? p.firstName ?? "");
+  const lastName = String(profileRow?.last_name ?? p.lastName ?? "");
+  const email = String(profileRow?.email ?? "");
+  const phone = String(profileRow?.phone ?? p.phone ?? "");
+  const companyName = String(companyRow?.name ?? profileRow?.company_name ?? c.name ?? "");
+
+  return {
+    personal: {
+      avatarUrl: String(p.avatarUrl ?? (profileRow as Row)?.avatar_url ?? ""),
+      firstName,
+      lastName,
+      title: String(p.title ?? (profileRow as Row)?.title ?? ""),
+      email,
+      phone,
+      linkedinUrl: String(p.linkedinUrl ?? ""),
+    },
+    company: {
+      name: companyName,
+      logoUrl: String(c.logoUrl ?? ""),
+      website: String(companyRow?.website ?? c.website ?? ""),
+      businessType: String(c.businessType ?? "Real Estate Developer"),
+      yearEstablished: String(c.yearEstablished ?? ""),
+      companySize: String(c.companySize ?? "11 to 50 employees"),
+      description: String(c.description ?? (typeof parsedDetails.rawDetails === "string" ? parsedDetails.rawDetails : "")),
+    },
+    address: {
+      country: String(a.country ?? ""),
+      state: String(a.state ?? ""),
+      city: String(a.city ?? ""),
+      officeAddress: String(a.officeAddress ?? ""),
+      postalCode: String(a.postalCode ?? ""),
+    },
+    contacts: {
+      primaryContactName: String(ct.primaryContactName ?? [firstName, lastName].filter(Boolean).join(" ")),
+      primaryContactEmail: String(ct.primaryContactEmail ?? email),
+      primaryContactPhone: String(ct.primaryContactPhone ?? phone),
+      billingEmail: String(ct.billingEmail ?? ""),
+      alternateContact: String(ct.alternateContact ?? ""),
+    },
+    brand: {
+      brandLogoUrl: String(b.brandLogoUrl ?? c.logoUrl ?? ""),
+      primaryColor: String(b.primaryColor || "#1f5e44"),
+      secondaryColor: String(b.secondaryColor || "#17201b"),
+      brandGuidelinesUrl: String(b.brandGuidelinesUrl ?? ""),
+      brandGuidelinesName: String(b.brandGuidelinesName ?? ""),
+      preferredBrandingOption: String(b.preferredBrandingOption || "Standard CreSTION"),
+    },
+    additional: {
+      discoverySource: String(ad.discoverySource ?? ""),
+      primaryReason: String(ad.primaryReason ?? ""),
+      notes: String(ad.notes ?? ""),
+    },
+  };
+}
+
+export async function saveFullClientProfile(
+  uid: string,
+  full: FullClientProfile,
+): Promise<FullClientProfile> {
+  const supabase = getSupabaseClient();
+
+  const detailsPayload = JSON.stringify({
+    personal: {
+      avatarUrl: full.personal.avatarUrl,
+      title: full.personal.title,
+      linkedinUrl: full.personal.linkedinUrl,
+    },
+    company: {
+      logoUrl: full.company.logoUrl,
+      businessType: full.company.businessType,
+      yearEstablished: full.company.yearEstablished,
+      companySize: full.company.companySize,
+      description: full.company.description,
+    },
+    address: full.address,
+    contacts: full.contacts,
+    brand: full.brand,
+    additional: full.additional,
+  });
+
+  const { data: companyData, error: companyError } = await supabase
+    .from("companies")
+    .upsert(
+      {
+        owner_id: uid,
+        name: full.company.name,
+        website: full.company.website,
+        details: detailsPayload,
+      },
+      { onConflict: "owner_id" },
+    )
+    .select("id")
+    .single();
+
+  if (companyError) fail(companyError);
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({
+      first_name: full.personal.firstName,
+      last_name: full.personal.lastName,
+      phone: full.personal.phone,
+      company_name: full.company.name,
+      company_id: companyData?.id,
+    })
+    .eq("id", uid);
+
+  if (profileError) fail(profileError);
+
+  return fetchFullClientProfile(uid);
+}
+
+export async function saveClientProfileSection<K extends keyof FullClientProfile>(
+  uid: string,
+  sectionKey: K,
+  sectionData: FullClientProfile[K],
+): Promise<FullClientProfile> {
+  const current = await fetchFullClientProfile(uid);
+  const updated: FullClientProfile = {
+    ...current,
+    [sectionKey]: {
+      ...current[sectionKey],
+      ...sectionData,
+    },
+  };
+  return saveFullClientProfile(uid, updated);
 }
 
 export async function fetchProjects(uid: string): Promise<Project[]> {

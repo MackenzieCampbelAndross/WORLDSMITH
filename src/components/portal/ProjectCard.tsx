@@ -27,12 +27,12 @@ export const ProjectCard = ({
   const delivered = isDeliveredStatus(project.status);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] transition-colors duration-300 hover:border-[#c8c0ae]">
+    <article className="group relative flex flex-col overflow-hidden rounded-[16px] border border-black/[0.08] bg-white shadow-sm transition-all duration-300 hover:border-black/20 hover:shadow-md">
       <Link
         href={openHref}
         aria-hidden="true"
         tabIndex={-1}
-        className="block h-[168px] overflow-hidden border-b border-[#e3ddce] bg-[#e8e2d5]"
+        className="block h-[168px] overflow-hidden border-b border-black/[0.06] bg-neutral-100"
       >
         {coverUrl ? (
           // Signed, short-lived storage URL.
@@ -47,7 +47,7 @@ export const ProjectCard = ({
             <svg viewBox="0 0 400 200" className="h-full w-full" fill="none" aria-hidden="true">
               <path
                 d="M40 160h320M80 160V95l45-28 45 28v65M170 160V72l60-34 60 34v88M230 160v-46h52M80 118h90M170 92h120"
-                stroke="#e8e2d5"
+                stroke="#ffffff"
                 strokeWidth="0.9"
                 opacity="0.5"
               />
@@ -61,12 +61,12 @@ export const ProjectCard = ({
         <Link href={openHref} className="font-accent text-[24px] leading-none text-[#171713] transition-colors hover:text-[#1f5e44]">
           {project.name}
         </Link>
-        <p className="mt-2 font-body text-[11.5px] text-[#716b5d]">
+        <p className="mt-2 font-body text-[11.5px] text-neutral-500">
           {[project.type, project.location].filter(Boolean).join(" · ") || "Project"}
         </p>
 
         <div className="mt-5 flex items-end justify-between gap-3">
-          <span className="inline-flex items-center gap-2 font-body text-[11px] text-[#3f3b33]">
+          <span className="inline-flex items-center gap-2 font-body text-[11px] text-neutral-800">
             <span className={`h-1.5 w-1.5 rounded-full ${statusDot[project.status]}`} />
             {STATUS_LABELS[project.status]}
           </span>
@@ -74,7 +74,7 @@ export const ProjectCard = ({
           <details className="relative">
             <summary
               aria-label={`Actions for ${project.name}`}
-              className="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-full text-[#8a8374] transition-colors hover:bg-[#e9e4d8] hover:text-[#171713] [&::-webkit-details-marker]:hidden"
+              className="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-[#171713] [&::-webkit-details-marker]:hidden"
             >
               <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
                 <circle cx="3" cy="8" r="1" fill="currentColor" />
@@ -82,11 +82,11 @@ export const ProjectCard = ({
                 <circle cx="13" cy="8" r="1" fill="currentColor" />
               </svg>
             </summary>
-            <div className="absolute bottom-full right-0 mb-1 w-40 rounded-[8px] border border-[#dbd4c5] bg-[#f3efe4] py-1 shadow-[0_10px_24px_-16px_rgba(0,0,0,0.35)]">
-              <Link href={openHref} className="block px-3 py-2 font-body text-[11px] text-[#3f3b33] hover:bg-[#efe9dd]">
+            <div className="absolute bottom-full right-0 mb-1 w-40 rounded-[12px] border border-black/[0.08] bg-white py-1 shadow-[0_10px_24px_-16px_rgba(0,0,0,0.2)]">
+              <Link href={openHref} className="block px-3 py-2 font-body text-[11px] text-neutral-800 hover:bg-neutral-50">
                 {project.status === "DRAFT" ? "Continue setup" : "Open project"}
               </Link>
-              <Link href={`/projects/${project.id}/activity`} className="block px-3 py-2 font-body text-[11px] text-[#3f3b33] hover:bg-[#efe9dd]">
+              <Link href={`/projects/${project.id}/activity`} className="block px-3 py-2 font-body text-[11px] text-neutral-800 hover:bg-neutral-50">
                 Activity
               </Link>
             </div>
@@ -97,13 +97,13 @@ export const ProjectCard = ({
           <div className="mt-4 flex gap-2">
             <Link
               href={`/projects/${project.id}/world`}
-              className="inline-flex flex-1 items-center justify-center rounded-[6px] bg-[#1f5e44] px-3 py-2 font-body text-[10.5px] font-medium text-[#e8e2d5] transition-colors hover:bg-[#174d37]"
+              className="inline-flex flex-1 items-center justify-center rounded-[8px] bg-[#1f5e44] px-3 py-2 font-body text-[10.5px] font-medium text-white transition-colors hover:bg-[#174d37]"
             >
               Enter World
             </Link>
             <Link
               href={`/projects/${project.id}/presentation`}
-              className="inline-flex items-center justify-center rounded-[6px] border border-[#d2cab8] px-3 py-2 font-body text-[10.5px] text-[#3f3b33] transition-colors hover:border-[#1f5e44]"
+              className="inline-flex items-center justify-center rounded-[8px] border border-black/[0.1] px-3 py-2 font-body text-[10.5px] text-neutral-800 transition-colors hover:border-[#1f5e44]"
             >
               Share
             </Link>

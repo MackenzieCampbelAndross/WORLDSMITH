@@ -39,7 +39,7 @@ export function SharedWorld({ slug, chrome }: { slug: string; chrome: boolean })
   if (error) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-[#1f5e44] px-6">
-        <div className="max-w-[420px] rounded-[12px] border border-[#dbd4c5]/25 bg-[#171713]/70 px-6 py-7 text-center">
+        <div className="max-w-[420px] rounded-[12px] border border-white/10 bg-[#171713]/70 px-6 py-7 text-center">
           <p className="font-body text-[10px] uppercase tracking-[0.22em] text-[#a8cebc]">Crestion Labs</p>
           <p className="mt-3 font-accent text-[22px] text-[#f0f1e6]">This walkthrough isn&apos;t available</p>
           <p className="mt-2 font-body text-[12px] leading-6 text-[#f0f1e6]/60">{error}</p>

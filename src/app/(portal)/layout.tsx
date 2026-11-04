@@ -7,8 +7,7 @@ import { PortalShell } from "@/components/portal/PortalShell";
 import { getSupabaseClient } from "@/lib/supabase";
 
 const PortalFallback = () => (
-  <div className="min-h-[100svh] bg-[#e8e2d5]" aria-busy="true">
-    <div className="fixed inset-y-0 left-0 hidden w-[272px] bg-[#1b4a36] lg:block" />
+  <div className="min-h-[100svh] bg-[#f7f7f7]" aria-busy="true">
     <span className="sr-only">Loading Crestion Labs workspace</span>
   </div>
 );

@@ -66,26 +66,26 @@ export default function ProjectActivityPage() {
             void load();
             setRefreshKey((key) => key + 1);
           }}
-          className="rounded-[7px] border border-[#d2cab8] px-3 py-2 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
+          className="rounded-[7px] border border-black/[0.08] bg-white px-3 py-2 font-body text-[9px] uppercase tracking-[0.12em] text-neutral-600 transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
         >
           Refresh
         </button>
       </div>
 
-      <div className="mt-6 rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-5 py-6">
+      <div className="mt-6 rounded-[16px] border border-black/[0.08] bg-white px-5 py-6 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">
+            <p className="font-body text-[9px] uppercase tracking-[0.18em] text-neutral-500">
               Current status
             </p>
             <div className="mt-3">
               <StatusPill status={project.status} />
             </div>
-            <p className="mt-4 max-w-[560px] font-body text-[12.5px] leading-6 text-[#3f3b33]">
+            <p className="mt-4 max-w-[560px] font-body text-[12.5px] leading-6 text-[#171713]">
               {STATUS_DESCRIPTIONS[project.status]}
             </p>
           </div>
-          <div className="text-right font-body text-[10px] text-[#8a8374]">
+          <div className="text-right font-body text-[10px] text-neutral-500">
             <p>Updated {formatRelative(project.updatedAt)}</p>
             <p className="mt-1">Created {formatDate(project.createdAt)}</p>
           </div>
@@ -94,7 +94,7 @@ export default function ProjectActivityPage() {
         {project.status === "DRAFT" && (
           <Link
             href={`/projects/new?draft=${project.id}`}
-            className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5]"
+            className="mt-5 inline-flex rounded-[8px] bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#164935]"
           >
             Continue setup
           </Link>
@@ -102,15 +102,15 @@ export default function ProjectActivityPage() {
         {project.status === "COMPLETED" && (
           <Link
             href={`/projects/${project.id}/world`}
-            className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5]"
+            className="mt-5 inline-flex rounded-[8px] bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#164935]"
           >
             Open World →
           </Link>
         )}
       </div>
 
-      <div className="mt-5 rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-5 py-5">
-        <p className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">Progress</p>
+      <div className="mt-5 rounded-[16px] border border-black/[0.08] bg-white px-5 py-5 shadow-sm">
+        <p className="font-body text-[9px] uppercase tracking-[0.18em] text-neutral-500">Progress</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {SUBMISSION_STAGES.map((label, index) => {
             const done = stageIndex >= index;
@@ -120,15 +120,15 @@ export default function ProjectActivityPage() {
                 <span
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] ${
                     done
-                      ? "border-[#1f5e44] bg-[#1f5e44] text-[#e8e2d5]"
+                      ? "border-[#1f5e44] bg-[#1f5e44] text-white"
                       : current
                         ? "border-[#1f5e44] text-[#1f5e44]"
-                        : "border-[#cfc8b8] text-transparent"
+                        : "border-neutral-300 text-transparent"
                   }`}
                 >
                   {done ? "✓" : "·"}
                 </span>
-                <span className={`font-body text-[11.5px] ${done || current ? "text-[#3f3b33]" : "text-[#8a8374]"}`}>
+                <span className={`font-body text-[11.5px] ${done || current ? "text-[#171713]" : "text-neutral-500"}`}>
                   {label}
                 </span>
               </div>
@@ -138,7 +138,7 @@ export default function ProjectActivityPage() {
       </div>
 
       <div className="mt-8">
-        <h3 className="font-body text-[9px] uppercase tracking-[0.18em] text-[#8a8374]">
+        <h3 className="font-body text-[9px] uppercase tracking-[0.18em] text-neutral-500">
           Project activity
         </h3>
         {loading ? (
@@ -154,24 +154,24 @@ export default function ProjectActivityPage() {
             />
           </div>
         ) : activity.length === 0 ? (
-          <div className="mt-4 rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-5 py-8">
+          <div className="mt-4 rounded-[16px] border border-black/[0.08] bg-white px-5 py-8 shadow-sm">
             <p className="font-accent text-[21px] leading-tight text-[#171713]">
               {project.status === "DRAFT" ? "No request has been sent yet." : "Your request is queued."}
             </p>
-            <p className="mt-2 max-w-[520px] font-body text-[11.5px] leading-5 text-[#716b5d]">
+            <p className="mt-2 max-w-[520px] font-body text-[11.5px] leading-5 text-neutral-600">
               {project.status === "DRAFT"
                 ? "Finish the brief and plans, then submit the project. Updates will appear here once the team starts."
                 : "The Crestion Labs team will post status changes here as your world moves through production."}
             </p>
           </div>
         ) : (
-          <div className="mt-4 border-t border-[#dbd4c5]">
+          <div className="mt-4 border-t border-black/[0.08]">
             {activity.map((entry) => (
-              <div key={entry.id} className="flex gap-4 border-b border-[#e3ddce] py-4">
+              <div key={entry.id} className="flex gap-4 border-b border-black/[0.05] py-4">
                 <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1f5e44]" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-body text-[12.5px] leading-5 text-[#3f3b33]">{entry.message}</p>
-                  <p className="mt-1 font-body text-[9px] uppercase tracking-[0.12em] text-[#8a8374]">
+                  <p className="font-body text-[12.5px] leading-5 text-[#171713]">{entry.message}</p>
+                  <p className="mt-1 font-body text-[9px] uppercase tracking-[0.12em] text-neutral-500">
                     {entry.eventType.replaceAll("_", " ")} · {formatDate(entry.createdAt)}
                   </p>
                 </div>

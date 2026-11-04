@@ -228,9 +228,9 @@ export default function NewProjectPage() {
         world generation. No room dimensions or material schedules required.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 rounded-[14px] border border-[#dbd4c5] bg-[#f3efe4] px-6 py-7 sm:px-8">
+      <form onSubmit={onSubmit} className="mt-8 rounded-[16px] border border-black/[0.08] bg-white px-6 py-7 shadow-sm sm:px-8">
         <div>
-          <label htmlFor="submission-name" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+          <label htmlFor="submission-name" className="font-body text-[9px] uppercase tracking-[0.16em] text-neutral-500">
             Project name
           </label>
           <input
@@ -238,7 +238,7 @@ export default function NewProjectPage() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="The Grove"
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+            className="mt-2 h-11 w-full rounded-[8px] border border-black/[0.1] bg-white px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-neutral-400 focus:border-[#1f5e44]"
           />
         </div>
 
@@ -250,7 +250,7 @@ export default function NewProjectPage() {
             id="submission-type"
             value={type}
             onChange={(event) => setType(event.target.value as (typeof PROJECT_TYPES)[number])}
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-black/[0.08] bg-white px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
           >
             {PROJECT_TYPES.map((option) => (
               <option key={option} value={option}>
@@ -262,7 +262,7 @@ export default function NewProjectPage() {
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <div>
-            <label htmlFor="submission-width" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+            <label htmlFor="submission-width" className="font-body text-[9px] uppercase tracking-[0.16em] text-neutral-500">
               Plan width (m)
             </label>
             <input
@@ -275,11 +275,11 @@ export default function NewProjectPage() {
               value={width}
               onChange={(event) => setWidth(event.target.value)}
               placeholder="12.0"
-              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+              className="mt-2 h-11 w-full rounded-[7px] border border-black/[0.08] bg-white px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-neutral-400 focus:border-[#1f5e44]"
             />
           </div>
           <div>
-            <label htmlFor="submission-length" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+            <label htmlFor="submission-length" className="font-body text-[9px] uppercase tracking-[0.16em] text-neutral-500">
               Plan length (m)
             </label>
             <input
@@ -292,24 +292,24 @@ export default function NewProjectPage() {
               value={length}
               onChange={(event) => setLength(event.target.value)}
               placeholder="9.0"
-              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
+              className="mt-2 h-11 w-full rounded-[7px] border border-black/[0.08] bg-white px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-neutral-400 focus:border-[#1f5e44]"
             />
           </div>
         </div>
-        <p className="mt-2 font-body text-[10.5px] leading-5 text-[#8a8374]">
+        <p className="mt-2 font-body text-[10.5px] leading-5 text-neutral-500">
           Measure the outer edge of the plan on both axes. With both numbers Creston builds your world
           at true scale; without them room sizes are estimated.
         </p>
 
         <div className="mt-5">
-          <label htmlFor="submission-style" className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+          <label htmlFor="submission-style" className="font-body text-[9px] uppercase tracking-[0.16em] text-neutral-500">
             Furnishing style
           </label>
           <select
             id="submission-style"
             value={style}
             onChange={(event) => setStyle(event.target.value as FurnishingStyle)}
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-black/[0.08] bg-white px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
           >
             {FURNISHING_STYLES.map((option) => (
               <option key={option} value={option}>
@@ -320,23 +320,23 @@ export default function NewProjectPage() {
         </div>
 
         <div className="mt-5">
-          <p className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">Floor plan</p>
+          <p className="font-body text-[9px] uppercase tracking-[0.16em] text-neutral-500">Floor plan</p>
           {uploaded ? (
-            <div className="mt-2 flex items-center justify-between gap-4 rounded-[7px] border border-[#d2cab8] bg-[#f7f2e7] px-3 py-3">
+            <div className="mt-2 flex items-center justify-between gap-4 rounded-[7px] border border-black/[0.08] bg-[#f7f7f7] px-3 py-3">
               <div className="min-w-0">
-                <p className="truncate font-body text-[12px] text-[#3f3b33]">{existingPlan ?? "Floor plan uploaded"}</p>
-                <p className="mt-0.5 font-body text-[10px] text-[#8a8374]">Source plan ready for Creston.</p>
+                <p className="truncate font-body text-[12px] text-[#171713]">{existingPlan ?? "Floor plan uploaded"}</p>
+                <p className="mt-0.5 font-body text-[10px] text-neutral-500">Source plan ready for Creston.</p>
               </div>
-              <span className="font-body text-[10px] text-[#2d5c3a]">Uploaded</span>
+              <span className="font-body text-[10px] text-[#1f5e44] font-medium">Uploaded</span>
             </div>
           ) : (
-            <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-[7px] border border-dashed border-[#cfc8b8] bg-[#faf6ec] px-5 py-8 text-center transition-colors hover:border-[#1f5e44]">
-              <span className="font-body text-[12px] text-[#3f3b33]">Choose the floor plan</span>
-              <span className="mt-1 font-body text-[10px] text-[#8a8374]">PNG, JPG or PDF · up to 15 MB</span>
-              <span className="mt-1 font-body text-[10px] text-[#8a8374]">
+            <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-[10px] border border-dashed border-neutral-300 bg-neutral-50 px-5 py-8 text-center transition-colors hover:border-[#1f5e44]">
+              <span className="font-body text-[12px] text-neutral-800">Choose the floor plan</span>
+              <span className="mt-1 font-body text-[10px] text-neutral-500">PNG, JPG or PDF · up to 15 MB</span>
+              <span className="mt-1 font-body text-[10px] text-neutral-500">
                 Use the line drawing of the plan, not a 3D view or a furnished render.
               </span>
-              <span className="mt-3 rounded-[6px] border border-[#d2cab8] bg-[#f3efe4] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#3f3b33]">
+              <span className="mt-3 rounded-[6px] border border-black/[0.1] bg-white px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-neutral-800">
                 Browse
               </span>
               <input
@@ -360,14 +360,14 @@ export default function NewProjectPage() {
             </label>
           )}
           {file && !uploaded && (
-            <p className="mt-2 font-body text-[10.5px] text-[#716b5d]">
+            <p className="mt-2 font-body text-[10.5px] text-neutral-600">
               {file.name} · {formatBytes(file.size)}
             </p>
           )}
         </div>
 
-        <div className="mt-6 rounded-[10px] border border-[#dbd4c5] bg-[#f3efe4] px-4 py-3.5">
-          <p className="font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]">
+        <div className="mt-6 rounded-[12px] border border-black/[0.06] bg-neutral-50 px-4 py-3.5">
+          <p className="font-body text-[9px] uppercase tracking-[0.16em] text-neutral-500">
             What Creston needs
           </p>
           <ul className="mt-2.5 space-y-1.5">
@@ -381,7 +381,7 @@ export default function NewProjectPage() {
                 />
                 <span
                   className={`font-body text-[11px] leading-5 ${
-                    item.passed ? "text-[#4d5a50]" : "text-[#a13328]"
+                    item.passed ? "text-neutral-700" : "text-[#a13328]"
                   }`}
                 >
                   <span className="font-medium">{item.label}</span>
@@ -393,7 +393,7 @@ export default function NewProjectPage() {
         </div>
 
         {error && (
-          <p role="alert" className="mt-5 rounded-[7px] bg-[#f8ece4] px-3.5 py-2.5 font-body text-[11.5px] leading-5 text-[#8a5a2f]">
+          <p role="alert" className="mt-5 rounded-[8px] bg-red-50 px-3.5 py-2.5 font-body text-[11.5px] leading-5 text-red-800 border border-red-200">
             {error}
           </p>
         )}
@@ -401,7 +401,7 @@ export default function NewProjectPage() {
         <button
           type="submit"
           disabled={busy !== null}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-[7px] bg-[#1f5e44] px-5 py-3 font-body text-[12px] font-medium text-[#e8e2d5] transition-colors hover:bg-[#174d37] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-[10px] bg-[#1f5e44] px-5 py-3 font-body text-[12px] font-medium text-white transition-colors hover:bg-[#174d37] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {busyLabel}
         </button>

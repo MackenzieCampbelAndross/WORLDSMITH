@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { saveProfile } from "@/lib/portal";
 
 const inputClass =
-  "mt-1.5 h-10 w-full border border-[#d2cab8] bg-transparent px-3 font-body text-[12.5px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]";
-const labelClass = "font-body text-[9px] uppercase tracking-[0.16em] text-[#8a8374]";
+  "mt-1.5 h-10 w-full rounded-[8px] border border-black/[0.1] bg-white px-3 font-body text-[12.5px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]";
+const labelClass = "font-body text-[9px] uppercase tracking-[0.16em] text-neutral-500";
 
 export const ProfileForm = ({
   uid,
@@ -64,7 +64,7 @@ export const ProfileForm = ({
       <button
         type="submit"
         disabled={status === "saving"}
-        className="mt-5 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5] disabled:opacity-60"
+        className="mt-5 rounded-[8px] bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-white disabled:opacity-60 transition-colors hover:bg-[#164935]"
       >
         {status === "saving" ? "Saving…" : "Save profile"}
       </button>

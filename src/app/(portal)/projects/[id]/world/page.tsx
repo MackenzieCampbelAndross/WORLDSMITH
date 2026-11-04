@@ -101,8 +101,8 @@ export default function ProjectWorldPage() {
 
   if (error) {
     return (
-      <div className="border border-[#dbd4c5] px-5 py-7">
-        <p className="font-body text-[12px] text-[#8a5a2f]">We couldn&apos;t load the world state.</p>
+      <div className="rounded-[16px] border border-black/[0.08] bg-white px-5 py-7 shadow-sm">
+        <p className="font-body text-[12px] text-red-700">We couldn&apos;t load the world state.</p>
       </div>
     );
   }
@@ -112,13 +112,13 @@ export default function ProjectWorldPage() {
     const inProduction = ["PROCESSING", "INTERNAL_REVIEW"].includes(project.status);
     return (
       <div>
-        <div className="relative overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-[#1b4a36] px-6 py-12 text-center sm:px-12">
+        <div className="relative overflow-hidden rounded-[20px] border border-white/10 bg-black px-6 py-12 text-center sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-20">
             <svg viewBox="0 0 400 200" className="h-full w-full" fill="none" aria-hidden="true">
-              <path d="M40 160h320M80 160V95l45-28 45 28v65M170 160V72l60-34 60 34v88M230 160v-46h52M80 118h90M170 92h120" stroke="#e8e2d5" strokeWidth="0.7" />
+              <path d="M40 160h320M80 160V95l45-28 45 28v65M170 160V72l60-34 60 34v88M230 160v-46h52M80 118h90M170 92h120" stroke="#ffffff" strokeWidth="0.7" />
             </svg>
           </div>
-          <p className="relative font-body text-[9.5px] uppercase tracking-[0.22em] text-[#e8e2d5]/50">
+          <p className="relative font-body text-[9.5px] uppercase tracking-[0.22em] text-white/50">
             {project.status === "DRAFT"
               ? "Awaiting submission"
               : project.status === "COMPLETED"
@@ -129,7 +129,7 @@ export default function ProjectWorldPage() {
                     ? "Request received"
                     : "World in production"}
           </p>
-          <h2 className="relative mt-4 font-display text-[28px] leading-tight text-[#fbf8ee] sm:text-[34px]">
+          <h2 className="relative mt-4 font-display text-[28px] leading-tight text-white sm:text-[34px]">
             {project.status === "DRAFT"
               ? "Your world hasn't started yet."
               : project.status === "COMPLETED"
@@ -142,21 +142,21 @@ export default function ProjectWorldPage() {
                       ? "Your world is being created."
                       : "Production update available."}
           </h2>
-          <p className="relative mx-auto mt-3 max-w-[480px] font-body text-[12.5px] leading-6 text-[#e8e2d5]/60">
+          <p className="relative mx-auto mt-3 max-w-[480px] font-body text-[12.5px] leading-6 text-white/70">
             {STATUS_DESCRIPTIONS[project.status]}
           </p>
           <div className="relative mt-6 flex justify-center">
             <StatusPill status={project.status} />
           </div>
           {stage && project.status !== "DRAFT" && (
-            <p className="relative mt-4 font-body text-[11px] text-[#e8e2d5]/45">
+            <p className="relative mt-4 font-body text-[11px] text-white/50">
               Live from production: {stage}.
             </p>
           )}
           {project.status === "DRAFT" && (
             <Link
               href={`/projects/new?draft=${project.id}`}
-              className="relative mt-8 inline-flex bg-[#e8e2d5] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-[#1b4a36]"
+              className="relative mt-8 inline-flex rounded-[8px] bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-white transition-colors hover:bg-[#164935]"
             >
               Continue setup
             </Link>
@@ -172,7 +172,7 @@ export default function ProjectWorldPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="font-accent text-[26px] leading-none text-[#171713]">3D World</h2>
-          <p className="mt-2 font-body text-[12px] text-[#716b5d]">
+          <p className="mt-2 font-body text-[12px] text-neutral-500">
             Your interactive architectural environment.
           </p>
         </div>
@@ -181,23 +181,23 @@ export default function ProjectWorldPage() {
             href={readyWorld.worldUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-[#e8e2d5] transition-colors hover:bg-[#174d37]"
+            className="inline-flex items-center gap-2 rounded-[8px] bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-white transition-colors hover:bg-[#174d37]"
           >
             Open World
             <span aria-hidden="true">↗</span>
           </a>
         ) : (
-          <span className="font-body text-[10px] text-[#8a8374]">Delivery details pending</span>
+          <span className="font-body text-[10px] text-neutral-500">Delivery details pending</span>
         )}
       </div>
 
-      <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-[#1b4a36]">
+      <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-[16px] border border-black/[0.08] bg-black">
         {readyWorld.glbPath && previews[readyWorld.glbPath] ? (
           <DeliveredWorld
             glbUrl={previews[readyWorld.glbPath]}
             collisionUrl={collisionPath ? previews[collisionPath] ?? null : null}
             onStill={project.coverPath ? undefined : handleStill}
-            className="h-full w-full rounded-[12px]"
+            className="h-full w-full rounded-[16px]"
           />
         ) : readyWorld.previewPath && previews[readyWorld.previewPath] ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -208,7 +208,7 @@ export default function ProjectWorldPage() {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <span className="font-cormorant text-[28px] uppercase tracking-[0.18em] text-[#e8e2d5]/60">
+            <span className="font-cormorant text-[28px] uppercase tracking-[0.18em] text-white/60">
               {project.name}
             </span>
           </div>
@@ -216,16 +216,16 @@ export default function ProjectWorldPage() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4]">
-          <div className="border-b border-[#dbd4c5] px-5 py-4">
+        <section className="rounded-[16px] border border-black/[0.08] bg-white shadow-sm">
+          <div className="border-b border-black/[0.06] px-5 py-4">
             <h3 className="font-accent text-[21px] leading-none text-[#171713]">Delivery</h3>
           </div>
-          <div className="divide-y divide-[#e3ddce]">
+          <div className="divide-y divide-black/[0.05]">
             {readyWorld.worldUrl && (
               <div className="flex items-center justify-between gap-4 px-5 py-3.5">
                 <div>
-                  <p className="font-body text-[11.5px] text-[#3f3b33]">Shareable link</p>
-                  <p className="mt-0.5 max-w-[360px] truncate font-body text-[10px] text-[#8a8374]">{readyWorld.worldUrl}</p>
+                  <p className="font-body text-[11.5px] text-[#171713]">Shareable link</p>
+                  <p className="mt-0.5 max-w-[360px] truncate font-body text-[10px] text-neutral-500">{readyWorld.worldUrl}</p>
                 </div>
                 <button type="button" onClick={() => void copy(readyWorld.worldUrl ?? "", "share")} className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#1f5e44]">
                   {copied === "share" ? "Copied" : "Copy"}
@@ -235,8 +235,8 @@ export default function ProjectWorldPage() {
             {readyWorld.embedUrl && (
               <div className="flex items-center justify-between gap-4 px-5 py-3.5">
                 <div>
-                  <p className="font-body text-[11.5px] text-[#3f3b33]">Website embed</p>
-                  <p className="mt-0.5 font-body text-[10px] text-[#8a8374]">Embed the world in your website.</p>
+                  <p className="font-body text-[11.5px] text-[#171713]">Website embed</p>
+                  <p className="mt-0.5 font-body text-[10px] text-neutral-500">Embed the world in your website.</p>
                 </div>
                 <button
                   type="button"
@@ -253,16 +253,16 @@ export default function ProjectWorldPage() {
               </div>
             )}
             {!readyWorld.worldUrl && !readyWorld.embedUrl && (
-              <p className="px-5 py-5 font-body text-[11.5px] text-[#8a8374]">
+              <p className="px-5 py-5 font-body text-[11.5px] text-neutral-500">
                 Delivery options will appear here when your world is published.
               </p>
             )}
           </div>
-          {copyError && <p className="px-5 pb-4 font-body text-[11px] text-[#8a5a2f]">{copyError}</p>}
+          {copyError && <p className="px-5 pb-4 font-body text-[11px] text-red-600">{copyError}</p>}
         </section>
 
-        <section className="rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4]">
-          <div className="border-b border-[#dbd4c5] px-5 py-4">
+        <section className="rounded-[16px] border border-black/[0.08] bg-white shadow-sm">
+          <div className="border-b border-black/[0.06] px-5 py-4">
             <h3 className="font-accent text-[21px] leading-none text-[#171713]">World Logs</h3>
           </div>
           <div className="px-5 py-2">
@@ -271,8 +271,8 @@ export default function ProjectWorldPage() {
               { label: "Status", value: "World ready" },
               { label: "Location", value: project.location },
             ].map((item) => (
-              <div key={item.label} className="flex items-baseline justify-between gap-4 border-b border-[#e3ddce] py-3 last:border-b-0">
-                <span className="font-body text-[9px] uppercase tracking-[0.12em] text-[#8a8374]">{item.label}</span>
+              <div key={item.label} className="flex items-baseline justify-between gap-4 border-b border-black/[0.05] py-3 last:border-b-0">
+                <span className="font-body text-[9px] uppercase tracking-[0.12em] text-neutral-500">{item.label}</span>
                 <span className="text-right font-body text-[11.5px] text-[#3f3b33]">{item.value}</span>
               </div>
             ))}

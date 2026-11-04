@@ -9,29 +9,6 @@ import { fetchProjects, type Project } from "@/lib/portal";
 import { isDeliveredStatus } from "@/lib/productionStatus";
 import { useSignedUrls } from "@/lib/use-signed-urls";
 
-type SectionKey = "CREATE" | "COMPLETED";
-
-const SECTIONS: Array<{ key: SectionKey; label: string }> = [
-  { key: "CREATE", label: "Create" },
-  { key: "COMPLETED", label: "Completed" },
-];
-
-const SectionIcon = ({ name }: { name: SectionKey }) => {
-  if (name === "CREATE") {
-    return (
-      <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-        <path d="M10 4.2v11.6M4.2 10h11.6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-      <circle cx="10" cy="10" r="6.6" stroke="currentColor" strokeWidth="1.2" />
-      <path d="m6.8 10.2 2.2 2.1 4.2-4.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-};
-
 export default function ProjectsPage() {
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -41,8 +18,15 @@ export default function ProjectsPage() {
     if (typeof window === "undefined") return "";
     return new URLSearchParams(window.location.search).get("q") ?? "";
   });
-  const [section, setSection] = useState<SectionKey>("CREATE");
   const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const onSearch = (event: Event) => {
+      setSearch((event as CustomEvent<string>).detail ?? "");
+    };
+    window.addEventListener("crestion:search", onSearch);
+    return () => window.removeEventListener("crestion:search", onSearch);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -63,185 +47,164 @@ export default function ProjectsPage() {
     };
   }, [user, refreshKey]);
 
-  const covers = useSignedUrls(projects.map((project) => project.coverPath));
+  // Extract all completed/delivered projects
+  const completedProjects = useMemo(() => {
+    return projects
+      .filter((project) => isDeliveredStatus(project.status))
+      .sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
+  }, [projects]);
 
-  const deliveredCount = useMemo(
-    () => projects.filter((project) => isDeliveredStatus(project.status)).length,
-    [projects],
-  );
-  const submittedCount = projects.length - deliveredCount;
+  const covers = useSignedUrls(completedProjects.map((project) => project.coverPath));
 
+  // Search filter across completed projects
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return projects
-      .filter((project) => {
-        if (q && !`${project.name} ${project.location} ${project.type}`.toLowerCase().includes(q)) return false;
-        return section === "COMPLETED"
-          ? isDeliveredStatus(project.status)
-          : !isDeliveredStatus(project.status);
-      })
-      .sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
-  }, [projects, search, section]);
-
-  const countFor = (key: SectionKey) => (key === "COMPLETED" ? deliveredCount : submittedCount);
-
-  const sectionNav = (variant: "sidebar" | "inline") => (
-    <div className={variant === "sidebar" ? "flex flex-col gap-1" : "flex gap-2"}>
-      {SECTIONS.map((item) => {
-        const active = section === item.key;
-        return (
-          <button
-            key={item.key}
-            type="button"
-            onClick={() => setSection(item.key)}
-            aria-current={active ? "page" : undefined}
-            className={
-              variant === "sidebar"
-                ? `flex items-center justify-between gap-2 rounded-[9px] px-2.5 py-2 font-body text-[11.5px] transition-colors ${
-                    active ? "bg-[#1b4a36] text-[#e8e2d5]" : "text-[#4d5a50] hover:bg-[#f2ece0]"
-                  }`
-                : `inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-body text-[11px] transition-colors ${
-                    active
-                      ? "border-[#1b4a36] bg-[#1b4a36] text-[#e8e2d5]"
-                      : "border-[#dbd4c5] bg-[#f3efe4] text-[#716b5d]"
-                  }`
-            }
-          >
-            <span className="flex items-center gap-2">
-              <SectionIcon name={item.key} />
-              {item.label}
-            </span>
-            <span
-              className={`font-body text-[10px] ${
-                active
-                  ? "text-[#e8e2d5]/60"
-                  : variant === "sidebar"
-                    ? "text-[#8a8374]"
-                    : "text-[#8a8374]"
-              }`}
-            >
-              {countFor(item.key)}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
+    if (!q) return completedProjects;
+    return completedProjects.filter((project) =>
+      `${project.name} ${project.location} ${project.type} ${project.developer}`
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [completedProjects, search]);
 
   return (
-    <div className="flex min-h-0 flex-1 gap-4">
-      <aside className="hidden w-[200px] shrink-0 md:block">
-        <div className="sticky top-0 rounded-[14px] border border-[#dbd4c5] bg-[#f3efe4] p-2">
-          <p className="px-2.5 pb-2 pt-1.5 font-body text-[9px] font-semibold uppercase tracking-[0.18em] text-[#8a8374]">
+    <div className="flex min-w-0 flex-1 flex-col gap-6">
+      {/* Top Header Row matching Dashboard size and alignment */}
+      <div className="flex flex-wrap items-end justify-between gap-4 pb-1">
+        <div>
+          <h1 className="font-body text-[32px] font-bold leading-[1.06] tracking-[-0.035em] text-[#17201b] sm:text-[40px] lg:text-[46px]">
             Projects
+          </h1>
+
+          <p className="mt-2 font-body text-[13px] text-neutral-600 sm:text-[14px]">
+            Explore, presentation-share, and embed all delivered 3D digital twins.
           </p>
-          {sectionNav("sidebar")}
-        </div>
-      </aside>
-
-      <section className="flex min-w-0 flex-1 flex-col">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="font-body text-[24px] font-semibold leading-none tracking-[-0.02em] text-[#171713]">
-              {section === "CREATE" ? "Create" : "Completed"}
-            </h1>
-            <p className="mt-2 font-body text-[11.5px] text-[#716b5d]">
-              {section === "CREATE"
-                ? `${submittedCount} ${submittedCount === 1 ? "project" : "projects"} in production.`
-                : `${deliveredCount} delivered ${deliveredCount === 1 ? "world" : "worlds"} ready to explore.`}
-            </p>
-          </div>
-          {section === "CREATE" && projects.length > 0 && (
-            <Link
-              href="/projects/new"
-              className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#143f2d] px-4 py-2.5 font-body text-[11px] font-medium text-[#efe9dd] transition-colors hover:bg-[#0f3626]"
-            >
-              <span aria-hidden="true" className="text-[14px] leading-none">
-                +
-              </span>
-              New project
-            </Link>
-          )}
         </div>
 
-        <div className="mt-3 md:hidden">{sectionNav("inline")}</div>
+        {/* Right side "+ New Project" Button */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/projects/new"
+            className="inline-flex shrink-0 items-center gap-2 rounded-[12px] bg-[#143f2d] px-4 py-2.5 font-body text-[12px] font-semibold text-white shadow-sm transition-all hover:bg-[#0d2f21] hover:shadow-md"
+          >
+            <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M8 3v10M3 8h10" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            New project
+          </Link>
+        </div>
+      </div>
 
-        {loading ? (
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-            {[0, 1, 2].map((item) => (
-              <LoadingBlock key={item} className="h-[286px] rounded-[12px]" />
-            ))}
-          </div>
-        ) : error ? (
-          <div className="mt-6">
-            <EmptyState
-              title="We couldn't load your projects."
-              body="The project list did not come through. Check your connection and try again."
-            />
+      {/* Search & Quick Controls Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <label className="flex h-10 w-full max-w-[340px] items-center gap-2.5 rounded-full border border-black/[0.08] bg-white px-4 text-neutral-500 shadow-2xs transition-colors focus-within:border-black/30">
+          <svg viewBox="0 0 18 18" className="h-4 w-4 shrink-0 text-neutral-400" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="4.6" stroke="currentColor" strokeWidth="1.3" />
+            <path d="m11.4 11.4 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          </svg>
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search completed projects..."
+            aria-label="Search completed projects"
+            className="min-w-0 flex-1 bg-transparent font-body text-[12px] text-[#171713] outline-none placeholder:text-neutral-400"
+          />
+          {search && (
             <button
               type="button"
-              onClick={() => {
-                setError(false);
-                setLoading(true);
-                setRefreshKey((key) => key + 1);
-              }}
-              className="mt-4 inline-flex rounded-[7px] bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8e2d5]"
+              onClick={() => setSearch("")}
+              className="text-neutral-400 hover:text-neutral-600 font-mono text-[10px]"
             >
-              Try again
+              Clear
             </button>
-          </div>
-        ) : projects.length === 0 ? (
-          <div className="mt-6">
-            <EmptyState
-              title="Your first world starts here."
-              body="Send us a floor plan. Creston handles the architectural interpretation and builds the interactive world."
-              actionLabel="Submit New Project"
-              actionHref="/projects/new"
-            />
-          </div>
-        ) : (
-          <>
-            <label className="mt-5 flex h-9 w-full max-w-[320px] items-center gap-2 rounded-full border border-[#dbd4c5] bg-[#f3efe4] px-4 text-[#8a8374] transition-colors focus-within:border-[#b9b09c]">
-              <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" aria-hidden="true">
-                <circle cx="8" cy="8" r="4.6" stroke="currentColor" strokeWidth="1.2" />
-                <path d="m11.4 11.4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search projects..."
-                aria-label="Search projects"
-                className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#171713] outline-none placeholder:text-[#a0988a]"
-              />
-            </label>
+          )}
+        </label>
 
-            {filtered.length === 0 ? (
-              <div className="mt-5 rounded-[12px] border border-[#dbd4c5] bg-[#f3efe4] px-6 py-10 text-center">
-                <p className="font-body text-[15px] font-semibold text-[#171713]">
-                  {search.trim() ? "No matching projects." : "Nothing here yet."}
-                </p>
-                <p className="mx-auto mt-2 max-w-[360px] font-body text-[11.5px] leading-5 text-[#716b5d]">
-                  {search.trim()
-                    ? "Try a different name, location or property type."
-                    : section === "COMPLETED"
-                      ? "Delivered worlds will appear here once Creston finishes processing."
-                      : "Submit a floor plan to start a new project."}
-                </p>
-              </div>
-            ) : (
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-                {filtered.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    coverUrl={project.coverPath ? covers[project.coverPath] : null}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </section>
+        <span className="font-mono text-[11px] text-neutral-400">
+          Showing {filtered.length} of {completedProjects.length} worlds
+        </span>
+      </div>
+
+      {/* Main Single Tab Content */}
+      {loading ? (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2, 3, 4, 5].map((item) => (
+            <LoadingBlock key={item} className="h-[290px] rounded-[16px]" />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="rounded-[20px] border border-black/[0.08] bg-white p-8 text-center shadow-sm">
+          <EmptyState
+            title="We couldn't load your projects."
+            body="The project list did not come through. Check your connection and try again."
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setError(false);
+              setLoading(true);
+              setRefreshKey((key) => key + 1);
+            }}
+            className="mt-4 inline-flex rounded-[10px] bg-[#143f2d] px-5 py-2.5 font-body text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#0d2f21]"
+          >
+            Try again
+          </button>
+        </div>
+      ) : completedProjects.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-[20px] border border-black/[0.08] bg-white px-6 py-16 text-center shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#eef5f1] text-[#1f5e44]">
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M12 3 2 9l10 6 10-6-10-6ZM2 15l10 6 10-6M2 9.5l10 6 10-6" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <h2 className="mt-4 font-body text-[16px] font-bold text-[#171713]">
+            No completed worlds yet
+          </h2>
+          <p className="mx-auto mt-2 max-w-[420px] font-body text-[12.5px] leading-relaxed text-neutral-600">
+            Once Creston completes 3D reconstruction and quality review for an architectural plan, your interactive twin will be cataloged here.
+          </p>
+          <div className="mt-6 flex items-center gap-3">
+            <Link
+              href="/projects/new"
+              className="inline-flex items-center gap-2 rounded-[10px] bg-[#143f2d] px-4 py-2.5 font-body text-[11.5px] font-semibold text-white shadow-sm transition-all hover:bg-[#0d2f21]"
+            >
+              Submit a floor plan
+            </Link>
+            <Link
+              href="/dashboard"
+              className="font-body text-[11.5px] font-medium text-neutral-600 hover:text-black"
+            >
+              Check pipeline status →
+            </Link>
+          </div>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="rounded-[20px] border border-black/[0.08] bg-white px-6 py-12 text-center shadow-sm">
+          <p className="font-body text-[15px] font-semibold text-[#171713]">
+            No completed projects match &ldquo;{search.trim()}&rdquo;
+          </p>
+          <p className="mx-auto mt-2 max-w-[360px] font-body text-[12px] text-neutral-600">
+            Try searching with a different property name, developer, or location.
+          </p>
+          <button
+            type="button"
+            onClick={() => setSearch("")}
+            className="mt-4 rounded-[8px] border border-black/[0.08] bg-white px-3.5 py-1.5 font-body text-[11px] font-medium text-neutral-700 hover:bg-neutral-50"
+          >
+            Clear search
+          </button>
+        </div>
+      ) : (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              coverUrl={project.coverPath ? covers[project.coverPath] : null}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

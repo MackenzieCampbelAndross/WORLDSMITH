@@ -64,3 +64,48 @@ export async function createFileSignedUrls(paths: string[]): Promise<Record<stri
       .map((entry) => [entry.path as string, entry.signedUrl as string]),
   );
 }
+
+export interface UploadResult {
+  url: string;
+  path: string;
+  name: string;
+  size: number;
+}
+
+export async function uploadClientAsset(
+  file: File,
+  category: "avatar" | "company-logo" | "brand-logo" | "brand-guidelines" | string,
+): Promise<UploadResult> {
+  const supabase = getSupabaseClient();
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData.session?.access_token;
+
+  if (!token) {
+    throw new Error("You must be signed in to upload files.");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("category", category);
+
+  const response = await fetch("/api/portal/upload", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  const resJson = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(resJson.message || "Failed to upload asset.");
+  }
+
+  return {
+    url: resJson.url,
+    path: resJson.path,
+    name: resJson.name,
+    size: resJson.size,
+  };
+}

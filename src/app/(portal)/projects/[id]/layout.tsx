@@ -71,14 +71,14 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
 
   if (project === null) {
     return (
-      <div className="border border-[#dbd4c5] bg-[#f3efe4] px-6 py-10">
+      <div className="rounded-[16px] border border-black/[0.08] bg-white px-6 py-10 shadow-sm">
         <p className="font-accent text-[24px] text-[#171713]">You don&apos;t have access to this project.</p>
-        <p className="mt-2 max-w-[440px] font-body text-[12.5px] leading-6 text-[#716b5d]">
+        <p className="mt-2 max-w-[440px] font-body text-[12.5px] leading-6 text-neutral-600">
           It may have been removed, or it belongs to another account.
         </p>
         <Link
           href="/projects"
-          className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] uppercase tracking-[0.13em] text-[#e8e2d5]"
+          className="mt-5 inline-flex rounded-[8px] bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] uppercase tracking-[0.13em] text-white"
         >
           Back to projects
         </Link>
@@ -116,7 +116,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
           <button
             type="button"
             onClick={() => void load()}
-            className="border border-[#d2cab8] px-2.5 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
+            className="rounded-[8px] border border-black/[0.1] px-2.5 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-neutral-600 transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
           >
             Refresh
           </button>
@@ -124,13 +124,13 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
       </div>
 
       {project.status === "DRAFT" && (
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-l-2 border-[#b3914e] bg-[#f6f0e1] px-4 py-3">
-          <p className="font-body text-[11.5px] text-[#6f6249]">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[10px] border-l-2 border-amber-500 bg-amber-50 px-4 py-3">
+          <p className="font-body text-[11.5px] text-amber-900">
             This project is a draft. Finish the brief and submit it to production.
           </p>
           <Link
             href={`/projects/new?draft=${project.id}`}
-            className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#6f6249] underline decoration-[#b3914e]/50 underline-offset-4"
+            className="font-body text-[9.5px] uppercase tracking-[0.12em] text-amber-900 underline decoration-amber-500/50 underline-offset-4"
           >
             Continue setup
           </Link>
@@ -138,8 +138,8 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
       )}
 
       {showSubmitted && (
-        <div className="mt-5 flex items-start justify-between gap-4 border-l-2 border-[#1f5e44] bg-[#e6e3d7] px-4 py-3">
-          <p className="font-body text-[11.5px] leading-5 text-[#2d5c3a]">
+        <div className="mt-5 flex items-start justify-between gap-4 rounded-[10px] border-l-2 border-[#1f5e44] bg-[#eef5f1] px-4 py-3">
+          <p className="font-body text-[11.5px] leading-5 text-[#1f5e44]">
             Project submitted. Our production team is reviewing your brief and will update the
             status here.
           </p>
@@ -147,14 +147,14 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
             type="button"
             onClick={() => setShowSubmitted(false)}
             aria-label="Dismiss submission notice"
-            className="shrink-0 font-body text-[11px] text-[#2d5c3a]/60 hover:text-[#2d5c3a]"
+            className="shrink-0 font-body text-[11px] text-[#1f5e44]/60 hover:text-[#1f5e44]"
           >
             ×
           </button>
         </div>
       )}
 
-      <div className="mt-7 flex gap-6 overflow-x-auto border-b border-[#dbd4c5]">
+      <div className="mt-7 flex gap-6 overflow-x-auto border-b border-black/[0.08]">
         {TABS.map((tab) => {
           const active = current(tab.href);
           return (

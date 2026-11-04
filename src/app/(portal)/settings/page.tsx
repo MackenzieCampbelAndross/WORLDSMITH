@@ -50,7 +50,7 @@ export default function SettingsPage() {
                 className={`block border-l py-2 pl-3 font-body text-[11.5px] transition-colors ${
                   active === section.id
                     ? "border-[#1f5e44] text-[#171713]"
-                    : "border-[#dbd4c5] text-[#8a8374] hover:text-[#1f5e44]"
+                    : "border-neutral-200 text-neutral-400 hover:text-[#1f5e44]"
                 }`}
               >
                 {section.label}
@@ -60,15 +60,15 @@ export default function SettingsPage() {
         </nav>
 
         <div className="space-y-8">
-          <section id="security" className="border border-[#dbd4c5] bg-[#f3efe4]">
-            <div className="border-b border-[#dbd4c5] px-5 py-4">
+          <section id="security" className="rounded-[16px] border border-black/[0.08] bg-white shadow-sm overflow-hidden">
+            <div className="border-b border-black/[0.06] px-5 py-4">
               <h2 className="font-accent text-[22px] leading-none text-[#171713]">Security</h2>
             </div>
             <SecuritySection email={user.email ?? ""} />
           </section>
 
-          <section id="notifications" className="border border-[#dbd4c5] bg-[#f3efe4]">
-            <div className="border-b border-[#dbd4c5] px-5 py-4">
+          <section id="notifications" className="rounded-[16px] border border-black/[0.08] bg-white shadow-sm overflow-hidden">
+            <div className="border-b border-black/[0.06] px-5 py-4">
               <h2 className="font-accent text-[22px] leading-none text-[#171713]">Notifications</h2>
             </div>
             <NotificationsSection
@@ -86,20 +86,20 @@ export default function SettingsPage() {
             />
           </section>
 
-          <section id="account" className="border border-[#dbd4c5] bg-[#f3efe4]">
-            <div className="border-b border-[#dbd4c5] px-5 py-4">
+          <section id="account" className="rounded-[16px] border border-black/[0.08] bg-white shadow-sm overflow-hidden">
+            <div className="border-b border-black/[0.06] px-5 py-4">
               <h2 className="font-accent text-[22px] leading-none text-[#171713]">Account</h2>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-5">
               <div>
                 <p className="font-body text-[11.5px] text-[#3f3b33]">Request account deletion</p>
-                <p className="mt-1 font-body text-[10.5px] text-[#8a8374]">
+                <p className="mt-1 font-body text-[10.5px] text-neutral-500">
                   Account contents and project records are removed after review.
                 </p>
               </div>
               <a
                 href="mailto:crestionlabs@gmail.com?subject=Crestion%20Labs%20account%20deletion%20request"
-                className="border border-[#d2cab8] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
+                className="rounded-[7px] border border-black/[0.08] bg-white px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-neutral-600 transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
               >
                 Contact Crestion Labs
               </a>
@@ -187,7 +187,7 @@ function SecuritySection({ email }: { email: string }) {
         <button
           type="button"
           onClick={() => void signOutEverywhere()}
-          className="mt-4 border border-[#d2cab8] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#8a5a2f] hover:text-[#8a5a2f]"
+          className="mt-4 rounded-[7px] border border-black/[0.08] bg-white px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-neutral-600 transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
         >
           Sign out of all devices
         </button>
@@ -229,12 +229,12 @@ function NotificationsSection({
 
   return (
     <div className="px-5 py-5">
-      <div className="divide-y divide-[#e3ddce]">
+      <div className="divide-y divide-black/[0.06]">
         {rows.map((row) => (
           <label key={row.key} className="flex cursor-pointer items-center justify-between gap-6 py-3.5">
             <span>
               <span className="block font-body text-[11.5px] text-[#3f3b33]">{row.label}</span>
-              <span className="mt-0.5 block font-body text-[10px] text-[#8a8374]">{row.hint}</span>
+              <span className="mt-0.5 block font-body text-[10px] text-neutral-500">{row.hint}</span>
             </span>
             <input
               type="checkbox"
@@ -246,7 +246,7 @@ function NotificationsSection({
         ))}
       </div>
       <FormStatus status={status} savedLabel="Notification preferences saved." errorLabel="We couldn't save your preferences." />
-      <button type="button" onClick={() => void save()} disabled={status === "saving"} className="mt-5 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5] disabled:opacity-60">
+      <button type="button" onClick={() => void save()} disabled={status === "saving"} className="mt-5 rounded-[8px] bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-white disabled:opacity-60 transition-colors hover:bg-[#164935]">
         {status === "saving" ? "Saving…" : "Save preferences"}
       </button>
     </div>

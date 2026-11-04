@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CrestionLabsLogo } from "@/components/CrestionLabsLogo";
 import { useAuth } from "@/components/auth-provider";
 
 type NavIconName =
@@ -76,16 +76,16 @@ const Icon = ({ name, className = "h-[18px] w-[18px]" }: { name: NavIconName; cl
   }
 };
 
-const SearchIcon = () => (
-  <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" aria-hidden="true">
-    <circle cx="8" cy="8" r="4.6" stroke="currentColor" strokeWidth="1.2" />
-    <path d="m11.4 11.4 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-  </svg>
-);
-
 const BellIcon = () => (
   <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" aria-hidden="true">
     <path d="M4.6 12.6h8.8l-1-1.7V8a3.4 3.4 0 0 0-6.8 0v2.9l-1 1.7ZM7.4 14.5a1.9 1.9 0 0 0 3.2 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const SidebarToggleIcon = () => (
+  <svg viewBox="0 0 20 20" className="h-[17px] w-[17px]" fill="none" aria-hidden="true">
+    <rect x="3" y="3.5" width="14" height="13" rx="2" stroke="currentColor" strokeWidth="1.2" />
+    <path d="M7.5 3.5v13" stroke="currentColor" strokeWidth="1.2" />
   </svg>
 );
 
@@ -112,12 +112,21 @@ const ProfileButton = () => {
       aria-label="Profile"
       title={`Profile (${displayName})`}
       className={`group flex items-center gap-2 rounded-full p-0.5 transition-all focus:outline-none ${
-        isProfileActive ? "ring-2 ring-[#123c2b] ring-offset-2 ring-offset-[#e8e2d5]" : "hover:opacity-85"
+        isProfileActive ? "ring-2 ring-[#123c2b] ring-offset-2 ring-offset-white" : "hover:opacity-85"
       }`}
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#123c2b] font-body text-[10.5px] font-semibold text-[#efe9dd] shadow-sm transition-transform group-hover:scale-105">
-        {initials}
-      </span>
+      {profile?.avatarUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={profile.avatarUrl}
+          alt={displayName}
+          className="h-8 w-8 rounded-full object-cover shadow-sm transition-transform group-hover:scale-105"
+        />
+      ) : (
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#123c2b] font-body text-[10.5px] font-semibold text-white shadow-sm transition-transform group-hover:scale-105">
+          {initials}
+        </span>
+      )}
       <span className="hidden pr-1 font-body text-[11.5px] font-medium text-[#17201b] transition-colors group-hover:text-[#123c2b] sm:inline-block">
         {displayName.split(" ")[0]}
       </span>
@@ -129,11 +138,11 @@ const NotificationsMenu = () => (
   <details className="relative">
     <summary
       aria-label="Notifications"
-      className="relative flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full text-[#5f6a62] transition-colors hover:bg-[#efebe0] hover:text-[#17201b] [&::-webkit-details-marker]:hidden"
+      className="relative flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full text-[#5f6a62] transition-colors hover:bg-black/5 hover:text-[#17201b] [&::-webkit-details-marker]:hidden"
     >
       <BellIcon />
     </summary>
-    <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-[10px] border border-[#dbd4c5] bg-white px-4 py-4 shadow-[0_18px_45px_-24px_rgba(0,0,0,0.35)]">
+    <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-[12px] border border-black/[0.08] bg-white px-4 py-4 shadow-[0_18px_45px_-24px_rgba(0,0,0,0.25)]">
       <p className="font-body text-[12px] text-[#17201b]">No new notifications</p>
       <p className="mt-1 font-body text-[10.5px] leading-4 text-[#8d938b]">
         Project updates appear in each project&apos;s Activity.
@@ -146,7 +155,90 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const { user } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [collapsed, setCollapsed] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 8);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("crestion:sidebar-collapsed");
+      if (saved !== null) {
+        setCollapsed(saved === "true");
+      }
+    } catch {}
+  }, []);
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("crestion:sidebar-collapsed", String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const expandSidebar = () => {
+    setCollapsed(false);
+    try {
+      localStorage.setItem("crestion:sidebar-collapsed", "false");
+    } catch {}
+  };
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      // If expanded/dragged even slightly to the right (>= 5px)
+      if (moveEvent.clientX - startX >= 5) {
+        expandSidebar();
+        cleanup();
+      }
+    };
+
+    const onMouseUp = (upEvent: MouseEvent) => {
+      if (upEvent.clientX - startX >= 2 || Math.abs(upEvent.clientX - startX) < 4) {
+        expandSidebar();
+      }
+      cleanup();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+
+  const handleToggleSidebar = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setDrawerOpen((prev) => !prev);
+    } else {
+      toggleCollapsed();
+    }
+  };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "b" || (e.shiftKey && (e.key === "S" || e.key === "s")))) {
+        e.preventDefault();
+        handleToggleSidebar();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   useEffect(() => {
     document.body.classList.add("portal-shell");
@@ -159,129 +251,185 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
   }, [pathname]);
 
   if (!user) {
-    return <div className="min-h-[100svh] bg-[#e8e2d5]" />;
+    return <div className="min-h-[100svh] bg-[#f7f7f7]" />;
   }
 
   const isActive = (item: NavItem) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
-  const pageTitle = pathname.startsWith("/dashboard")
-    ? "Overview"
-    : pathname.startsWith("/settings")
-      ? "Settings"
-      : pathname.startsWith("/support")
-        ? "Support"
-        : pathname.startsWith("/deliverables")
-          ? "Deliverables"
-          : pathname.startsWith("/profile")
-            ? "Profile"
-            : "Projects";
-
-  const renderNav = (items: NavItem[], onNavigate?: () => void) => (
-    <nav className="flex flex-col gap-0.5">
+  const renderNav = (items: NavItem[], isCompressed: boolean, onNavigate?: () => void) => (
+    <nav className={`flex w-full flex-col ${isCompressed ? "items-center gap-2" : "gap-1"}`}>
       {items.map((item) => {
         const active = isActive(item);
+        if (isCompressed) {
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
+              title={item.label}
+              className={`group relative flex h-10 w-10 items-center justify-center rounded-[10px] border transition-all ${
+                active
+                  ? "border-[#2a7857] bg-[#1f5e44] text-white shadow-sm"
+                  : "border-transparent text-neutral-400 hover:bg-white/[0.08] hover:text-white"
+              }`}
+            >
+              <span className="shrink-0">
+                <Icon name={item.icon} />
+              </span>
+              <span className="pointer-events-none absolute left-full ml-3 hidden whitespace-nowrap rounded-[7px] border border-white/10 bg-neutral-900 px-2.5 py-1 font-body text-[11px] font-medium text-white shadow-xl group-hover:block z-50">
+                {item.label}
+              </span>
+            </Link>
+          );
+        }
         return (
           <Link
             key={item.href}
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
-            className={`flex items-center gap-3 rounded-[9px] px-3 py-2.5 font-body text-[12.5px] transition-colors ${
+            className={`flex items-center gap-3 rounded-[10px] border px-3 py-2.5 font-body text-[12.5px] transition-colors ${
               active
-                ? "bg-[#2c5a44] text-[#efe9dd]"
-                : "text-[#e4e9e1]/65 hover:bg-white/[0.06] hover:text-[#efe9dd]"
+                ? "border-[#2a7857] bg-[#1f5e44] text-white shadow-sm"
+                : "border-transparent text-neutral-400 hover:bg-white/[0.08] hover:text-white"
             }`}
           >
-            <Icon name={item.icon} />
-            {item.label}
+            <span className="shrink-0">
+              <Icon name={item.icon} />
+            </span>
+            <span className="truncate">{item.label}</span>
           </Link>
         );
       })}
     </nav>
   );
 
-  const searchForm = (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-        const q = query.trim();
-        window.dispatchEvent(new CustomEvent("crestion:search", { detail: q }));
-        if (!pathname.startsWith("/dashboard")) {
-          window.location.assign(q ? `/projects?q=${encodeURIComponent(q)}` : "/projects");
-        }
-      }}
-      className="hidden h-10 w-[300px] items-center gap-2.5 rounded-[10px] border border-[#e3ded2] bg-white/70 px-3.5 text-[#746f62] transition-colors focus-within:border-[#b9b09c] lg:flex xl:w-[340px]"
-    >
-      <SearchIcon />
-      <input
-        value={query}
-        onChange={(event) => {
-          setQuery(event.target.value);
-          window.dispatchEvent(new CustomEvent("crestion:search", { detail: event.target.value }));
-        }}
-        placeholder="Search projects, files, or deliverables..."
-        aria-label="Search projects, files, or deliverables"
-        className="min-w-0 flex-1 bg-transparent font-body text-[11.5px] text-[#17201b] outline-none placeholder:text-[#95998f]"
-      />
-    </form>
-  );
-
   const brand = (
-    <Link href="/dashboard" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
-      <CrestionLabsLogo size={27} />
-      <span className="font-body text-[12px] font-semibold uppercase tracking-[0.15em] text-[#efe9dd]">
-        Crestion Labs
+    <Link
+      href="/dashboard"
+      title="CrestionLabs"
+      className="block transition-opacity hover:opacity-85"
+    >
+      <span
+        style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
+        className="text-[24px] font-bold tracking-[-0.03em] leading-none text-white"
+      >
+        CrestionLabs
       </span>
     </Link>
   );
 
   return (
-    <div className="flex min-h-[100svh] w-full text-[#17201b]">
-      <aside className="sticky top-0 hidden h-[100svh] w-[226px] shrink-0 flex-col bg-[#123c2b] px-3.5 py-5 lg:flex">
-        <div className="px-2">{brand}</div>
+    <div className="flex min-h-[100svh] w-full bg-[#f7f7f7] text-[#17201b]">
+      <aside
+        className={`sticky top-3 hidden h-[calc(100svh-1.5rem)] shrink-0 flex-col rounded-[20px] bg-black shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)] transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:flex overflow-visible m-3 ${
+          collapsed
+            ? "w-[72px] p-3 items-center"
+            : "w-[240px] p-4 items-stretch"
+        }`}
+      >
+        {/* Edge expand handle when sidebar is collapsed */}
+        {collapsed && (
+          <div
+            onMouseDown={handleResizeStart}
+            onClick={expandSidebar}
+            title="Drag or click to expand sidebar"
+            className="group/resizer absolute -right-2 top-0 bottom-0 w-4 cursor-ew-resize z-50 flex items-center justify-center select-none"
+          >
+            <div className="h-14 w-[3px] rounded-full bg-white/20 opacity-0 group-hover/resizer:opacity-100 group-hover/resizer:bg-white/60 transition-all duration-200" />
+          </div>
+        )}
 
-        <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#e4e9e1]/35">
-          Portal
-        </p>
-        {renderNav(NAV_PRIMARY)}
+        {collapsed ? (
+          <div className="flex flex-col items-center">
+            <Link
+              href="/dashboard"
+              title="CrestionLabs"
+              className="flex h-9 w-9 items-center justify-center transition-transform hover:scale-105"
+            >
+              <span
+                style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
+                className="text-[20px] font-bold tracking-[-0.03em] leading-none text-white select-none"
+              >
+                CL
+              </span>
+            </Link>
+          </div>
+        ) : (
+          <div className="flex w-full items-center justify-between px-2">
+            {brand}
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              aria-label="Compress sidebar"
+              title="Compress sidebar (Ctrl+Shift+S)"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 transition-colors hover:bg-white/[0.08] hover:text-white"
+            >
+              <SidebarToggleIcon />
+            </button>
+          </div>
+        )}
 
-        <div className="mt-auto border-t border-white/10 pt-3">
-          {renderNav(NAV_BOTTOM)}
+        {collapsed ? (
+          <div className="my-3 h-px w-8 bg-white/10" />
+        ) : (
+          <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+            Portal
+          </p>
+        )}
+
+        {renderNav(NAV_PRIMARY, collapsed)}
+
+        <div className={`mt-auto w-full border-t border-white/10 ${collapsed ? "pt-2 flex flex-col items-center" : "pt-3"}`}>
+          {renderNav(NAV_BOTTOM, collapsed)}
         </div>
       </aside>
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#ded7c9] bg-[#e8e2d5]/95 px-4 backdrop-blur-xl sm:px-6">
-          <span className="font-body text-[15px] font-semibold tracking-[-0.01em] text-[#17201b]">
-            {pageTitle}
-          </span>
-
-          <div className="flex items-center gap-1.5">
-            {searchForm}
+        <header
+          className={`sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-out ${
+            scrolled
+              ? "border-b border-black/[0.06] bg-white/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] backdrop-blur-md"
+              : "border-b border-transparent bg-transparent shadow-none"
+          }`}
+        >
+          <div className="flex items-center gap-2.5 lg:hidden">
             <Link
-              href="/projects"
-              aria-label="Search projects"
-              className="flex h-9 w-9 items-center justify-center rounded-full text-[#5f6a62] transition-colors hover:bg-[#efebe0] lg:hidden"
+              href="/dashboard"
+              aria-label="CrestionLabs Dashboard"
+              className="flex items-center transition-transform duration-200 hover:scale-105"
             >
-              <SearchIcon />
+              <Image
+                src="/brand-mark-green.png"
+                alt="CrestionLabs"
+                width={30}
+                height={30}
+                priority
+                className="h-[30px] w-[30px] shrink-0 object-contain"
+              />
             </Link>
-            <NotificationsMenu />
-            <ProfileButton />
+
             <button
               type="button"
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Open portal navigation"
-              className="flex h-9 w-9 items-center justify-center rounded-full text-[#17201b] transition-colors hover:bg-[#efebe0] lg:hidden"
+              onClick={handleToggleSidebar}
+              aria-label="Open sidebar"
+              className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#5f6a62] transition-colors hover:bg-black/5 hover:text-[#17201b]"
             >
-              <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-                <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.2" />
-              </svg>
+              <SidebarToggleIcon />
             </button>
+          </div>
+
+          <div className="ml-auto flex items-center gap-1.5">
+            <NotificationsMenu />
+            <ProfileButton />
           </div>
         </header>
 
-        <main className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 lg:p-6">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col px-4 pb-8 pt-1 sm:px-6 sm:pt-2 lg:px-8">
+          {children}
+        </main>
       </div>
 
       {drawerOpen && (
@@ -290,16 +438,23 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             type="button"
             aria-label="Close portal navigation"
             onClick={() => setDrawerOpen(false)}
-            className="absolute inset-0 bg-black/35"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[272px] flex-col bg-[#123c2b] px-4 py-6">
+          <aside className="absolute inset-y-3 left-3 flex w-[272px] flex-col rounded-[20px] bg-black px-4 py-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
-              {brand}
+              <Link href="/dashboard" onClick={() => setDrawerOpen(false)} className="block transition-opacity hover:opacity-85">
+                <span
+                  style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
+                  className="text-[24px] font-bold tracking-[-0.03em] leading-none text-white"
+                >
+                  CrestionLabs
+                </span>
+              </Link>
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
                 aria-label="Close portal navigation"
-                className="text-[#e4e9e1]/60 hover:text-white"
+                className="text-neutral-400 hover:text-white"
               >
                 <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
                   <path d="M3 3l10 10M13 3 3 13" stroke="currentColor" strokeWidth="1.2" />
@@ -307,13 +462,13 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
               </button>
             </div>
 
-            <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#e4e9e1]/35">
+            <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
               Portal
             </p>
-            {renderNav(NAV_PRIMARY, () => setDrawerOpen(false))}
+            {renderNav(NAV_PRIMARY, false, () => setDrawerOpen(false))}
 
             <div className="mt-auto border-t border-white/10 pt-3">
-              {renderNav(NAV_BOTTOM, () => setDrawerOpen(false))}
+              {renderNav(NAV_BOTTOM, false, () => setDrawerOpen(false))}
             </div>
           </aside>
         </div>
