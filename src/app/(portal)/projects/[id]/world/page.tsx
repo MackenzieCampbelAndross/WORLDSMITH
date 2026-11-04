@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import DeliveredWorld from "@/components/portal/DeliveredWorld";
 import { LoadingBlock } from "@/components/portal/EmptyState";
 import { StatusPill } from "@/components/portal/StatusPill";
 import { useProjectWorkspace } from "@/components/portal/ProjectWorkspaceContext";
-import { fetchWorld, type World } from "@/lib/portal";
+import { fetchWorld, saveProjectCover, type World } from "@/lib/portal";
 import { syncProductionStatus } from "@/lib/production";
 import { STATUS_DESCRIPTIONS } from "@/lib/productionStatus";
 import { useSignedUrls } from "@/lib/use-signed-urls";
@@ -66,6 +66,18 @@ export default function ProjectWorldPage() {
     ? `${world.glbPath.slice(0, world.glbPath.lastIndexOf("/"))}/collision.json`
     : null;
   const previews = useSignedUrls([world?.previewPath, world?.glbPath, collisionPath]);
+
+  const handleStill = useCallback(
+    async (blob: Blob) => {
+      try {
+        await saveProjectCover(project.id, blob);
+        await refresh();
+      } catch {
+        // The card image is cosmetic; the world itself is delivered either way.
+      }
+    },
+    [project.id, refresh],
+  );
 
   const copy = async (value: string, kind: "share" | "embed") => {
     try {
@@ -184,6 +196,7 @@ export default function ProjectWorldPage() {
           <DeliveredWorld
             glbUrl={previews[readyWorld.glbPath]}
             collisionUrl={collisionPath ? previews[collisionPath] ?? null : null}
+            onStill={project.coverPath ? undefined : handleStill}
             className="h-full w-full rounded-[12px]"
           />
         ) : readyWorld.previewPath && previews[readyWorld.previewPath] ? (

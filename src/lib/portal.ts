@@ -1,5 +1,5 @@
 import { getSupabaseClient } from "@/lib/supabase";
-import { createFileSignedUrls, deleteProjectObject, uploadProjectObject } from "@/lib/storage";
+import { createFileSignedUrls, deleteProjectObject, uploadProjectCover, uploadProjectObject } from "@/lib/storage";
 
 export const PROJECT_TYPES = [
   "Residential",
@@ -682,6 +682,12 @@ export async function setProjectCover(id: string, path: string | null): Promise<
     .update({ cover_path: path })
     .eq("id", id);
   if (error) fail(error);
+}
+
+/** Stores a frame of the finished world as the project's card image. */
+export async function saveProjectCover(id: string, blob: Blob): Promise<void> {
+  const { path } = await uploadProjectCover(id, blob);
+  await setProjectCover(id, path);
 }
 
 export async function logActivity(

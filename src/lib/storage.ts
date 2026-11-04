@@ -21,6 +21,20 @@ export async function uploadProjectObject(
   return { path };
 }
 
+export async function uploadProjectCover(projectId: string, blob: Blob): Promise<{ path: string }> {
+  const supabase = getSupabaseClient();
+  const path = `${projectId}/cover/world.jpg`;
+  const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
+    contentType: "image/jpeg",
+    upsert: true,
+  });
+  if (error) {
+    console.error("[storage] cover upload rejected", { path, error });
+    throw new Error(error.message);
+  }
+  return { path };
+}
+
 export async function deleteProjectObject(path: string): Promise<void> {
   const supabase = getSupabaseClient();
   const { error } = await supabase.storage.from(BUCKET).remove([path]);

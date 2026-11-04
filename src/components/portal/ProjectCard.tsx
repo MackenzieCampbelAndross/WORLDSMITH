@@ -43,7 +43,17 @@ export const ProjectCard = ({
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
           />
         ) : (
-          <span className="sr-only">{project.name}</span>
+          <div className="flex h-full w-full items-center justify-center bg-[#1b4a36] px-6">
+            <svg viewBox="0 0 400 200" className="h-full w-full" fill="none" aria-hidden="true">
+              <path
+                d="M40 160h320M80 160V95l45-28 45 28v65M170 160V72l60-34 60 34v88M230 160v-46h52M80 118h90M170 92h120"
+                stroke="#f4f1e6"
+                strokeWidth="0.9"
+                opacity="0.5"
+              />
+            </svg>
+            <span className="sr-only">{project.name}</span>
+          </div>
         )}
       </Link>
 

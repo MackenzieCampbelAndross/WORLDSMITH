@@ -42,6 +42,7 @@ interface DeliveredWorldProps {
   glbUrl: string;
   collisionUrl: string | null;
   className?: string;
+  onStill?: (blob: Blob) => void;
 }
 
 const EYE_HEIGHT = 1.6;
@@ -170,10 +171,11 @@ const skyFragmentShader = `
   }
 `;
 
-export function DeliveredWorld({ glbUrl, collisionUrl, className = "" }: DeliveredWorldProps) {
+export function DeliveredWorld({ glbUrl, collisionUrl, className = "", onStill }: DeliveredWorldProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<Runtime | null>(null);
+  const stillRef = useRef<DeliveredWorldProps["onStill"]>(onStill);
   const [status, setStatus] = useState<"loading" | "ready" | "failed">("loading");
   const [message, setMessage] = useState<string | null>(null);
   const [rooms, setRooms] = useState<RoomArea[]>([]);
@@ -279,6 +281,35 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "" }: Deliver
     window.addEventListener("keyup", onKeyUp);
 
     const clock = new THREE.Clock();
+    let stillAt = 0;
+    // The drawing buffer is cleared once the frame is presented, so the still has
+    // to be read from the GPU inside the same animation frame as the render.
+    const captureStill = () => {
+      const gl = renderer.getContext();
+      const width = gl.drawingBufferWidth;
+      const height = gl.drawingBufferHeight;
+      const pixels = new Uint8Array(width * height * 4);
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      const rowBytes = width * 4;
+      const flipped = new Uint8ClampedArray(pixels.length);
+      for (let y = 0; y < height; y++) {
+        const source = (height - 1 - y) * rowBytes;
+        for (let x = 0; x < rowBytes; x += 4) {
+          const target = y * rowBytes + x;
+          flipped[target] = pixels[source + x];
+          flipped[target + 1] = pixels[source + x + 1];
+          flipped[target + 2] = pixels[source + x + 2];
+          flipped[target + 3] = 255;
+        }
+      }
+      const surface = document.createElement("canvas");
+      surface.width = width;
+      surface.height = height;
+      surface.getContext("2d")?.putImageData(new ImageData(flipped, width, height), 0, 0);
+      surface.toBlob((blob) => {
+        if (blob) stillRef.current?.(blob);
+      }, "image/jpeg", 0.85);
+    };
     const animate = () => {
       frame = requestAnimationFrame(animate);
       const delta = Math.min(clock.getDelta(), 0.05);
@@ -306,6 +337,10 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "" }: Deliver
       camera.rotation.y = view.yaw;
       camera.rotation.x = view.pitch;
       renderer.render(scene, camera);
+      if (stillAt && performance.now() >= stillAt) {
+        stillAt = 0;
+        captureStill();
+      }
     };
 
     const applyLighting = (
@@ -473,6 +508,8 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "" }: Deliver
         };
 
         setStatus("ready");
+        // Give the embedded textures a moment to decode before the still is taken.
+        if (stillRef.current) stillAt = performance.now() + 2500;
         animate();
       })
       .catch((error) => {
@@ -526,6 +563,10 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "" }: Deliver
   useEffect(() => {
     runtimeRef.current?.setQuality(quality);
   }, [quality]);
+
+  useEffect(() => {
+    stillRef.current = onStill;
+  }, [onStill]);
 
   useEffect(() => {
     const onChange = () => setFullscreen(Boolean(document.fullscreenElement));
