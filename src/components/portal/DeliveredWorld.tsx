@@ -593,13 +593,6 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "", onStill }
     >
       <div ref={mountRef} className="absolute inset-0" />
 
-      {/* The hero's datum lines and paper grain, laid over the scene. */}
-      <div className="grid-lines pointer-events-none absolute inset-0 z-[5]" aria-hidden="true" />
-      <div
-        className="paper-grain pointer-events-none absolute inset-0 z-[5] opacity-80 mix-blend-soft-light"
-        aria-hidden="true"
-      />
-
       {status === "loading" && (
         <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 font-body text-[11px] text-[#f0f1e6]/70">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#a8cebc]" aria-hidden="true" />

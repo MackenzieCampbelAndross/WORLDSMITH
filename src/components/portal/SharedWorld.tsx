@@ -65,7 +65,7 @@ export function SharedWorld({ slug, chrome }: { slug: string; chrome: boolean })
   }
 
   return (
-    <div className="min-h-dvh bg-[#2f3423] px-4 py-6 sm:px-8 sm:py-10">
+    <div className="rule-lines rule-lines--on-dark min-h-dvh bg-[#2f3423] px-4 py-6 sm:px-8 sm:py-10">
       <div className="mx-auto w-full max-w-[1180px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
