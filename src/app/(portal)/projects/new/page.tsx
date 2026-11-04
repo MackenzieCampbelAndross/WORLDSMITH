@@ -216,7 +216,7 @@ export default function NewProjectPage() {
 
   return (
     <div className="mx-auto max-w-[760px]">
-      <Link href="/projects" className="font-body text-[10px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#2f3423]">
+      <Link href="/projects" className="font-body text-[10px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#1f5e44]">
         ← Projects
       </Link>
 
@@ -238,7 +238,7 @@ export default function NewProjectPage() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="The Grove"
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#2f3423]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
           />
         </div>
 
@@ -250,7 +250,7 @@ export default function NewProjectPage() {
             id="submission-type"
             value={type}
             onChange={(event) => setType(event.target.value as (typeof PROJECT_TYPES)[number])}
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#2f3423]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
           >
             {PROJECT_TYPES.map((option) => (
               <option key={option} value={option}>
@@ -275,7 +275,7 @@ export default function NewProjectPage() {
               value={width}
               onChange={(event) => setWidth(event.target.value)}
               placeholder="12.0"
-              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#2f3423]"
+              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
             />
           </div>
           <div>
@@ -292,7 +292,7 @@ export default function NewProjectPage() {
               value={length}
               onChange={(event) => setLength(event.target.value)}
               placeholder="9.0"
-              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#2f3423]"
+              className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors placeholder:text-[#a0988a] focus:border-[#1f5e44]"
             />
           </div>
         </div>
@@ -309,7 +309,7 @@ export default function NewProjectPage() {
             id="submission-style"
             value={style}
             onChange={(event) => setStyle(event.target.value as FurnishingStyle)}
-            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#2f3423]"
+            className="mt-2 h-11 w-full rounded-[7px] border border-[#d2cab8] bg-transparent px-3 font-body text-[13px] text-[#171713] outline-none transition-colors focus:border-[#1f5e44]"
           >
             {FURNISHING_STYLES.map((option) => (
               <option key={option} value={option}>
@@ -327,10 +327,10 @@ export default function NewProjectPage() {
                 <p className="truncate font-body text-[12px] text-[#3f3b33]">{existingPlan ?? "Floor plan uploaded"}</p>
                 <p className="mt-0.5 font-body text-[10px] text-[#8a8374]">Source plan ready for Creston.</p>
               </div>
-              <span className="font-body text-[10px] text-[#333a29]">Uploaded</span>
+              <span className="font-body text-[10px] text-[#2d5c3a]">Uploaded</span>
             </div>
           ) : (
-            <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-[7px] border border-dashed border-[#cfc8b8] bg-[#faf6ec] px-5 py-8 text-center transition-colors hover:border-[#2f3423]">
+            <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-[7px] border border-dashed border-[#cfc8b8] bg-[#faf6ec] px-5 py-8 text-center transition-colors hover:border-[#1f5e44]">
               <span className="font-body text-[12px] text-[#3f3b33]">Choose the floor plan</span>
               <span className="mt-1 font-body text-[10px] text-[#8a8374]">PNG, JPG or PDF · up to 15 MB</span>
               <span className="mt-1 font-body text-[10px] text-[#8a8374]">
@@ -376,7 +376,7 @@ export default function NewProjectPage() {
                 <span
                   aria-hidden="true"
                   className={`mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full ${
-                    item.passed ? "bg-[#2f3423]" : "bg-[#a13328]"
+                    item.passed ? "bg-[#1f5e44]" : "bg-[#a13328]"
                   }`}
                 />
                 <span
@@ -401,7 +401,7 @@ export default function NewProjectPage() {
         <button
           type="submit"
           disabled={busy !== null}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-[7px] bg-[#2f3423] px-5 py-3 font-body text-[12px] font-medium text-[#e8e2d5] transition-colors hover:bg-[#252a1b] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-[7px] bg-[#1f5e44] px-5 py-3 font-body text-[12px] font-medium text-[#e8e2d5] transition-colors hover:bg-[#174d37] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {busyLabel}
         </button>

@@ -18,7 +18,7 @@ export const EmptyState = ({
     {actionLabel && actionHref && (
       <Link
         href={actionHref}
-        className="mt-6 inline-flex items-center gap-2 bg-[#2f3423] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8e2d5] transition-colors hover:bg-[#252a1b]"
+        className="mt-6 inline-flex items-center gap-2 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8e2d5] transition-colors hover:bg-[#174d37]"
       >
         <span aria-hidden="true">+</span>
         {actionLabel}

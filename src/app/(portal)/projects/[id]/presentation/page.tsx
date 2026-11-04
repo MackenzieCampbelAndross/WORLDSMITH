@@ -66,7 +66,7 @@ export default function ProjectPresentationPage() {
               <StatusPill status={project.status} />
             </div>
           </div>
-          <Link href={`/projects/${project.id}/activity`} className="font-body text-[10.5px] text-[#2f3423] hover:opacity-70">
+          <Link href={`/projects/${project.id}/activity`} className="font-body text-[10.5px] text-[#1f5e44] hover:opacity-70">
             View activity →
           </Link>
         </div>
@@ -105,14 +105,14 @@ export default function ProjectPresentationPage() {
                   href={shareUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-[7px] bg-[#2f3423] px-4 py-2 font-body text-[10.5px] font-medium text-[#e8e2d5] hover:bg-[#252a1b]"
+                  className="rounded-[7px] bg-[#1f5e44] px-4 py-2 font-body text-[10.5px] font-medium text-[#e8e2d5] hover:bg-[#174d37]"
                 >
                   Open world ↗
                 </a>
                 <button
                   type="button"
                   onClick={() => void copy(shareUrl, "link")}
-                  className="rounded-[7px] border border-[#d2cab8] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#2f3423]"
+                  className="rounded-[7px] border border-[#d2cab8] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#1f5e44]"
                 >
                   {copied === "link" ? "Copied" : "Copy link"}
                 </button>
@@ -132,7 +132,7 @@ export default function ProjectPresentationPage() {
                     "embed",
                   )
                 }
-                className="mt-4 rounded-[7px] border border-[#d2cab8] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#2f3423]"
+                className="mt-4 rounded-[7px] border border-[#d2cab8] px-4 py-2 font-body text-[10.5px] text-[#3f3b33] hover:border-[#1f5e44]"
               >
                 {copied === "embed" ? "Copied" : "Copy embed"}
               </button>

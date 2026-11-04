@@ -78,7 +78,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
         </p>
         <Link
           href="/projects"
-          className="mt-5 inline-flex bg-[#2f3423] px-4 py-2.5 font-body text-[10px] uppercase tracking-[0.13em] text-[#e8e2d5]"
+          className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] uppercase tracking-[0.13em] text-[#e8e2d5]"
         >
           Back to projects
         </Link>
@@ -93,7 +93,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
     <ProjectWorkspaceProvider project={project} refresh={load}>
       <Link
         href="/projects"
-        className="font-body text-[9.5px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#2f3423]"
+        className="font-body text-[9.5px] uppercase tracking-[0.16em] text-[#8a8374] transition-colors hover:text-[#1f5e44]"
       >
         ← All projects
       </Link>
@@ -116,7 +116,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
           <button
             type="button"
             onClick={() => void load()}
-            className="border border-[#d2cab8] px-2.5 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#2f3423] hover:text-[#2f3423]"
+            className="border border-[#d2cab8] px-2.5 py-1.5 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
           >
             Refresh
           </button>
@@ -138,8 +138,8 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
       )}
 
       {showSubmitted && (
-        <div className="mt-5 flex items-start justify-between gap-4 border-l-2 border-[#2f3423] bg-[#e6e3d7] px-4 py-3">
-          <p className="font-body text-[11.5px] leading-5 text-[#333a29]">
+        <div className="mt-5 flex items-start justify-between gap-4 border-l-2 border-[#1f5e44] bg-[#e6e3d7] px-4 py-3">
+          <p className="font-body text-[11.5px] leading-5 text-[#2d5c3a]">
             Project submitted. Our production team is reviewing your brief and will update the
             status here.
           </p>
@@ -147,7 +147,7 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
             type="button"
             onClick={() => setShowSubmitted(false)}
             aria-label="Dismiss submission notice"
-            className="shrink-0 font-body text-[11px] text-[#333a29]/60 hover:text-[#333a29]"
+            className="shrink-0 font-body text-[11px] text-[#2d5c3a]/60 hover:text-[#2d5c3a]"
           >
             ×
           </button>
@@ -163,8 +163,8 @@ export default function ProjectWorkspaceLayout({ children }: { children: React.R
               href={`${base}${tab.href}`}
               className={`shrink-0 border-b py-3 font-body text-[10.5px] uppercase tracking-[0.12em] transition-colors ${
                 active
-                  ? "border-[#2f3423] text-[#171713]"
-                  : "border-transparent text-[#8a8374] hover:text-[#2f3423]"
+                  ? "border-[#1f5e44] text-[#171713]"
+                  : "border-transparent text-[#8a8374] hover:text-[#1f5e44]"
               }`}
             >
               {tab.label}

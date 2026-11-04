@@ -75,7 +75,7 @@ export default function ProjectOverviewPage() {
             <h2 className="font-accent text-[22px] leading-none text-[#171713]">Production status</h2>
             <Link
               href={`/projects/${project.id}/activity`}
-              className="font-body text-[10px] text-[#2f3423] transition-opacity hover:opacity-70"
+              className="font-body text-[10px] text-[#1f5e44] transition-opacity hover:opacity-70"
             >
               View activity →
             </Link>
@@ -103,7 +103,7 @@ export default function ProjectOverviewPage() {
                 {project.status === "DRAFT" && (
                   <Link
                     href={`/projects/new?draft=${project.id}`}
-                    className="mt-4 inline-flex bg-[#2f3423] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#e8e2d5]"
+                    className="mt-4 inline-flex bg-[#1f5e44] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#e8e2d5]"
                   >
                     Continue setup
                   </Link>
@@ -167,7 +167,7 @@ export default function ProjectOverviewPage() {
                   <span className="block font-body text-[12px] text-[#3f3b33]">{action.label}</span>
                   <span className="mt-0.5 block font-body text-[10px] text-[#8a8374]">{action.hint}</span>
                 </span>
-                <span className="font-body text-[13px] text-[#2f3423]" aria-hidden="true">→</span>
+                <span className="font-body text-[13px] text-[#1f5e44]" aria-hidden="true">→</span>
               </Link>
             ))}
           </div>

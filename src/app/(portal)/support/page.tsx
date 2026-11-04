@@ -40,7 +40,7 @@ export default function SupportPage() {
           <div className="mt-4 flex flex-wrap gap-2.5">
             <a
               href="mailto:crestionlabs@gmail.com"
-              className="inline-flex items-center gap-2 rounded-[7px] bg-[#202415] px-3.5 py-2 font-body text-[10.5px] font-medium text-[#efe9dd] hover:bg-[#0f3626]"
+              className="inline-flex items-center gap-2 rounded-[7px] bg-[#143f2d] px-3.5 py-2 font-body text-[10.5px] font-medium text-[#efe9dd] hover:bg-[#0f3626]"
             >
               crestionlabs@gmail.com
             </a>

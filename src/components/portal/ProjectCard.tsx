@@ -43,7 +43,7 @@ export const ProjectCard = ({
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-[#2b3021] px-6">
+          <div className="flex h-full w-full items-center justify-center bg-[#1b4a36] px-6">
             <svg viewBox="0 0 400 200" className="h-full w-full" fill="none" aria-hidden="true">
               <path
                 d="M40 160h320M80 160V95l45-28 45 28v65M170 160V72l60-34 60 34v88M230 160v-46h52M80 118h90M170 92h120"
@@ -58,7 +58,7 @@ export const ProjectCard = ({
       </Link>
 
       <div className="flex flex-1 flex-col px-5 pb-4 pt-4">
-        <Link href={openHref} className="font-accent text-[24px] leading-none text-[#171713] transition-colors hover:text-[#2f3423]">
+        <Link href={openHref} className="font-accent text-[24px] leading-none text-[#171713] transition-colors hover:text-[#1f5e44]">
           {project.name}
         </Link>
         <p className="mt-2 font-body text-[11.5px] text-[#716b5d]">
@@ -97,13 +97,13 @@ export const ProjectCard = ({
           <div className="mt-4 flex gap-2">
             <Link
               href={`/projects/${project.id}/world`}
-              className="inline-flex flex-1 items-center justify-center rounded-[6px] bg-[#2f3423] px-3 py-2 font-body text-[10.5px] font-medium text-[#e8e2d5] transition-colors hover:bg-[#252a1b]"
+              className="inline-flex flex-1 items-center justify-center rounded-[6px] bg-[#1f5e44] px-3 py-2 font-body text-[10.5px] font-medium text-[#e8e2d5] transition-colors hover:bg-[#174d37]"
             >
               Enter World
             </Link>
             <Link
               href={`/projects/${project.id}/presentation`}
-              className="inline-flex items-center justify-center rounded-[6px] border border-[#d2cab8] px-3 py-2 font-body text-[10.5px] text-[#3f3b33] transition-colors hover:border-[#2f3423]"
+              className="inline-flex items-center justify-center rounded-[6px] border border-[#d2cab8] px-3 py-2 font-body text-[10.5px] text-[#3f3b33] transition-colors hover:border-[#1f5e44]"
             >
               Share
             </Link>

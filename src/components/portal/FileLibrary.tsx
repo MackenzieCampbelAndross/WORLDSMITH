@@ -195,7 +195,7 @@ export const FileLibrary = ({
             </select>
             <label
               htmlFor={inputId}
-              className="cursor-pointer border border-[#2f3423] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.14em] text-[#2f3423] transition-colors hover:bg-[#2f3423] hover:text-[#e8e2d5]"
+              className="cursor-pointer border border-[#1f5e44] px-3 py-1.5 font-body text-[9px] uppercase tracking-[0.14em] text-[#1f5e44] transition-colors hover:bg-[#1f5e44] hover:text-[#e8e2d5]"
             >
               Browse
             </label>
@@ -221,7 +221,7 @@ export const FileLibrary = ({
           {queue.map((item) => (
             <div key={item.key} className="flex items-center justify-between border border-[#dbd4c5] px-4 py-2.5">
               <span className="truncate font-body text-[11.5px] text-[#514c42]">{item.name}</span>
-              <span className={`font-body text-[10px] ${item.status === "error" ? "text-[#8a5a2f]" : item.status === "done" ? "text-[#2f3423]" : "text-[#8a8374]"}`}>
+              <span className={`font-body text-[10px] ${item.status === "error" ? "text-[#8a5a2f]" : item.status === "done" ? "text-[#1f5e44]" : "text-[#8a8374]"}`}>
                 {item.message ?? "Uploading…"}
               </span>
             </div>
@@ -232,7 +232,7 @@ export const FileLibrary = ({
       {error ? (
         <div className="mt-6 border border-[#dbd4c5] px-5 py-6">
           <p className="font-body text-[12px] text-[#8a5a2f]">We couldn&apos;t load these files.</p>
-          <button type="button" onClick={() => void load()} className="mt-3 font-body text-[10px] uppercase tracking-[0.12em] text-[#2f3423]">
+          <button type="button" onClick={() => void load()} className="mt-3 font-body text-[10px] uppercase tracking-[0.12em] text-[#1f5e44]">
             Try again
           </button>
         </div>
@@ -248,7 +248,7 @@ export const FileLibrary = ({
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search files…"
-              className="h-8 min-w-[180px] flex-1 border border-[#ddd7c9] bg-transparent px-3 font-body text-[11px] outline-none placeholder:text-[#a0988a] focus:border-[#2f3423]"
+              className="h-8 min-w-[180px] flex-1 border border-[#ddd7c9] bg-transparent px-3 font-body text-[11px] outline-none placeholder:text-[#a0988a] focus:border-[#1f5e44]"
             />
             <select
               value={categoryFilter}
@@ -301,7 +301,7 @@ export const FileLibrary = ({
                     <td className="py-3 pr-5 font-body text-[10.5px] text-[#8a8374]">{formatRelative(file.createdAt)}</td>
                     <td className="py-3 text-right">
                       <div className="flex items-center justify-end gap-3">
-                        <button type="button" onClick={() => void openFile(file)} className="font-body text-[9px] uppercase tracking-[0.1em] text-[#2f3423] hover:opacity-70">
+                        <button type="button" onClick={() => void openFile(file)} className="font-body text-[9px] uppercase tracking-[0.1em] text-[#1f5e44] hover:opacity-70">
                           Open
                         </button>
                         <button

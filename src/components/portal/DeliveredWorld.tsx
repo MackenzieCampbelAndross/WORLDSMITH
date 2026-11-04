@@ -588,7 +588,7 @@ export function DeliveredWorld({ glbUrl, collisionUrl, className = "", onStill }
   return (
     <div
       ref={panelRef}
-      className={`relative overflow-hidden bg-[#2f3423] ${className}`}
+      className={`relative overflow-hidden bg-[#1f5e44] ${className}`}
       data-testid="delivered-world"
     >
       <div ref={mountRef} className="absolute inset-0" />

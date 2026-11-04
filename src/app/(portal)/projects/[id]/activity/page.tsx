@@ -66,7 +66,7 @@ export default function ProjectActivityPage() {
             void load();
             setRefreshKey((key) => key + 1);
           }}
-          className="rounded-[7px] border border-[#d2cab8] px-3 py-2 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#2f3423] hover:text-[#2f3423]"
+          className="rounded-[7px] border border-[#d2cab8] px-3 py-2 font-body text-[9px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
         >
           Refresh
         </button>
@@ -94,7 +94,7 @@ export default function ProjectActivityPage() {
         {project.status === "DRAFT" && (
           <Link
             href={`/projects/new?draft=${project.id}`}
-            className="mt-5 inline-flex bg-[#2f3423] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5]"
+            className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5]"
           >
             Continue setup
           </Link>
@@ -102,7 +102,7 @@ export default function ProjectActivityPage() {
         {project.status === "COMPLETED" && (
           <Link
             href={`/projects/${project.id}/world`}
-            className="mt-5 inline-flex bg-[#2f3423] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5]"
+            className="mt-5 inline-flex bg-[#1f5e44] px-4 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5]"
           >
             Open World →
           </Link>
@@ -120,9 +120,9 @@ export default function ProjectActivityPage() {
                 <span
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] ${
                     done
-                      ? "border-[#2f3423] bg-[#2f3423] text-[#e8e2d5]"
+                      ? "border-[#1f5e44] bg-[#1f5e44] text-[#e8e2d5]"
                       : current
-                        ? "border-[#2f3423] text-[#2f3423]"
+                        ? "border-[#1f5e44] text-[#1f5e44]"
                         : "border-[#cfc8b8] text-transparent"
                   }`}
                 >
@@ -168,7 +168,7 @@ export default function ProjectActivityPage() {
           <div className="mt-4 border-t border-[#dbd4c5]">
             {activity.map((entry) => (
               <div key={entry.id} className="flex gap-4 border-b border-[#e3ddce] py-4">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#2f3423]" />
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1f5e44]" />
                 <div className="min-w-0 flex-1">
                   <p className="font-body text-[12.5px] leading-5 text-[#3f3b33]">{entry.message}</p>
                   <p className="mt-1 font-body text-[9px] uppercase tracking-[0.12em] text-[#8a8374]">

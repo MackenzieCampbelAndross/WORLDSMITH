@@ -112,7 +112,7 @@ export default function ProjectWorldPage() {
     const inProduction = ["PROCESSING", "INTERNAL_REVIEW"].includes(project.status);
     return (
       <div>
-        <div className="relative overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-[#2b3021] px-6 py-12 text-center sm:px-12">
+        <div className="relative overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-[#1b4a36] px-6 py-12 text-center sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-20">
             <svg viewBox="0 0 400 200" className="h-full w-full" fill="none" aria-hidden="true">
               <path d="M40 160h320M80 160V95l45-28 45 28v65M170 160V72l60-34 60 34v88M230 160v-46h52M80 118h90M170 92h120" stroke="#e8e2d5" strokeWidth="0.7" />
@@ -156,7 +156,7 @@ export default function ProjectWorldPage() {
           {project.status === "DRAFT" && (
             <Link
               href={`/projects/new?draft=${project.id}`}
-              className="relative mt-8 inline-flex bg-[#e8e2d5] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-[#2b3021]"
+              className="relative mt-8 inline-flex bg-[#e8e2d5] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-[#1b4a36]"
             >
               Continue setup
             </Link>
@@ -181,7 +181,7 @@ export default function ProjectWorldPage() {
             href={readyWorld.worldUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 bg-[#2f3423] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-[#e8e2d5] transition-colors hover:bg-[#252a1b]"
+            className="inline-flex items-center gap-2 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.13em] text-[#e8e2d5] transition-colors hover:bg-[#174d37]"
           >
             Open World
             <span aria-hidden="true">↗</span>
@@ -191,7 +191,7 @@ export default function ProjectWorldPage() {
         )}
       </div>
 
-      <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-[#2b3021]">
+      <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-[12px] border border-[#dbd4c5] bg-[#1b4a36]">
         {readyWorld.glbPath && previews[readyWorld.glbPath] ? (
           <DeliveredWorld
             glbUrl={previews[readyWorld.glbPath]}
@@ -227,7 +227,7 @@ export default function ProjectWorldPage() {
                   <p className="font-body text-[11.5px] text-[#3f3b33]">Shareable link</p>
                   <p className="mt-0.5 max-w-[360px] truncate font-body text-[10px] text-[#8a8374]">{readyWorld.worldUrl}</p>
                 </div>
-                <button type="button" onClick={() => void copy(readyWorld.worldUrl ?? "", "share")} className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#2f3423]">
+                <button type="button" onClick={() => void copy(readyWorld.worldUrl ?? "", "share")} className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#1f5e44]">
                   {copied === "share" ? "Copied" : "Copy"}
                 </button>
               </div>
@@ -246,7 +246,7 @@ export default function ProjectWorldPage() {
                       "embed",
                     )
                   }
-                  className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#2f3423]"
+                  className="font-body text-[9.5px] uppercase tracking-[0.12em] text-[#1f5e44]"
                 >
                   {copied === "embed" ? "Copied" : "Copy embed"}
                 </button>

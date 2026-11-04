@@ -8,7 +8,7 @@ const tones: Record<ProjectStatus, { bg: string; text: string; dot: string }> = 
   PROCESSING: { bg: "bg-[#e4ebf2]", text: "text-[#34536b]", dot: "bg-[#5d7f99]" },
   INTERNAL_REVIEW: { bg: "bg-[#ece9f3]", text: "text-[#574a75]", dot: "bg-[#7c6b9e]" },
   CLIENT_REVIEW: { bg: "bg-[#f3e8df]", text: "text-[#7a5538]", dot: "bg-[#a97b56]" },
-  COMPLETED: { bg: "bg-[#e3efe4]", text: "text-[#333a29]", dot: "bg-[#4e8a5c]" },
+  COMPLETED: { bg: "bg-[#e3efe4]", text: "text-[#2d5c3a]", dot: "bg-[#4e8a5c]" },
 };
 
 export const StatusPill = ({ status }: { status: ProjectStatus }) => {

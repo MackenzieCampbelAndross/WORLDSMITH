@@ -112,13 +112,13 @@ const ProfileButton = () => {
       aria-label="Profile"
       title={`Profile (${displayName})`}
       className={`group flex items-center gap-2 rounded-full p-0.5 transition-all focus:outline-none ${
-        isProfileActive ? "ring-2 ring-[#232818] ring-offset-2 ring-offset-[#e8e2d5]" : "hover:opacity-85"
+        isProfileActive ? "ring-2 ring-[#123c2b] ring-offset-2 ring-offset-[#e8e2d5]" : "hover:opacity-85"
       }`}
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#232818] font-body text-[10.5px] font-semibold text-[#efe9dd] shadow-sm transition-transform group-hover:scale-105">
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#123c2b] font-body text-[10.5px] font-semibold text-[#efe9dd] shadow-sm transition-transform group-hover:scale-105">
         {initials}
       </span>
-      <span className="hidden pr-1 font-body text-[11.5px] font-medium text-[#17201b] transition-colors group-hover:text-[#232818] sm:inline-block">
+      <span className="hidden pr-1 font-body text-[11.5px] font-medium text-[#17201b] transition-colors group-hover:text-[#123c2b] sm:inline-block">
         {displayName.split(" ")[0]}
       </span>
     </Link>
@@ -189,7 +189,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             aria-current={active ? "page" : undefined}
             className={`flex items-center gap-3 rounded-[9px] px-3 py-2.5 font-body text-[12.5px] transition-colors ${
               active
-                ? "bg-[#3a4230] text-[#efe9dd]"
+                ? "bg-[#2c5a44] text-[#efe9dd]"
                 : "text-[#e4e9e1]/65 hover:bg-white/[0.06] hover:text-[#efe9dd]"
             }`}
           >
@@ -238,7 +238,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex min-h-[100svh] w-full text-[#17201b]">
-      <aside className="sticky top-0 hidden h-[100svh] w-[226px] shrink-0 flex-col bg-[#232818] px-3.5 py-5 lg:flex">
+      <aside className="sticky top-0 hidden h-[100svh] w-[226px] shrink-0 flex-col bg-[#123c2b] px-3.5 py-5 lg:flex">
         <div className="px-2">{brand}</div>
 
         <p className="mb-1.5 mt-7 px-3 font-body text-[8.5px] font-semibold uppercase tracking-[0.2em] text-[#e4e9e1]/35">
@@ -292,7 +292,7 @@ export const PortalShell = ({ children }: { children: React.ReactNode }) => {
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-black/35"
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[272px] flex-col bg-[#232818] px-4 py-6">
+          <aside className="absolute inset-y-0 left-0 flex w-[272px] flex-col bg-[#123c2b] px-4 py-6">
             <div className="flex items-start justify-between gap-4">
               {brand}
               <button

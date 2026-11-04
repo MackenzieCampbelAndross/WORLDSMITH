@@ -49,8 +49,8 @@ export default function SettingsPage() {
                 onClick={() => setActive(section.id)}
                 className={`block border-l py-2 pl-3 font-body text-[11.5px] transition-colors ${
                   active === section.id
-                    ? "border-[#2f3423] text-[#171713]"
-                    : "border-[#dbd4c5] text-[#8a8374] hover:text-[#2f3423]"
+                    ? "border-[#1f5e44] text-[#171713]"
+                    : "border-[#dbd4c5] text-[#8a8374] hover:text-[#1f5e44]"
                 }`}
               >
                 {section.label}
@@ -99,7 +99,7 @@ export default function SettingsPage() {
               </div>
               <a
                 href="mailto:crestionlabs@gmail.com?subject=Crestion%20Labs%20account%20deletion%20request"
-                className="border border-[#d2cab8] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#2f3423] hover:text-[#2f3423]"
+                className="border border-[#d2cab8] px-4 py-2 font-body text-[9.5px] uppercase tracking-[0.12em] text-[#716b5d] transition-colors hover:border-[#1f5e44] hover:text-[#1f5e44]"
               >
                 Contact Crestion Labs
               </a>
@@ -240,13 +240,13 @@ function NotificationsSection({
               type="checkbox"
               checked={prefs[row.key]}
               onChange={(event) => setPrefs((current) => ({ ...current, [row.key]: event.target.checked }))}
-              className="h-4 w-4 accent-[#2f3423]"
+              className="h-4 w-4 accent-[#1f5e44]"
             />
           </label>
         ))}
       </div>
       <FormStatus status={status} savedLabel="Notification preferences saved." errorLabel="We couldn't save your preferences." />
-      <button type="button" onClick={() => void save()} disabled={status === "saving"} className="mt-5 bg-[#2f3423] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5] disabled:opacity-60">
+      <button type="button" onClick={() => void save()} disabled={status === "saving"} className="mt-5 bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#e8e2d5] disabled:opacity-60">
         {status === "saving" ? "Saving…" : "Save preferences"}
       </button>
     </div>
@@ -263,7 +263,7 @@ function FormStatus({
   errorLabel: string;
 }) {
   if (status === "saved") {
-    return <p className="mt-4 font-body text-[11px] text-[#2f3423]">{savedLabel}</p>;
+    return <p className="mt-4 font-body text-[11px] text-[#1f5e44]">{savedLabel}</p>;
   }
   if (status === "error") {
     return <p className="mt-4 font-body text-[11px] text-[#8a5a2f]">{errorLabel}</p>;

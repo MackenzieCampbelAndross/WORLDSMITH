@@ -98,11 +98,11 @@ export default function ProjectsPage() {
             className={
               variant === "sidebar"
                 ? `flex items-center justify-between gap-2 rounded-[9px] px-2.5 py-2 font-body text-[11.5px] transition-colors ${
-                    active ? "bg-[#2b3021] text-[#e8e2d5]" : "text-[#4d5a50] hover:bg-[#f2ece0]"
+                    active ? "bg-[#1b4a36] text-[#e8e2d5]" : "text-[#4d5a50] hover:bg-[#f2ece0]"
                   }`
                 : `inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-body text-[11px] transition-colors ${
                     active
-                      ? "border-[#2b3021] bg-[#2b3021] text-[#e8e2d5]"
+                      ? "border-[#1b4a36] bg-[#1b4a36] text-[#e8e2d5]"
                       : "border-[#dbd4c5] bg-[#f3efe4] text-[#716b5d]"
                   }`
             }
@@ -154,7 +154,7 @@ export default function ProjectsPage() {
           {section === "CREATE" && projects.length > 0 && (
             <Link
               href="/projects/new"
-              className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#202415] px-4 py-2.5 font-body text-[11px] font-medium text-[#efe9dd] transition-colors hover:bg-[#0f3626]"
+              className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-[#143f2d] px-4 py-2.5 font-body text-[11px] font-medium text-[#efe9dd] transition-colors hover:bg-[#0f3626]"
             >
               <span aria-hidden="true" className="text-[14px] leading-none">
                 +
@@ -185,7 +185,7 @@ export default function ProjectsPage() {
                 setLoading(true);
                 setRefreshKey((key) => key + 1);
               }}
-              className="mt-4 inline-flex rounded-[7px] bg-[#2f3423] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8e2d5]"
+              className="mt-4 inline-flex rounded-[7px] bg-[#1f5e44] px-5 py-2.5 font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8e2d5]"
             >
               Try again
             </button>

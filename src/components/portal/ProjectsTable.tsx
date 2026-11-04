@@ -72,7 +72,7 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
               >
                 <td className="py-2.5 pr-4">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[7px] bg-[#e6e3d7] font-body text-[12px] font-semibold text-[#3c4430]">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[7px] bg-[#e6e3d7] font-body text-[12px] font-semibold text-[#2f6b4c]">
                       {project.name.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="min-w-0">
