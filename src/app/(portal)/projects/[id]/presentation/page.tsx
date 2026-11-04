@@ -128,7 +128,7 @@ export default function ProjectPresentationPage() {
                 type="button"
                 onClick={() =>
                   void copy(
-                    `<iframe src="${embedUrl}" width="100%" height="640" style="border:0" allowfullscreen></iframe>`,
+                    `<iframe src="${embedUrl}" width="100%" height="640" style="border:0" allow="fullscreen; pointer-lock; keyboard-map" allowfullscreen></iframe>`,
                     "embed",
                   )
                 }

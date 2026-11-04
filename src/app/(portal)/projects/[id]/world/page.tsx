@@ -62,7 +62,10 @@ export default function ProjectWorldPage() {
     };
   }, [project.id, refresh]);
 
-  const previews = useSignedUrls([world?.previewPath, world?.glbPath]);
+  const collisionPath = world?.glbPath
+    ? `${world.glbPath.slice(0, world.glbPath.lastIndexOf("/"))}/collision.json`
+    : null;
+  const previews = useSignedUrls([world?.previewPath, world?.glbPath, collisionPath]);
 
   const copy = async (value: string, kind: "share" | "embed") => {
     try {
@@ -180,9 +183,7 @@ export default function ProjectWorldPage() {
         {readyWorld.glbPath && previews[readyWorld.glbPath] ? (
           <DeliveredWorld
             glbUrl={previews[readyWorld.glbPath]}
-            collisionUrl={
-              previews[`${readyWorld.glbPath.replace("scene.glb", "collision.json")}`] ?? null
-            }
+            collisionUrl={collisionPath ? previews[collisionPath] ?? null : null}
             className="h-full w-full rounded-[12px]"
           />
         ) : readyWorld.previewPath && previews[readyWorld.previewPath] ? (
@@ -228,7 +229,7 @@ export default function ProjectWorldPage() {
                   type="button"
                   onClick={() =>
                     void copy(
-                      `<iframe src="${readyWorld.embedUrl}" width="100%" height="640" style="border:0" allowfullscreen></iframe>`,
+                      `<iframe src="${readyWorld.embedUrl}" width="100%" height="640" style="border:0" allow="fullscreen; pointer-lock; keyboard-map" allowfullscreen></iframe>`,
                       "embed",
                     )
                   }
