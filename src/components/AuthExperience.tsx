@@ -38,7 +38,7 @@ function otpErrorMessage(error: unknown): string {
     return "We couldn't send a code to that email. Check the address or create an account.";
   }
   if (/fetch|network/i.test(message)) {
-    return "Network error. Check your connection and try again.";
+    return "Authentication server is unreachable. Please ensure the Supabase backend project is active and unpaused.";
   }
   return "Something went wrong. Please try again.";
 }
