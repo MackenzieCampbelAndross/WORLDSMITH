@@ -418,22 +418,69 @@ const mapActivity = (row: Row): Activity => ({
   createdAt: toDate(row.created_at),
 });
 
-const mapWorld = (row: Row): World => ({
-  id: String(row.id ?? ""),
-  projectId: String(row.project_id ?? ""),
-  status:
-    row.status === "review" || row.status === "ready" || row.status === "failed"
-      ? row.status
-      : "processing",
-  worldUrl: typeof row.world_url === "string" ? row.world_url : null,
-  previewPath: typeof row.preview_path === "string" ? row.preview_path : null,
-  shareSlug: typeof row.share_slug === "string" ? row.share_slug : null,
-  embedUrl: typeof row.embed_url === "string" ? row.embed_url : null,
-  glbPath: typeof row.glb_path === "string" ? row.glb_path : null,
-  fbxPath: typeof row.fbx_path === "string" ? row.fbx_path : null,
-  objPath: typeof row.obj_path === "string" ? row.obj_path : null,
-  sourceAvailable: row.source_available === true,
-});
+export function resolveWorldUrl(
+  rawUrl: string | null,
+  slug: string | null,
+  kind: "share" | "embed" = "share",
+): string | null {
+  if (typeof window !== "undefined") {
+    const origin = window.location.origin;
+    if (slug) return `${origin}/${kind}/${slug}`;
+    if (rawUrl) {
+      try {
+        const parsed = new URL(rawUrl);
+        if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+          return `${origin}${parsed.pathname}${parsed.search}`;
+        }
+      } catch {
+        // ignore invalid url
+      }
+    }
+  }
+
+  const fallbackOrigin = (
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.SITE_URL ||
+    "https://crestionlabs.vercel.app"
+  ).replace(/\/$/, "");
+
+  if (slug) return `${fallbackOrigin}/${kind}/${slug}`;
+  if (rawUrl) {
+    try {
+      const parsed = new URL(rawUrl);
+      if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+        return `${fallbackOrigin}${parsed.pathname}${parsed.search}`;
+      }
+    } catch {
+      // ignore
+    }
+    return rawUrl;
+  }
+  return null;
+}
+
+const mapWorld = (row: Row): World => {
+  const shareSlug = typeof row.share_slug === "string" ? row.share_slug : null;
+  const rawWorldUrl = typeof row.world_url === "string" ? row.world_url : null;
+  const rawEmbedUrl = typeof row.embed_url === "string" ? row.embed_url : null;
+
+  return {
+    id: String(row.id ?? ""),
+    projectId: String(row.project_id ?? ""),
+    status:
+      row.status === "review" || row.status === "ready" || row.status === "failed"
+        ? row.status
+        : "processing",
+    worldUrl: resolveWorldUrl(rawWorldUrl, shareSlug, "share"),
+    previewPath: typeof row.preview_path === "string" ? row.preview_path : null,
+    shareSlug,
+    embedUrl: resolveWorldUrl(rawEmbedUrl, shareSlug, "embed"),
+    glbPath: typeof row.glb_path === "string" ? row.glb_path : null,
+    fbxPath: typeof row.fbx_path === "string" ? row.fbx_path : null,
+    objPath: typeof row.obj_path === "string" ? row.obj_path : null,
+    sourceAvailable: row.source_available === true,
+  };
+};
 
 const mapAnalytics = (row: Row): AnalyticsRow => ({
   id: String(row.id ?? ""),

@@ -30,9 +30,27 @@ type Headers = Record<string, string>;
 
 // Absolute base used to build the share and embed links handed to clients.
 export function siteBase(request: Request): string {
-  const configured = process.env.SITE_URL?.trim();
-  const base = configured || new URL(request.url).origin;
-  return base.replace(/\/$/, "");
+  const configured =
+    process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+
+  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+  const forwardedHost =
+    request.headers.get("x-forwarded-host") || request.headers.get("host");
+  if (
+    forwardedHost &&
+    !forwardedHost.includes("localhost") &&
+    !forwardedHost.includes("127.0.0.1")
+  ) {
+    return `${forwardedProto}://${forwardedHost}`.replace(/\/$/, "");
+  }
+
+  const base = new URL(request.url).origin;
+  if (!base.includes("localhost") && !base.includes("127.0.0.1")) {
+    return base.replace(/\/$/, "");
+  }
+
+  return "https://crestionlabs.vercel.app";
 }
 
 // The slug is the only thing guarding a shared walkthrough, so it has to be
